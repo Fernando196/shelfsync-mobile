@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native projects (generado por `expo prebuild` / `expo run:android` / `expo run:ios`)
+android/
+ios/
+
+# EAS / credenciales
+credentials.json
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Metro
+.metro-health-check*
+
+# Logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Variables de entorno locales
+.env
+.env*.local
+
+# TypeScript
+*.tsbuildinfo
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Claude Code (config local de esta maquina)
+.claude/settings.local.json
+
+# Capturas/artefactos temporales de debug
+screen.png
