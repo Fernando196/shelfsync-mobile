@@ -1,11 +1,12 @@
-import React, { useCallback, useState } from "react";
-import { View, Text, Pressable, ActivityIndicator, Image, Alert } from "react-native";
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { useNavigation } from "@react-navigation/native";
-import { Flashlight, FlashlightOff, Package, Printer, FileText } from "lucide-react-native";
-import { getItemBySku, photoUrl, InventoryItem } from "../api/client";
-import ThermalPreviewModal from "../components/ThermalPreviewModal";
-import { hapticSelect, hapticError } from "../lib/haptics";
+import React, { useCallback, useState } from 'react';
+import { View, Text, Pressable, ActivityIndicator, Image, Alert } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useNavigation } from '@react-navigation/native';
+import { Flashlight, FlashlightOff, Package, Printer, FileText } from 'lucide-react-native';
+import { getItemBySku, photoUrl } from '../api/client';
+import ThermalPreviewModal from '../components/ThermalPreviewModal';
+import { hapticSelect, hapticError } from '../lib/haptics';
+import { InventoryItem } from '../interfaces/item.interface';
 
 export default function ScannerScreen() {
   const navigation = useNavigation<any>();
@@ -31,12 +32,12 @@ export default function ScannerScreen() {
         setFound(item);
       } catch (e: any) {
         hapticError();
-        Alert.alert("No encontrado", e?.message ?? "No se pudo buscar el articulo");
+        Alert.alert('No encontrado', e?.message ?? 'No se pudo buscar el articulo');
       } finally {
         setLoading(false);
       }
     },
-    [loading, found]
+    [loading, found],
   );
 
   if (!permission) {
@@ -50,8 +51,13 @@ export default function ScannerScreen() {
   if (!permission.granted) {
     return (
       <View className="flex-1 items-center justify-center bg-white px-8">
-        <Text className="text-slate-600 text-center mb-4">Se necesita acceso a la camara para escanear codigos QR.</Text>
-        <Pressable onPress={requestPermission} className="bg-primary-600 rounded-xl px-5 py-3 active:scale-95">
+        <Text className="text-slate-600 text-center mb-4">
+          Se necesita acceso a la camara para escanear codigos QR.
+        </Text>
+        <Pressable
+          onPress={requestPermission}
+          className="bg-primary-600 rounded-xl px-5 py-3 active:scale-95"
+        >
           <Text className="text-white font-semibold">Dar permiso</Text>
         </Pressable>
       </View>
@@ -63,7 +69,7 @@ export default function ScannerScreen() {
       <CameraView
         style={{ flex: 1 }}
         enableTorch={torch}
-        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+        barcodeScannerSettings={{ barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93'] }}
         onBarcodeScanned={loading || found ? undefined : onScanned}
       />
 
@@ -75,7 +81,7 @@ export default function ScannerScreen() {
             height: 240,
             borderRadius: 24,
             borderWidth: 3,
-            borderColor: "rgba(79,70,229,0.9)",
+            borderColor: 'rgba(79,70,229,0.9)',
           }}
         />
       </View>
@@ -100,8 +106,8 @@ export default function ScannerScreen() {
         <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-5 pb-8">
           <View className="flex-row items-center">
             <View className="w-16 h-16 rounded-xl bg-slate-100 items-center justify-center overflow-hidden mr-3">
-              {found.photos[0] ? (
-                <Image source={{ uri: photoUrl(found.photos[0].url) }} className="w-16 h-16" />
+              {found.files?.[0] ? (
+                <Image source={{ uri: photoUrl(found.files?.[0].url) }} className="w-16 h-16" />
               ) : (
                 <Package size={26} color="#94a3b8" />
               )}
@@ -117,7 +123,7 @@ export default function ScannerScreen() {
 
           <View className="flex-row mt-5">
             <Pressable
-              onPress={() => navigation.navigate("ItemDetail", { id: found.id })}
+              onPress={() => navigation.navigate('ItemDetail', { id: found.id })}
               className="flex-1 flex-row items-center justify-center bg-primary-600 rounded-xl py-3 mr-2 active:scale-95"
             >
               <FileText size={16} color="#fff" />
@@ -142,10 +148,16 @@ export default function ScannerScreen() {
         <ThermalPreviewModal
           visible={showPrint}
           onClose={() => setShowPrint(false)}
-          product={{ sku: found.sku, name: found.name, qty: found.qty, location: found.location }}
+          product={{
+            id: found.id,
+            sku: found.sku,
+            name: found.name,
+            qty: found.qty,
+            location: found.location,
+          }}
           onGoToPrinterSetup={() => {
             setShowPrint(false);
-            navigation.navigate("Settings");
+            navigation.navigate('Settings');
           }}
         />
       )}

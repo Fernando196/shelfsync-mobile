@@ -1,16 +1,25 @@
-import React, { useCallback, useState } from "react";
-import { View, Text, FlatList, Pressable, ActivityIndicator, RefreshControl, Alert } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { CloudUpload, RefreshCw, Trash2, CheckCheck, X } from "lucide-react-native";
-import { listQueue, syncAll, syncEntry, clearSynced, removeEntry, QueueEntry } from "../lib/syncQueue";
-import StatusPill, { PillTone } from "../components/StatusPill";
-import { hapticSuccess, hapticTap, hapticSelect } from "../lib/haptics";
+import React, { useCallback, useState } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+  RefreshControl,
+  Alert,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { CloudUpload, RefreshCw, Trash2, CheckCheck, X } from 'lucide-react-native';
+import { listQueue, syncAll, syncEntry, clearSynced, removeEntry } from '../lib/syncQueue';
+import StatusPill, { PillTone } from '../components/StatusPill';
+import { hapticSuccess, hapticTap, hapticSelect } from '../lib/haptics';
+import { QueueEntry } from '../interfaces/queue.interface';
 
-const STATUS_META: Record<QueueEntry["status"], { label: string; tone: PillTone }> = {
-  pending: { label: "Pendiente", tone: "warning" },
-  syncing: { label: "Sincronizando", tone: "info" },
-  synced: { label: "Sincronizado", tone: "success" },
-  error: { label: "Error", tone: "danger" },
+const STATUS_META: Record<QueueEntry['status'], { label: string; tone: PillTone }> = {
+  pending: { label: 'Pendiente', tone: 'warning' },
+  syncing: { label: 'Sincronizando', tone: 'info' },
+  synced: { label: 'Sincronizado', tone: 'success' },
+  error: { label: 'Error', tone: 'danger' },
 };
 
 export default function SyncQueueScreen() {
@@ -26,10 +35,10 @@ export default function SyncQueueScreen() {
   useFocusEffect(
     useCallback(() => {
       load();
-    }, [load])
+    }, [load]),
   );
 
-  const pendingCount = entries.filter((e) => e.status === "pending" || e.status === "error").length;
+  const pendingCount = entries.filter((e) => e.status === 'pending' || e.status === 'error').length;
 
   const handleSyncAll = async () => {
     hapticTap();
@@ -54,20 +63,20 @@ export default function SyncQueueScreen() {
 
   const handleRemove = (entry: QueueEntry) => {
     Alert.alert(
-      "Quitar de la cola",
+      'Quitar de la cola',
       `"${entry.product.name || entry.product.sku}" se quita de este dispositivo. Esto no borra nada del servidor.`,
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: 'Cancelar', style: 'cancel' },
         {
-          text: "Quitar",
-          style: "destructive",
+          text: 'Quitar',
+          style: 'destructive',
           onPress: async () => {
             hapticSelect();
             await removeEntry(entry.localId);
             await load();
           },
         },
-      ]
+      ],
     );
   };
 
@@ -82,7 +91,9 @@ export default function SyncQueueScreen() {
       <View className="px-5 pt-4 pb-3">
         <Text className="text-2xl font-bold text-slate-800">Sincronizacion</Text>
         <Text className="text-slate-400 text-sm mt-0.5">
-          {pendingCount > 0 ? `${pendingCount} productos pendientes por subir` : "Todo sincronizado"}
+          {pendingCount > 0
+            ? `${pendingCount} productos pendientes por subir`
+            : 'Todo sincronizado'}
         </Text>
 
         <View className="flex-row mt-4">
@@ -90,15 +101,17 @@ export default function SyncQueueScreen() {
             onPress={handleSyncAll}
             disabled={syncingAll || pendingCount === 0}
             className={`flex-1 flex-row items-center justify-center rounded-xl py-3 mr-2 active:scale-95 ${
-              pendingCount === 0 ? "bg-slate-200" : "bg-primary-600"
+              pendingCount === 0 ? 'bg-slate-200' : 'bg-primary-600'
             }`}
           >
             {syncingAll ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <>
-                <CloudUpload size={16} color={pendingCount === 0 ? "#94a3b8" : "#fff"} />
-                <Text className={`font-semibold ml-2 text-sm ${pendingCount === 0 ? "text-slate-400" : "text-white"}`}>
+                <CloudUpload size={16} color={pendingCount === 0 ? '#94a3b8' : '#fff'} />
+                <Text
+                  className={`font-semibold ml-2 text-sm ${pendingCount === 0 ? 'text-slate-400' : 'text-white'}`}
+                >
                   Sincronizar todo
                 </Text>
               </>
@@ -141,11 +154,11 @@ export default function SyncQueueScreen() {
                 </View>
               </View>
 
-              {item.status === "error" && item.error && (
+              {item.status === 'error' && item.error && (
                 <Text className="text-xs text-rose-500 mt-2">{item.error}</Text>
               )}
 
-              {(item.status === "pending" || item.status === "error") && (
+              {(item.status === 'pending' || item.status === 'error') && (
                 <Pressable
                   onPress={() => handleRetry(item.localId)}
                   disabled={retryingId === item.localId}
@@ -156,7 +169,9 @@ export default function SyncQueueScreen() {
                   ) : (
                     <>
                       <RefreshCw size={13} color="#334155" />
-                      <Text className="text-slate-700 text-xs font-medium ml-1.5">Reintentar ahora</Text>
+                      <Text className="text-slate-700 text-xs font-medium ml-1.5">
+                        Reintentar ahora
+                      </Text>
                     </>
                   )}
                 </Pressable>

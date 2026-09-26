@@ -1,16 +1,8 @@
-import React from "react";
-import { View, Text, Image, Pressable } from "react-native";
-import { Package, MapPin } from "lucide-react-native";
-import StatusPill, { PillTone } from "./StatusPill";
-
-export interface ProductCardData {
-  sku: string;
-  name: string;
-  qty: number;
-  location: string;
-  category: string;
-  thumbnailUri?: string;
-}
+import React from 'react';
+import { View, Text, Image, Pressable } from 'react-native';
+import { Package, MapPin } from 'lucide-react-native';
+import StatusPill, { PillTone } from './StatusPill';
+import { ProductCardData } from '../interfaces/product.interface';
 
 export default function ProductCard({
   item,
@@ -49,7 +41,7 @@ export default function ProductCard({
           <View className="flex-row items-center flex-1">
             <MapPin size={12} color="#94a3b8" />
             <Text className="text-xs text-slate-500 ml-1 flex-1" numberOfLines={1}>
-              {item.location || "Sin ubicacion"}
+              {item.location || 'Sin ubicacion'}
             </Text>
           </View>
           <View className="bg-indigo-50 rounded-full px-2 py-0.5 ml-2">

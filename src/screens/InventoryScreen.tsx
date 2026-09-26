@@ -1,17 +1,26 @@
-import React, { useCallback, useState } from "react";
-import { View, Text, TextInput, FlatList, RefreshControl, Alert } from "react-native";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { Search, PackageSearch, WifiOff } from "lucide-react-native";
-import { listItems, photoUrl, InventoryItem } from "../api/client";
-import { listQueue, QueueEntry } from "../lib/syncQueue";
-import ProductCard, { ProductCardData } from "../components/ProductCard";
-import { PillTone } from "../components/StatusPill";
+import React, { useCallback, useState } from 'react';
+import { View, Text, TextInput, FlatList, RefreshControl, Alert } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Search, PackageSearch, WifiOff } from 'lucide-react-native';
+import { listItems, photoUrl } from '../api/client';
+import { listQueue } from '../lib/syncQueue';
+import ProductCard from '../components/ProductCard';
+import { PillTone } from '../components/StatusPill';
+import { InventoryItem } from '../interfaces/item.interface';
+import { QueueEntry } from '../interfaces/queue.interface';
+import { ProductCardData } from '../interfaces/product.interface';
 
-type Row = { key: string; card: ProductCardData; statusLabel?: string; statusTone?: PillTone; onPress?: () => void };
+type Row = {
+  key: string;
+  card: ProductCardData;
+  statusLabel?: string;
+  statusTone?: PillTone;
+  onPress?: () => void;
+};
 
 export default function InventoryScreen() {
   const navigation = useNavigation<any>();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [offline, setOffline] = useState(false);
@@ -34,7 +43,7 @@ export default function InventoryScreen() {
   useFocusEffect(
     useCallback(() => {
       load(query);
-    }, [load, query])
+    }, [load, query]),
   );
 
   const onRefresh = async () => {
@@ -50,20 +59,25 @@ export default function InventoryScreen() {
       name: item.name,
       qty: item.qty,
       location: item.location,
-      category: item.category,
-      thumbnailUri: item.photos[0] ? photoUrl(item.photos[0].url) : undefined,
+      category: item.category?.name,
+      thumbnailUri: item?.files?.length ? photoUrl(item.files[0].url) : undefined,
     },
-    onPress: () => navigation.navigate("ItemDetail", { id: item.id }),
+    onPress: () => navigation.navigate('ItemDetail', { id: item.id }),
   }));
 
   const pendingRows: Row[] = queue
-    .filter((e) => e.status !== "synced")
-    .filter((e) => !query || e.product.sku.toLowerCase().includes(query.toLowerCase()) || e.product.name.toLowerCase().includes(query.toLowerCase()))
+    .filter((e) => e.status !== 'synced')
+    .filter(
+      (e) =>
+        !query ||
+        e.product.sku.toLowerCase().includes(query.toLowerCase()) ||
+        e.product.name.toLowerCase().includes(query.toLowerCase()),
+    )
     .map((entry) => {
       const toneByStatus: Record<string, { label: string; tone: PillTone }> = {
-        pending: { label: "Pendiente", tone: "warning" },
-        syncing: { label: "Sincronizando", tone: "info" },
-        error: { label: "Error de sync", tone: "danger" },
+        pending: { label: 'Pendiente', tone: 'warning' },
+        syncing: { label: 'Sincronizando', tone: 'info' },
+        error: { label: 'Error de sync', tone: 'danger' },
       };
       const status = toneByStatus[entry.status] ?? toneByStatus.pending;
       return {
@@ -73,17 +87,16 @@ export default function InventoryScreen() {
           name: entry.product.name,
           qty: entry.product.qty,
           location: entry.product.location,
-          category: entry.product.category,
           thumbnailUri: entry.product.photoUris[0],
         },
         statusLabel: status.label,
         statusTone: status.tone,
         onPress: () =>
           Alert.alert(
-            "Aun no sincronizado",
-            entry.status === "error"
-              ? entry.error ?? "Hubo un error al sincronizar este producto."
-              : "Este producto se guardo localmente y se subira cuando haya conexion. Puedes reintentar desde la pestana Sincronizar."
+            'Aun no sincronizado',
+            entry.status === 'error'
+              ? (entry.error ?? 'Hubo un error al sincronizar este producto.')
+              : 'Este producto se guardo localmente y se subira cuando haya conexion. Puedes reintentar desde la pestana Sincronizar.',
           ),
       };
     });
@@ -123,7 +136,12 @@ export default function InventoryScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         renderItem={({ item }) => (
-          <ProductCard item={item.card} statusLabel={item.statusLabel} statusTone={item.statusTone} onPress={item.onPress} />
+          <ProductCard
+            item={item.card}
+            statusLabel={item.statusLabel}
+            statusTone={item.statusTone}
+            onPress={item.onPress}
+          />
         )}
         ListEmptyComponent={
           <View className="items-center mt-24">
