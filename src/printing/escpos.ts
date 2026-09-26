@@ -40,15 +40,15 @@ export function qrCommand(
 }
 
 export interface InventoryTicketData {
+  id: string;
   sku: string;
   name?: string;
   qty?: number | string;
   location?: string;
 }
 
-export function buildInventoryTicket(data: InventoryTicketData): number[] {
+export function buildInventoryTicket(data: InventoryTicketData,payloadQr: string): number[] {
   const now = formatDateTimeEs(new Date());
-  const qrPayload = JSON.stringify(data);
 
   return [
     ESC, 0x40, // init
@@ -67,7 +67,7 @@ export function buildInventoryTicket(data: InventoryTicketData): number[] {
     ...textBytes(`Fecha:     ${now}`),
     ...textBytes(" "),
     ESC, 0x61, 1, // centrar el QR
-    ...qrCommand(qrPayload, { size: 6, errorCorrection: "M" }),
+    ...qrCommand(payloadQr, { size: 6, errorCorrection: "M" }),
     ESC, 0x64, 3, // avanzar 3 lineas
     GS, 0x56, 0x00, // corte total
   ];

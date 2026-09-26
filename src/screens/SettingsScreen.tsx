@@ -107,7 +107,7 @@ export default function SettingsScreen() {
     hapticTap();
     setTesting(true);
     try {
-      await printInventoryTicket({ sku: "TEST-001", name: "Ticket de prueba", qty: 1, location: "Bodega" });
+      await printInventoryTicket({ id:'pruebas', sku: "TEST-001", name: "Ticket de prueba", qty: 1, location: "Bodega" }, `shelfsync://item/pruebas`);
       hapticSuccess();
     } catch (e: any) {
       hapticError();

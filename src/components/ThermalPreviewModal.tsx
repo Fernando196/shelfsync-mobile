@@ -1,24 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Modal, View, Text, Pressable, ActivityIndicator, Alert } from "react-native";
-import QRCode from "react-native-qrcode-svg";
-import { Printer, X, Bluetooth, TriangleAlert } from "lucide-react-native";
-import { getConnectedPrinter, printInventoryTicket } from "../printing/PrinterService";
-import { hapticSuccess, hapticError, hapticTap } from "../lib/haptics";
-import { formatDateEs } from "../lib/formatDate";
-
-export interface ThermalTicketProduct {
-  sku: string;
-  name: string;
-  qty: number | string;
-  location: string;
-}
-
-interface ThermalPreviewModalProps {
-  visible: boolean;
-  onClose: () => void;
-  product: ThermalTicketProduct;
-  onGoToPrinterSetup?: () => void;
-}
+import React, { useEffect, useState } from 'react';
+import { Modal, View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
+import { Printer, X, Bluetooth, TriangleAlert } from 'lucide-react-native';
+import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
+import { hapticSuccess, hapticError, hapticTap } from '../lib/haptics';
+import { formatDateEs } from '../lib/formatDate';
+import { ThermalPreviewModalProps } from '../interfaces/thermal.interface';
 
 export default function ThermalPreviewModal({
   visible,
@@ -33,19 +20,19 @@ export default function ThermalPreviewModal({
     if (visible) setPrinterName(getConnectedPrinter()?.name ?? null);
   }, [visible]);
 
-  const qrPayload = JSON.stringify({ sku: product.sku, name: product.name, qty: product.qty, location: product.location });
+  const qrPayload = product.id;
   const today = formatDateEs(new Date());
 
   const handlePrint = async () => {
     hapticTap();
     setPrinting(true);
     try {
-      await printInventoryTicket(product);
+      await printInventoryTicket(product, `shelfsync://item/${product.id}`);
       hapticSuccess();
-      Alert.alert("Etiqueta enviada", "La MP210 deberia estar imprimiendo la etiqueta ahora.");
+      Alert.alert('Etiqueta enviada', 'La MP210 deberia estar imprimiendo la etiqueta ahora.');
     } catch (e: any) {
       hapticError();
-      Alert.alert("Error al imprimir", e?.message ?? String(e));
+      Alert.alert('Error al imprimir', e?.message ?? String(e));
     } finally {
       setPrinting(false);
     }
@@ -67,7 +54,7 @@ export default function ThermalPreviewModal({
             <QRCode value={qrPayload} size={128} color="#0f172a" backgroundColor="#f8fafc" />
             <Text className="font-bold text-slate-900 mt-3">{product.name || product.sku}</Text>
             <Text className="text-slate-600 text-xs mt-1">SKU {product.sku}</Text>
-            <Text className="text-slate-600 text-xs">{product.location || "Sin ubicacion"}</Text>
+            <Text className="text-slate-600 text-xs">{product.location || 'Sin ubicacion'}</Text>
             <Text className="text-slate-400 text-[10px] mt-1">{today}</Text>
           </View>
 
@@ -75,7 +62,9 @@ export default function ThermalPreviewModal({
             {printerName ? (
               <View className="flex-row items-center bg-emerald-50 rounded-xl px-3 py-2">
                 <Bluetooth size={16} color="#10b981" />
-                <Text className="text-emerald-700 text-sm font-medium ml-2">{printerName} conectada</Text>
+                <Text className="text-emerald-700 text-sm font-medium ml-2">
+                  {printerName} conectada
+                </Text>
               </View>
             ) : (
               <Pressable
@@ -94,15 +83,17 @@ export default function ThermalPreviewModal({
             onPress={handlePrint}
             disabled={!printerName || printing}
             className={`flex-row items-center justify-center rounded-xl py-4 mt-4 active:scale-95 ${
-              !printerName || printing ? "bg-slate-200" : "bg-primary-600"
+              !printerName || printing ? 'bg-slate-200' : 'bg-primary-600'
             }`}
           >
             {printing ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <>
-                <Printer size={18} color={!printerName ? "#94a3b8" : "#fff"} />
-                <Text className={`font-semibold ml-2 ${!printerName ? "text-slate-400" : "text-white"}`}>
+                <Printer size={18} color={!printerName ? '#94a3b8' : '#fff'} />
+                <Text
+                  className={`font-semibold ml-2 ${!printerName ? 'text-slate-400' : 'text-white'}`}
+                >
                   Imprimir etiqueta
                 </Text>
               </>

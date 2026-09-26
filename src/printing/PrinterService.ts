@@ -182,8 +182,8 @@ async function writeRawBytes(bytes: number[]): Promise<void> {
   }
 }
 
-export async function printInventoryTicket(data: InventoryTicketData): Promise<void> {
-  const ticketBytes = buildInventoryTicket(data);
+export async function printInventoryTicket(data: InventoryTicketData,payloadQr: string): Promise<void> {
+  const ticketBytes = buildInventoryTicket(data, payloadQr);
   await writeRawBytes(ticketBytes);
 }
 
