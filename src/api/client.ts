@@ -1,9 +1,12 @@
-import { getAccessToken, notifyUnauthorized } from "../lib/auth";
+import { File } from 'expo-file-system';
+import { getAccessToken, notifyUnauthorized } from '../lib/auth';
+import { LoginResponse } from '../interfaces/login.interface';
+import { InventoryItem, UpsertItemInput } from '../interfaces/item.interface';
 
 // Cambia esto por la IP local de la maquina donde corre el backend - el
 // celular no es la misma maquina que tu PC, "localhost" ahi apuntaria al
 // propio telefono. Ejemplo: "http://192.168.1.79:4000"
-export const API_BASE_URL = "http://192.168.1.79:4000";
+export const API_BASE_URL = 'http://192.168.1.79:4000';
 
 // fetch en React Native no tiene timeout por defecto: si el telefono no
 // alcanza al backend (IP equivocada, otra red WiFi, firewall) la promesa se
@@ -19,8 +22,10 @@ async function fetchWithTimeout(input: string, init: RequestInit): Promise<Respo
   try {
     return await fetch(input, { ...init, signal: controller.signal });
   } catch (e: any) {
-    if (e?.name === "AbortError") {
-      throw new Error("Tiempo de espera agotado contactando al servidor. Revisa la conexion o la IP configurada.");
+    if (e?.name === 'AbortError') {
+      throw new Error(
+        'Tiempo de espera agotado contactando al servidor. Revisa la conexion o la IP configurada.',
+      );
     }
     throw e;
   } finally {
@@ -28,53 +33,16 @@ async function fetchWithTimeout(input: string, init: RequestInit): Promise<Respo
   }
 }
 
-export interface InventoryPhoto {
-  id: string;
-  filename: string;
-  url: string;
-  createdAt: string;
-}
-
-export interface InventoryItem {
-  id: string;
-  sku: string;
-  name: string;
-  qty: number;
-  location: string;
-  category: string;
-  latitude: number | null;
-  longitude: number | null;
-  photos: InventoryPhoto[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface UpsertItemInput {
-  id?: string;
-  sku: string;
-  name: string;
-  qty: number;
-  location: string;
-  category: string;
-  latitude?: number;
-  longitude?: number;
-}
-
-export interface LoginResponse {
-  accessToken: string;
-  user: { id: string; email: string; name?: string; role?: string };
-}
-
 /** Login unico por dispositivo (ver src/lib/auth.ts): el token que devuelve
  * se guarda y se reusa en cada request hasta que el operario cierra sesion. */
 export function login(email: string, password: string): Promise<LoginResponse> {
-  return request("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
+  return request('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
 }
 
 async function request(path: string, options: RequestInit = {}) {
   const token = await getAccessToken();
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> | undefined),
   };
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -92,16 +60,19 @@ async function request(path: string, options: RequestInit = {}) {
 /** Crea o actualiza (upsert idempotente) un articulo. Si `input.id` viene de
  * la cola offline, reenviar el mismo POST no genera duplicados. */
 export function createItem(input: UpsertItemInput): Promise<InventoryItem> {
-  return request("/api/items", { method: "POST", body: JSON.stringify(input) });
+  return request('/api/items', { method: 'POST', body: JSON.stringify(input) });
 }
 
 export function updateItem(id: string, patch: Partial<UpsertItemInput>): Promise<InventoryItem> {
-  return request(`/api/items/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify(patch) });
+  return request(`/api/items/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
 }
 
 /** Soft-delete: el articulo deja de aparecer en listItems pero no se borra fisicamente. */
 export function deleteItem(id: string): Promise<null> {
-  return request(`/api/items/${encodeURIComponent(id)}`, { method: "DELETE" });
+  return request(`/api/items/${encodeURIComponent(id)}`, { method: 'DELETE' });
 }
 
 export function getItemById(id: string): Promise<InventoryItem> {
@@ -114,21 +85,26 @@ export function getItemBySku(sku: string): Promise<InventoryItem> {
 }
 
 export function listItems(query?: string): Promise<InventoryItem[]> {
-  const qs = query ? `?q=${encodeURIComponent(query)}` : "";
+  const qs = query ? `?q=${encodeURIComponent(query)}` : '';
   return request(`/api/items${qs}`);
 }
 
 export async function uploadPhoto(id: string, fileUri: string): Promise<InventoryItem> {
   const form = new FormData();
-  // @ts-expect-error - forma que espera React Native para adjuntar un archivo local
-  form.append("photos", { uri: fileUri, name: `foto-${Date.now()}.jpg`, type: "image/jpeg" });
+  // El fetch global de Expo (expo/fetch) no acepta el objeto { uri, name, type }
+  // de React Native ("Unsupported FormDataPart implementation"); necesita un
+  // File de expo-file-system, que lee los bytes del archivo local. El
+  // Content-Type con boundary lo pone fetch solo.
+  const file = new File(fileUri);
+  if (!file.exists) throw new Error('La foto ya no existe en el telefono');
+  form.append('photos', file as unknown as Blob, `foto-${Date.now()}.jpg`);
 
   const token = await getAccessToken();
-  const headers: Record<string, string> = { "Content-Type": "multipart/form-data" };
+  const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetchWithTimeout(`${API_BASE_URL}/api/items/${encodeURIComponent(id)}/photos`, {
-    method: "POST",
+    method: 'POST',
     body: form,
     headers,
   });
