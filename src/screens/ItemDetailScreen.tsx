@@ -164,9 +164,9 @@ export default function ItemDetailScreen() {
         product={{
           id: item.id,
           sku: item.sku,
-          name: item.name,
+          name: item.name || '',
           qty: item.qty,
-          location: item.location,
+          location: item.location || '',
         }}
         onGoToPrinterSetup={() => {
           setShowPrint(false);

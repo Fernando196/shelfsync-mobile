@@ -10,13 +10,13 @@ export interface InventoryPhoto {
 
 export interface InventoryItem extends IAuditable {
   id: string;
-  categoryId?: string | null;
+  categoryId: string | null;
   sku: string;
-  name?: string;
-  qty?: number;
-  location?: string;
-  latitude?: number | null;
-  longitude?: number | null;
+  name: string | null;
+  qty: number;
+  location: string | null;
+  latitude: number | null;
+  longitude: number | null;
   files?: InventoryPhoto[];
 
   category?: ICategoryItem | null;
@@ -34,12 +34,10 @@ export interface UpsertItemInput {
 }
 
 export interface EditForm {
-  id?: string;
-  categoryId?: string;
   sku: string;
   name: string;
   qty: number;
-  location?: string;
+  location: string;
   latitude: number | null;
   longitude: number | null;
 }

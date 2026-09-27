@@ -152,9 +152,9 @@ export default function ScannerScreen() {
           product={{
             id: found.id,
             sku: found.sku,
-            name: found.name,
+            name: found.name || '',
             qty: found.qty,
-            location: found.location,
+            location: found.location || '',
           }}
           onGoToPrinterSetup={() => {
             setShowPrint(false);

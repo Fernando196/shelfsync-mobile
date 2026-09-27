@@ -16,18 +16,15 @@ import LocationPickerMap from '../components/LocationPickerMap';
 import { hapticSuccess, hapticError } from '../lib/haptics';
 import { EditForm, InventoryItem } from '../interfaces/item.interface';
 import { getItemById, updateItem } from '../services/items.service';
-import { generateUuid } from '../lib/uuid';
 
-function emptyForm() {
+function emptyForm(): EditForm {
   return {
-    localId: generateUuid(),
     sku: '',
     name: '',
     qty: 1,
     location: '',
-    photos: [] as string[],
-    latitude: null as number | null,
-    longitude: null as number | null,
+    latitude: null,
+    longitude: null,
   };
 }
 
@@ -43,23 +40,28 @@ export default function EditProductScreen() {
   useEffect(() => {
     getItemById(id)
       .then((item) => {
-        setForm(item as EditForm);
+        setForm({
+          latitude: item.latitude ?? null,
+          longitude: item.longitude ?? null,
+          location: item.location || '',
+          name: item.name || '',
+          qty: item.qty ?? 0,
+          sku: item.sku,
+        });
       })
       .catch((e) => Alert.alert('No se pudo cargar', e?.message ?? String(e)))
       .finally(() => setLoading(false));
   }, [id]);
 
   const handleSave = async () => {
-    if (!form) return;
-
     if (!form.sku.trim()) return;
     setSaving(true);
     try {
       await updateItem(id, {
         sku: form.sku.trim(),
-        name: form?.name?.trim() || '',
+        name: form.name.trim() || '',
         qty: form.qty,
-        location: form?.location?.trim() || '',
+        location: form.location.trim() || '',
         latitude: form.latitude ?? undefined,
         longitude: form.longitude ?? undefined,
       });
@@ -73,10 +75,8 @@ export default function EditProductScreen() {
     }
   };
 
-  const onChangeForm = <K extends keyof ReturnType<typeof emptyForm>>(
-    key: K,
-    value: ReturnType<typeof emptyForm>[K],
-  ) => setForm((f) => ({ ...f, [key]: value }));
+  const onChangeForm = <K extends keyof EditForm>(key: K, value: EditForm[K]) =>
+    setForm((f) => ({ ...f, [key]: value }));
 
   if (loading) {
     return (

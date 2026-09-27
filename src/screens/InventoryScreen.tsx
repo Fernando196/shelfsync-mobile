@@ -57,9 +57,9 @@ export default function InventoryScreen() {
     key: `remote-${item.id}`,
     card: {
       sku: item.sku,
-      name: item.name,
+      name: item.name || '',
       qty: item.qty,
-      location: item.location,
+      location: item.location || '',
       category: item.category?.name,
       thumbnailUri: item?.files?.length ? photoUrl(item.files[0].url) : undefined,
     },
