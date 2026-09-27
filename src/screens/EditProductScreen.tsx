@@ -13,9 +13,9 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { Tag, Boxes, MapPin, Minus, Plus } from 'lucide-react-native';
 import AccordionSection from '../components/AccordionSection';
 import LocationPickerMap from '../components/LocationPickerMap';
-import { getItemById, updateItem } from '../api/client';
 import { hapticSuccess, hapticError } from '../lib/haptics';
 import { EditForm, InventoryItem } from '../interfaces/item.interface';
+import { getItemById, updateItem } from '../services/items.service';
 import { generateUuid } from '../lib/uuid';
 
 function emptyForm() {

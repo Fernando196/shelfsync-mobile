@@ -2,10 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, Image, ScrollView, ActivityIndicator, Pressable, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
 import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Trash2 } from 'lucide-react-native';
-import { getItemById, deleteItem, photoUrl } from '../api/client';
 import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { InventoryItem } from '../interfaces/item.interface';
+import { deleteItem, getItemById } from '../services/items.service';
+import { photoUrl } from '../services/files.service';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();

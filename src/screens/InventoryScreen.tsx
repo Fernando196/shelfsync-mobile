@@ -2,13 +2,14 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, FlatList, RefreshControl, Alert } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Search, PackageSearch, WifiOff } from 'lucide-react-native';
-import { listItems, photoUrl } from '../api/client';
 import { listQueue } from '../lib/syncQueue';
 import ProductCard from '../components/ProductCard';
 import { PillTone } from '../components/StatusPill';
 import { InventoryItem } from '../interfaces/item.interface';
 import { QueueEntry } from '../interfaces/queue.interface';
 import { ProductCardData } from '../interfaces/product.interface';
+import { listItems } from '../services/items.service';
+import { photoUrl } from '../services/files.service';
 
 type Row = {
   key: string;

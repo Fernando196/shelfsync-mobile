@@ -1,20 +1,29 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from "react-native";
-import { Warehouse } from "lucide-react-native";
-import { login } from "../../api/client";
-import { saveAccessToken, saveProfileFromUser } from "../../lib/auth";
-import { useSession } from "../../state/SessionContext";
-import { hapticError, hapticSuccess } from "../../lib/haptics";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import { Warehouse } from 'lucide-react-native';
+import { saveAccessToken, saveProfileFromUser } from '../../lib/auth';
+import { useSession } from '../../state/SessionContext';
+import { hapticError, hapticSuccess } from '../../lib/haptics';
+import { login } from '../../services/auth.service';
 
 export default function LoginScreen() {
   const { refreshToken, refreshProfile } = useSession();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
-      Alert.alert("Faltan datos", "Ingresa tu correo y contrasena.");
+      Alert.alert('Faltan datos', 'Ingresa tu correo y contrasena.');
       return;
     }
     setLoading(true);
@@ -26,14 +35,17 @@ export default function LoginScreen() {
       await Promise.all([refreshToken(), refreshProfile()]);
     } catch (e: any) {
       hapticError();
-      Alert.alert("No se pudo iniciar sesion", e?.message ?? String(e));
+      Alert.alert('No se pudo iniciar sesion', e?.message ?? String(e));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1 bg-white">
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      className="flex-1 bg-white"
+    >
       <View className="flex-1 px-6 justify-center">
         <View className="items-center mb-10">
           <View className="w-16 h-16 rounded-2xl bg-primary-600 items-center justify-center mb-4">
@@ -71,7 +83,11 @@ export default function LoginScreen() {
           disabled={loading}
           className="bg-primary-600 rounded-xl py-4 items-center active:scale-95"
         >
-          {loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white font-semibold text-base">Entrar</Text>}
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className="text-white font-semibold text-base">Entrar</Text>
+          )}
         </Pressable>
       </View>
     </KeyboardAvoidingView>

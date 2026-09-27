@@ -3,10 +3,11 @@ import { View, Text, Pressable, ActivityIndicator, Image, Alert } from 'react-na
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { Flashlight, FlashlightOff, Package, Printer, FileText } from 'lucide-react-native';
-import { getItemBySku, photoUrl } from '../api/client';
 import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import { hapticSelect, hapticError } from '../lib/haptics';
 import { InventoryItem } from '../interfaces/item.interface';
+import { getItemBySku } from '../services/items.service';
+import { photoUrl } from '../services/files.service';
 
 export default function ScannerScreen() {
   const navigation = useNavigation<any>();

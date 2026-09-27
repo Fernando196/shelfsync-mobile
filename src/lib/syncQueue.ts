@@ -1,10 +1,11 @@
 // Cola de sincronizacion offline-first: los productos se guardan localmente
 // con un UUID apenas se capturan, y ese mismo UUID se manda como `id` al
-// crear el articulo en el backend (POST /api/items es upsert idempotente por
+// crear el articulo en el backend (POST /items es upsert idempotente por
 // id), asi que reintentar un envio nunca duplica el articulo.
 import { readJSON, writeJSON, STORAGE_KEYS } from './storage';
-import { createItem, uploadPhoto } from '../api/client';
 import { QueuedProduct, QueueEntry } from '../interfaces/queue.interface';
+import { createItem } from '../services/items.service';
+import { uploadPhoto } from '../services/files.service';
 
 async function readQueue(): Promise<QueueEntry[]> {
   return (await readJSON<QueueEntry[]>(STORAGE_KEYS.syncQueue)) ?? [];

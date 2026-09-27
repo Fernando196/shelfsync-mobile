@@ -1,11 +1,11 @@
-import * as SecureStore from "expo-secure-store";
-import { readJSON, writeJSON, removeKey, STORAGE_KEYS } from "./storage";
+import * as SecureStore from 'expo-secure-store';
+import { readJSON, writeJSON, removeKey, STORAGE_KEYS } from './storage';
 
 // El PIN y el token del backend se guardan en SecureStore (Keychain/Keystore,
 // cifrado a nivel de OS). El perfil local (nombre/rol, no sensible) se guarda
 // en AsyncStorage junto con la cola de sincronizacion.
-const PIN_SECURE_KEY = "mp210_operator_pin";
-const TOKEN_SECURE_KEY = "mp210_access_token";
+const PIN_SECURE_KEY = 'mp210_operator_pin';
+const TOKEN_SECURE_KEY = 'mp210_access_token';
 
 // El perfil ya no se captura a mano: viene del `user` que devuelve el login
 // del backend (no tiene rol, solo id/email/fullName - modelo de un solo rol).
@@ -81,7 +81,7 @@ export async function resetSession(): Promise<void> {
   await removeKey(STORAGE_KEYS.profile);
 }
 
-// api/client.ts avisa aqui cuando el backend responde 401 (token invalido o
+// api/http.ts avisa aqui cuando el backend responde 401 (token invalido o
 // vencido) para que la app borre el token y vuelva a LoginScreen sin que
 // cada pantalla tenga que manejarlo por separado.
 let unauthorizedHandler: (() => void) | null = null;
