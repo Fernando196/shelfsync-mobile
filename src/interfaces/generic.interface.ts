@@ -9,3 +9,7 @@ export interface IAuditable {
     fullName: string;
   } | null;
 }
+
+export interface QueryFilters {
+  [name: string]: string | Array<number> | Array<string> | number | boolean | null;
+}

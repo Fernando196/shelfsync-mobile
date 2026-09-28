@@ -11,6 +11,7 @@ import MainTabs from './MainTabs';
 import ItemDetailScreen from '../screens/ItemDetailScreen';
 import EditProductScreen from '../screens/EditProductScreen';
 import { useAutoSyncOnReconnect } from '../hooks/useAutoSync';
+import { useRefreshCategories } from '../hooks/useRefreshCategories';
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -32,6 +33,7 @@ function Gate() {
   const { loading, hasToken, hasPin, unlocked } = useSession();
   useAutoSyncOnReconnect(unlocked);
   useAutoReconnectPrinter(unlocked);
+  useRefreshCategories(unlocked);
 
   if (loading) return <Splash />;
   if (!hasToken) return <LoginScreen />;

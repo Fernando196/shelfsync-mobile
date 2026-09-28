@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -28,15 +28,16 @@ import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import { generateUuid } from '../lib/uuid';
 import { enqueueProduct, syncEntry } from '../lib/syncQueue';
 import { hapticSuccess, hapticTap } from '../lib/haptics';
-
-const CATEGORIES = ['Salas', 'Recamaras', 'Comedores', 'Almacenaje', 'Oficina'];
+import { ICategory } from '../interfaces/category.interface';
+import { getCategories } from '../lib/categoryCatalog';
+import CategoryAutocomplete from '../components/CategoryAutocomplete';
 
 function emptyForm() {
   return {
     localId: generateUuid(),
     sku: '',
     name: '',
-    category: CATEGORIES[0],
+    categoryId: null as string | null,
     qty: 1,
     location: '',
     photos: [] as string[],
@@ -75,6 +76,7 @@ export default function CreateProductScreen() {
         photoUris: form.photos,
         latitude: form.latitude ?? undefined,
         longitude: form.longitude ?? undefined,
+        categoryId: form.categoryId ?? undefined,
       });
       // syncEntry nunca lanza (atrapa sus propios errores y devuelve false),
       // asi que si algo revienta aqui es al guardar localmente - eso si hay
@@ -171,14 +173,11 @@ export default function CreateProductScreen() {
 
           <Text className="text-xs font-semibold text-slate-500 mb-2">Categoria</Text>
           <View className="flex-row flex-wrap">
-            {CATEGORIES.map((c) => (
-              <Chip
-                key={c}
-                label={c}
-                selected={form.category === c}
-                onPress={() => set('category', c)}
-              />
-            ))}
+            <CategoryAutocomplete
+              label="Buscar categoria"
+              onChange={(id) => set('categoryId', id)}
+              selected={form.categoryId || ''}
+            />
           </View>
         </AccordionSection>
 

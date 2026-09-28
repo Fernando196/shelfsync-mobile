@@ -10,3 +10,9 @@ export interface ICategoryItem {
   id: string;
   name: string;
 }
+
+export interface IUpsertCategoryInput {
+  id?: string;
+  name: string;
+  active?: boolean;
+}
