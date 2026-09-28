@@ -1,16 +1,16 @@
-import React from "react";
-import { View, ActivityIndicator } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { SessionProvider, useSession } from "../state/SessionContext";
-import { useAutoSyncOnReconnect } from "../lib/useAutoSync";
-import { useAutoReconnectPrinter } from "../lib/useAutoReconnectPrinter";
-import LoginScreen from "../screens/auth/LoginScreen";
-import CreatePinScreen from "../screens/auth/CreatePinScreen";
-import PinUnlockScreen from "../screens/auth/PinUnlockScreen";
-import MainTabs from "./MainTabs";
-import ItemDetailScreen from "../screens/ItemDetailScreen";
-import EditProductScreen from "../screens/EditProductScreen";
+import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SessionProvider, useSession } from '../state/SessionContext';
+import { useAutoReconnectPrinter } from '../hooks/useAutoReconnectPrinter';
+import LoginScreen from '../screens/auth/LoginScreen';
+import CreatePinScreen from '../screens/auth/CreatePinScreen';
+import PinUnlockScreen from '../screens/auth/PinUnlockScreen';
+import MainTabs from './MainTabs';
+import ItemDetailScreen from '../screens/ItemDetailScreen';
+import EditProductScreen from '../screens/EditProductScreen';
+import { useAutoSyncOnReconnect } from '../hooks/useAutoSync';
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -44,12 +44,12 @@ function Gate() {
       <Stack.Screen
         name="ItemDetail"
         component={ItemDetailScreen}
-        options={{ headerShown: true, title: "Detalle", headerTintColor: "#4f46e5" }}
+        options={{ headerShown: true, title: 'Detalle', headerTintColor: '#4f46e5' }}
       />
       <Stack.Screen
         name="EditProduct"
         component={EditProductScreen}
-        options={{ headerShown: true, title: "Editar", headerTintColor: "#4f46e5" }}
+        options={{ headerShown: true, title: 'Editar', headerTintColor: '#4f46e5' }}
       />
     </Stack.Navigator>
   );
