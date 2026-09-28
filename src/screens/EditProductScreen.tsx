@@ -16,6 +16,7 @@ import LocationPickerMap from '../components/LocationPickerMap';
 import { hapticSuccess, hapticError } from '../lib/haptics';
 import { EditForm, InventoryItem } from '../interfaces/item.interface';
 import { getItemById, updateItem } from '../services/items.service';
+import CategoryAutocomplete from '../components/CategoryAutocomplete';
 
 function emptyForm(): EditForm {
   return {
@@ -25,6 +26,7 @@ function emptyForm(): EditForm {
     location: '',
     latitude: null,
     longitude: null,
+    categoryId: null,
   };
 }
 
@@ -47,6 +49,7 @@ export default function EditProductScreen() {
           name: item.name || '',
           qty: item.qty ?? 0,
           sku: item.sku,
+          categoryId: item.categoryId ?? null,
         });
       })
       .catch((e) => Alert.alert('No se pudo cargar', e?.message ?? String(e)))
@@ -64,6 +67,7 @@ export default function EditProductScreen() {
         location: form.location.trim() || '',
         latitude: form.latitude ?? undefined,
         longitude: form.longitude ?? undefined,
+        categoryId: form.categoryId ?? undefined,
       });
       hapticSuccess();
       navigation.goBack();
@@ -112,11 +116,13 @@ export default function EditProductScreen() {
         />
 
         <Text className="text-xs font-semibold text-slate-500 mb-2">Categoria</Text>
-        {/* <View className="flex-row flex-wrap">
-          {CATEGORIES.map((c) => (
-            <Chip key={c} label={c} selected={category === c} onPress={() => setCategory(c)} />
-          ))}
-        </View> */}
+        <View className="flex-row flex-wrap">
+          <CategoryAutocomplete
+            label="Buscar categoria"
+            onChange={(id) => onChangeForm('categoryId', id)}
+            selected={form.categoryId || ''}
+          />
+        </View>
       </AccordionSection>
 
       <AccordionSection title="Inventario y stock" icon={<Boxes size={18} color="#4f46e5" />}>

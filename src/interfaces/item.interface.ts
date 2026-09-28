@@ -40,4 +40,5 @@ export interface EditForm {
   location: string;
   latitude: number | null;
   longitude: number | null;
+  categoryId: string | null;
 }
