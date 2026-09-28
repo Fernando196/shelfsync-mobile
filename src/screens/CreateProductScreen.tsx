@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -22,14 +22,11 @@ import {
 } from 'lucide-react-native';
 import AccordionSection from '../components/AccordionSection';
 import PhotoPicker from '../components/PhotoPicker';
-import Chip from '../components/Chip';
 import LocationPickerMap from '../components/LocationPickerMap';
 import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import { generateUuid } from '../lib/uuid';
 import { enqueueProduct, syncEntry } from '../lib/syncQueue';
 import { hapticSuccess, hapticTap } from '../lib/haptics';
-import { ICategory } from '../interfaces/category.interface';
-import { getCategories } from '../lib/categoryCatalog';
 import CategoryAutocomplete from '../components/CategoryAutocomplete';
 
 function emptyForm() {
