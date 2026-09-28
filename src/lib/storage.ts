@@ -1,10 +1,10 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const STORAGE_KEYS = {
-  profile: "mp210:profile",
-  syncQueue: "mp210:sync-queue",
-  lastPrinter: "mp210:last-printer",
-  labelFormat: "mp210:label-format",
+  profile: 'shelfsync:profile',
+  syncQueue: 'shelfsync:sync-queue',
+  lastPrinter: 'shelfsync:last-printer',
+  labelFormat: 'shelfsync:label-format',
 } as const;
 
 export async function readJSON<T>(key: string): Promise<T | null> {
