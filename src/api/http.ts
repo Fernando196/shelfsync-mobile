@@ -1,6 +1,9 @@
 import { getAccessToken, notifyUnauthorized } from '../lib/auth';
 
-export const API_BASE_URL = 'http://192.168.1.92:4000';
+if (!process.env.EXPO_PUBLIC_API_BASE_URL) {
+  throw new Error('The public env variable does not exist.');
+}
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 export const COMPLETE_API_BASE_URL = `${API_BASE_URL}/api`;
 
 const REQUEST_TIMEOUT_MS = 12000;
