@@ -38,8 +38,18 @@ export async function request(path: string, options: RequestInit = {}) {
   if (res.status === 401) notifyUnauthorized();
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || body.message || `Error ${res.status}`);
+    const msg = Array.isArray(body.message) ? body.message.join(', ') : body.message;
+    throw new ApiError(msg || body.error || `Error ${res.status}`, res.status);
   }
   if (res.status === 204) return null;
   return res.json();
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
+    super(message);
+  }
 }
