@@ -1,6 +1,6 @@
 export interface ThermalTicketProduct {
   id: string;
-  sku: string;
+  code: string;
   name: string;
   qty: number | string;
   location: string;

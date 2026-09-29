@@ -2,8 +2,8 @@
 // backend Node (backend/routes no la usa, vive solo aqui) - el transporte es
 // distinto (BLE en vez de puerto serie) pero los bytes que se mandan son
 // exactamente los mismos.
-import { utf8Bytes } from "./bytes";
-import { formatDateTimeEs } from "../lib/formatDate";
+import { utf8Bytes } from './bytes';
+import { formatDateTimeEs } from '../lib/formatDate';
 
 const ESC = 0x1b;
 const GS = 0x1d;
@@ -14,21 +14,22 @@ function textBytes(str: string): number[] {
   // de linea de la impresora).
 }
 
-export type ErrorCorrection = "L" | "M" | "Q" | "H";
+export type ErrorCorrection = 'L' | 'M' | 'Q' | 'H';
 
 export function qrCommand(
   data: string,
-  opts: { size?: number; errorCorrection?: ErrorCorrection } = {}
+  opts: { size?: number; errorCorrection?: ErrorCorrection } = {},
 ): number[] {
   const size = opts.size ?? 6;
   const ecMap: Record<ErrorCorrection, number> = { L: 48, M: 49, Q: 50, H: 51 };
-  const ec = ecMap[opts.errorCorrection ?? "M"];
+  const ec = ecMap[opts.errorCorrection ?? 'M'];
 
   const dataBytes = utf8Bytes(data);
   const storeLen = dataBytes.length + 3;
   const pL = storeLen & 0xff;
   const pH = (storeLen >> 8) & 0xff;
 
+  // prettier-ignore
   return [
     GS, 0x28, 0x6b, 0x04, 0x00, 0x31, 0x41, 0x32, 0x00, // seleccionar modelo 2
     GS, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x43, size, // tamano del modulo (1-16)
@@ -41,15 +42,16 @@ export function qrCommand(
 
 export interface InventoryTicketData {
   id: string;
-  sku: string;
+  code: string;
   name?: string;
   qty?: number | string;
   location?: string;
 }
 
-export function buildInventoryTicket(data: InventoryTicketData,payloadQr: string): number[] {
+export function buildInventoryTicket(data: InventoryTicketData, payloadQr: string): number[] {
   const now = formatDateTimeEs(new Date());
 
+  // prettier-ignore
   return [
     ESC, 0x40, // init
     ESC, 0x61, 1, // centrar
@@ -60,7 +62,7 @@ export function buildInventoryTicket(data: InventoryTicketData,payloadQr: string
     ESC, 0x45, 0, // negrita off
     ...textBytes("------------------------"),
     ESC, 0x61, 0, // izquierda
-    ...textBytes(`SKU:       ${data.sku}`),
+    ...textBytes(`CODIGO:    ${data.code}`),
     ...textBytes(`Nombre:    ${data.name || "-"}`),
     ...textBytes(`Cantidad:  ${data.qty ?? "-"}`),
     ...textBytes(`Ubicacion: ${data.location || "-"}`),

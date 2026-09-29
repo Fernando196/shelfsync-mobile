@@ -66,6 +66,7 @@ export default function CreateProductScreen() {
     try {
       await enqueueProduct({
         localId: form.localId,
+        code: '',
         sku: form.sku.trim(),
         name: form.name.trim(),
         qty: form.qty,
@@ -244,7 +245,7 @@ export default function CreateProductScreen() {
       <ThermalPreviewModal
         visible={showPrint}
         onClose={() => setShowPrint(false)}
-        product={{ id: '', sku: form.sku, name: form.name, qty: form.qty, location: form.location }}
+        product={{ id: '', code: '', name: form.name, qty: form.qty, location: form.location }}
         onGoToPrinterSetup={() => {
           setShowPrint(false);
           navigation.navigate('Settings');

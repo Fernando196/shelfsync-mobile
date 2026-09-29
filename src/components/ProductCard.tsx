@@ -31,11 +31,11 @@ export default function ProductCard({
       <View className="flex-1">
         <View className="flex-row items-center justify-between">
           <Text className="text-base font-semibold text-slate-800 flex-1" numberOfLines={1}>
-            {item.name || item.sku}
+            {item.name || item.code}
           </Text>
           {statusLabel ? <StatusPill label={statusLabel} tone={statusTone} /> : null}
         </View>
-        <Text className="text-xs text-slate-400 mt-0.5">SKU {item.sku}</Text>
+        <Text className="text-xs text-slate-400 mt-0.5">Codigo: {item.code}</Text>
 
         <View className="flex-row items-center justify-between mt-2">
           <View className="flex-row items-center flex-1">

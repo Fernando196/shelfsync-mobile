@@ -1,6 +1,6 @@
 export interface ProductCardData {
-  sku: string;
   name: string;
+  code?: string;
   qty: number;
   location: string;
   thumbnailUri?: string;

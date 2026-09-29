@@ -71,7 +71,6 @@ export async function syncEntry(localId: string): Promise<boolean> {
     const { product } = entry;
     await createItem({
       id: product.localId,
-      sku: product.sku,
       name: product.name,
       qty: product.qty,
       location: product.location,

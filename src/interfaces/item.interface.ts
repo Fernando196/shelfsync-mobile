@@ -1,5 +1,6 @@
 import { ICategoryItem } from './category.interface';
 import { IAuditable } from './generic.interface';
+import { CreateProductLookupInput, IProductLookup } from './productLookup.interface';
 
 export interface InventoryPhoto {
   id: string;
@@ -10,8 +11,8 @@ export interface InventoryPhoto {
 
 export interface InventoryItem extends IAuditable {
   id: string;
+  code: number;
   categoryId: string | null;
-  sku: string;
   name: string | null;
   qty: number;
   location: string | null;
@@ -20,21 +21,23 @@ export interface InventoryItem extends IAuditable {
   files?: InventoryPhoto[];
 
   category?: ICategoryItem | null;
+  productLookupId?: string;
+  productLookup: IProductLookup;
 }
 
 export interface UpsertItemInput {
   id?: string;
   categoryId?: string;
-  sku: string;
   name: string;
   qty: number;
   location: string;
   latitude?: number;
   longitude?: number;
+  productLookupId?: string;
+  productLookup?: CreateProductLookupInput;
 }
 
 export interface EditForm {
-  sku: string;
   name: string;
   qty: number;
   location: string;

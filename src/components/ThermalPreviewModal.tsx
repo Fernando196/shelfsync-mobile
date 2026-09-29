@@ -52,8 +52,8 @@ export default function ThermalPreviewModal({
           {/* Vista previa monocromatica de la etiqueta */}
           <View className="items-center border border-dashed border-slate-300 rounded-2xl py-5 bg-slate-50">
             <QRCode value={qrPayload} size={128} color="#0f172a" backgroundColor="#f8fafc" />
-            <Text className="font-bold text-slate-900 mt-3">{product.name || product.sku}</Text>
-            <Text className="text-slate-600 text-xs mt-1">SKU {product.sku}</Text>
+            <Text className="font-bold text-slate-900 mt-3">{product.name || product.code}</Text>
+            <Text className="text-slate-600 text-xs mt-1">Codigo {product.code}</Text>
             <Text className="text-slate-600 text-xs">{product.location || 'Sin ubicacion'}</Text>
             <Text className="text-slate-400 text-[10px] mt-1">{today}</Text>
           </View>

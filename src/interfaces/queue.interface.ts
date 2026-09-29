@@ -1,5 +1,6 @@
 export interface QueuedProduct {
   localId: string;
+  code: string;
   categoryId?: string;
   sku: string;
   name: string;

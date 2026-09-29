@@ -7,6 +7,7 @@ import type { RootStackParamList } from '../navigation/RootNavigator';
 import { InventoryItem } from '../interfaces/item.interface';
 import { deleteItem, getItemById } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
+import { formatItemCode } from '../lib/formatItemCode';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -106,8 +107,15 @@ export default function ItemDetailScreen() {
         )}
         <View className="flex-row items-start justify-between">
           <View className="flex-1 mr-3">
-            <Text className="text-2xl font-bold text-slate-800">{item.name || item.sku}</Text>
-            <Text className="text-slate-400 text-sm mb-4">SKU {item.sku}</Text>
+            <Text className="text-2xl font-bold text-slate-800">
+              {item.name || item.productLookup.description}
+            </Text>
+            <Text className="text-base font-semibold text-slate-500">
+              {formatItemCode(item.code)}
+            </Text>
+            {item.productLookup?.sku && (
+              <Text className="text-slate-400 text-sm mb-4">SKU {item.productLookup.sku}</Text>
+            )}
           </View>
           <Pressable
             onPress={() => navigation.navigate('EditProduct', { id: item.id })}
@@ -163,10 +171,10 @@ export default function ItemDetailScreen() {
         onClose={() => setShowPrint(false)}
         product={{
           id: item.id,
-          sku: item.sku,
           name: item.name || '',
           qty: item.qty,
           location: item.location || '',
+          code: formatItemCode(item.code),
         }}
         onGoToPrinterSetup={() => {
           setShowPrint(false);

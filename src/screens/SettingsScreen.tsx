@@ -1,8 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, FlatList, Pressable, ActivityIndicator, Alert, ScrollView } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import type { Device } from "react-native-ble-plx";
-import { User, Bluetooth, BluetoothOff, Radar, LogOut, Printer, Ruler } from "lucide-react-native";
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import type { Device } from 'react-native-ble-plx';
+import { User, Bluetooth, BluetoothOff, Radar, LogOut, Printer, Ruler } from 'lucide-react-native';
 import {
   requestBlePermissions,
   scanForPrinters,
@@ -12,14 +20,14 @@ import {
   getConnectedPrinter,
   forgetSavedPrinter,
   printInventoryTicket,
-} from "../printing/PrinterService";
-import StatusPill from "../components/StatusPill";
-import Chip from "../components/Chip";
-import { useSession } from "../state/SessionContext";
-import { hapticTap, hapticSuccess, hapticError } from "../lib/haptics";
-import { readJSON, writeJSON, STORAGE_KEYS } from "../lib/storage";
+} from '../printing/PrinterService';
+import StatusPill from '../components/StatusPill';
+import Chip from '../components/Chip';
+import { useSession } from '../state/SessionContext';
+import { hapticTap, hapticSuccess, hapticError } from '../lib/haptics';
+import { readJSON, writeJSON, STORAGE_KEYS } from '../lib/storage';
 
-const LABEL_FORMATS = ["58mm", "80mm"];
+const LABEL_FORMATS = ['58mm', '80mm'];
 
 export default function SettingsScreen() {
   const { profile, resetSession } = useSession();
@@ -27,7 +35,9 @@ export default function SettingsScreen() {
   const [connecting, setConnecting] = useState(false);
   const [testing, setTesting] = useState(false);
   const [devices, setDevices] = useState<Device[]>([]);
-  const [connectedName, setConnectedName] = useState<string | null>(getConnectedPrinter()?.name ?? null);
+  const [connectedName, setConnectedName] = useState<string | null>(
+    getConnectedPrinter()?.name ?? null,
+  );
   const [labelFormat, setLabelFormat] = useState(LABEL_FORMATS[0]);
 
   useEffect(() => {
@@ -40,25 +50,29 @@ export default function SettingsScreen() {
   useFocusEffect(
     useCallback(() => {
       setConnectedName(getConnectedPrinter()?.name ?? null);
-    }, [])
+    }, []),
   );
 
   const startScan = useCallback(async () => {
     const ok = await requestBlePermissions();
     if (!ok) {
-      Alert.alert("Permisos requeridos", "Se necesita permiso de Bluetooth para buscar la impresora.");
+      Alert.alert(
+        'Permisos requeridos',
+        'Se necesita permiso de Bluetooth para buscar la impresora.',
+      );
       return;
     }
     setDevices([]);
     setScanning(true);
     try {
       scanForPrinters(
-        (device) => setDevices((prev) => (prev.some((d) => d.id === device.id) ? prev : [...prev, device])),
-        () => setScanning(false)
+        (device) =>
+          setDevices((prev) => (prev.some((d) => d.id === device.id) ? prev : [...prev, device])),
+        () => setScanning(false),
       );
     } catch (e: any) {
       setScanning(false);
-      Alert.alert("Bluetooth no disponible", e.message ?? String(e));
+      Alert.alert('Bluetooth no disponible', e.message ?? String(e));
       return;
     }
     setTimeout(() => {
@@ -77,7 +91,7 @@ export default function SettingsScreen() {
       hapticSuccess();
     } catch (e: any) {
       hapticError();
-      Alert.alert("No se pudo conectar", e.message ?? String(e));
+      Alert.alert('No se pudo conectar', e.message ?? String(e));
     } finally {
       setConnecting(false);
     }
@@ -89,11 +103,11 @@ export default function SettingsScreen() {
   };
 
   const handleForget = () => {
-    Alert.alert("Olvidar impresora", "La proxima vez que abras la app no se reconectara sola.", [
-      { text: "Cancelar", style: "cancel" },
+    Alert.alert('Olvidar impresora', 'La proxima vez que abras la app no se reconectara sola.', [
+      { text: 'Cancelar', style: 'cancel' },
       {
-        text: "Olvidar",
-        style: "destructive",
+        text: 'Olvidar',
+        style: 'destructive',
         onPress: async () => {
           await disconnectPrinter();
           await forgetSavedPrinter();
@@ -107,25 +121,35 @@ export default function SettingsScreen() {
     hapticTap();
     setTesting(true);
     try {
-      await printInventoryTicket({ id:'pruebas', sku: "TEST-001", name: "Ticket de prueba", qty: 1, location: "Bodega" }, `shelfsync://item/pruebas`);
+      await printInventoryTicket(
+        { id: 'pruebas', code: 'BOD-001', name: 'Ticket de prueba', qty: 1, location: 'Bodega' },
+        `shelfsync://item/pruebas`,
+      );
       hapticSuccess();
     } catch (e: any) {
       hapticError();
-      Alert.alert("Error al imprimir", e.message ?? String(e));
+      Alert.alert('Error al imprimir', e.message ?? String(e));
     } finally {
       setTesting(false);
     }
   };
 
   const handleLogout = () => {
-    Alert.alert("Cerrar turno", "Se cerrara tu sesion en este dispositivo. Tendras que iniciar sesion otra vez.", [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Cerrar turno", style: "destructive", onPress: () => resetSession() },
-    ]);
+    Alert.alert(
+      'Cerrar turno',
+      'Se cerrara tu sesion en este dispositivo. Tendras que iniciar sesion otra vez.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Cerrar turno', style: 'destructive', onPress: () => resetSession() },
+      ],
+    );
   };
 
   return (
-    <ScrollView className="flex-1 bg-surface" contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
+    <ScrollView
+      className="flex-1 bg-surface"
+      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+    >
       <Text className="text-2xl font-bold text-slate-800 mb-5">Ajustes</Text>
 
       <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 flex-row items-center">
@@ -133,8 +157,10 @@ export default function SettingsScreen() {
           <User size={22} color="#4f46e5" />
         </View>
         <View className="flex-1">
-          <Text className="font-semibold text-slate-800">{profile?.fullName ?? profile?.email ?? "Operario"}</Text>
-          <Text className="text-slate-400 text-xs">{profile?.email ?? "Sin correo"}</Text>
+          <Text className="font-semibold text-slate-800">
+            {profile?.fullName ?? profile?.email ?? 'Operario'}
+          </Text>
+          <Text className="text-slate-400 text-xs">{profile?.email ?? 'Sin correo'}</Text>
         </View>
         <Pressable onPress={handleLogout} className="p-2 active:scale-95">
           <LogOut size={20} color="#f43f5e" />
@@ -158,7 +184,9 @@ export default function SettingsScreen() {
               disabled={testing}
               className="flex-1 flex-row items-center justify-center bg-primary-600 rounded-xl py-3 mr-2 active:scale-95"
             >
-              {testing ? <ActivityIndicator color="#fff" /> : (
+              {testing ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
                 <>
                   <Printer size={16} color="#fff" />
                   <Text className="text-white font-semibold ml-2 text-sm">Ticket de prueba</Text>
@@ -186,9 +214,13 @@ export default function SettingsScreen() {
             disabled={scanning || connecting}
             className="flex-row items-center justify-center bg-indigo-50 rounded-xl py-3 active:scale-95"
           >
-            {scanning ? <Radar size={16} color="#4f46e5" /> : <Bluetooth size={16} color="#4f46e5" />}
+            {scanning ? (
+              <Radar size={16} color="#4f46e5" />
+            ) : (
+              <Bluetooth size={16} color="#4f46e5" />
+            )}
             <Text className="text-primary-700 font-semibold ml-2 text-sm">
-              {scanning ? "Buscando dispositivos..." : "Buscar impresora"}
+              {scanning ? 'Buscando dispositivos...' : 'Buscar impresora'}
             </Text>
           </Pressable>
         )}
@@ -205,13 +237,17 @@ export default function SettingsScreen() {
                 className="flex-row items-center justify-between py-3 border-b border-slate-100 active:bg-slate-50"
               >
                 <View>
-                  <Text className="text-slate-700 font-medium">{item.name || "Dispositivo sin nombre"}</Text>
+                  <Text className="text-slate-700 font-medium">
+                    {item.name || 'Dispositivo sin nombre'}
+                  </Text>
                   <Text className="text-slate-400 text-xs">{item.id}</Text>
                 </View>
                 {connecting && <ActivityIndicator size="small" />}
               </Pressable>
             )}
-            ListEmptyComponent={<Text className="text-slate-400 text-sm py-3">Buscando dispositivos cercanos...</Text>}
+            ListEmptyComponent={
+              <Text className="text-slate-400 text-sm py-3">Buscando dispositivos cercanos...</Text>
+            }
           />
         )}
       </View>

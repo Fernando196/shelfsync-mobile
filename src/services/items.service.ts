@@ -20,10 +20,6 @@ export function getItemById(id: string): Promise<InventoryItem> {
   return request(`/items/${encodeURIComponent(id)}`);
 }
 
-export function getItemBySku(sku: string): Promise<InventoryItem> {
-  return request(`/items/sku/${encodeURIComponent(sku)}`);
-}
-
 export function listItems(query?: string): Promise<InventoryItem[]> {
   const qs = query ? `?q=${encodeURIComponent(query)}` : '';
   return request(`/items${qs}`);

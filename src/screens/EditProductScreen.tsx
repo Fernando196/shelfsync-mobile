@@ -17,10 +17,10 @@ import { hapticSuccess, hapticError } from '../lib/haptics';
 import { EditForm, InventoryItem } from '../interfaces/item.interface';
 import { getItemById, updateItem } from '../services/items.service';
 import CategoryAutocomplete from '../components/CategoryAutocomplete';
+import { formatItemCode } from '../lib/formatItemCode';
 
 function emptyForm(): EditForm {
   return {
-    sku: '',
     name: '',
     qty: 1,
     location: '',
@@ -36,32 +36,31 @@ export default function EditProductScreen() {
   const { id } = route.params;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [item, setItem] = useState<InventoryItem | null>(null);
 
   const [form, setForm] = useState<EditForm>(emptyForm());
 
   useEffect(() => {
     getItemById(id)
-      .then((item) => {
+      .then((itemResponse) => {
         setForm({
-          latitude: item.latitude ?? null,
-          longitude: item.longitude ?? null,
-          location: item.location || '',
-          name: item.name || '',
-          qty: item.qty ?? 0,
-          sku: item.sku,
-          categoryId: item.categoryId ?? null,
+          latitude: itemResponse.latitude ?? null,
+          longitude: itemResponse.longitude ?? null,
+          location: itemResponse.location || '',
+          name: itemResponse.name || '',
+          qty: itemResponse.qty ?? 0,
+          categoryId: itemResponse.categoryId ?? null,
         });
+        setItem(itemResponse);
       })
       .catch((e) => Alert.alert('No se pudo cargar', e?.message ?? String(e)))
       .finally(() => setLoading(false));
   }, [id]);
 
   const handleSave = async () => {
-    if (!form.sku.trim()) return;
     setSaving(true);
     try {
       await updateItem(id, {
-        sku: form.sku.trim(),
         name: form.name.trim() || '',
         qty: form.qty,
         location: form.location.trim() || '',
@@ -101,13 +100,15 @@ export default function EditProductScreen() {
       </Text>
 
       <AccordionSection title="Identificacion del mueble" icon={<Tag size={18} color="#4f46e5" />}>
-        <Text className="text-xs font-semibold text-slate-500 mb-1">SKU / codigo *</Text>
-        <TextInput
-          className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base"
-          value={form.sku}
-          onChangeText={(sku) => onChangeForm('sku', sku)}
-          autoCapitalize="characters"
-        />
+        <Text className="text-xs font-semibold text-slate-500 mb-1">
+          Codigo: {item && formatItemCode(item.code)}
+        </Text>
+        <Text className="text-xs font-semibold text-slate-500 mb-1">
+          SKU / codigo {item?.productLookup.sku}
+        </Text>
+        <Text className="text-xs font-semibold text-slate-500 mb-1">
+          Producto {item?.productLookup.description}
+        </Text>
         <Text className="text-xs font-semibold text-slate-500 mb-1">Nombre del mueble</Text>
         <TextInput
           className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base"
@@ -168,8 +169,8 @@ export default function EditProductScreen() {
 
       <Pressable
         onPress={handleSave}
-        disabled={saving || !form.sku.trim()}
-        className={`rounded-xl py-4 items-center mt-2 active:scale-95 ${saving || !form.sku.trim() ? 'bg-slate-200' : 'bg-primary-600'}`}
+        disabled={saving}
+        className={`rounded-xl py-4 items-center mt-2 active:scale-95 ${saving ? 'bg-slate-200' : 'bg-primary-600'}`}
       >
         {saving ? (
           <ActivityIndicator color="#fff" />

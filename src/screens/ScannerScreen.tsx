@@ -6,8 +6,8 @@ import { Flashlight, FlashlightOff, Package, Printer, FileText } from 'lucide-re
 import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import { hapticSelect, hapticError } from '../lib/haptics';
 import { InventoryItem } from '../interfaces/item.interface';
-import { getItemBySku } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
+import { formatItemCode } from '../lib/formatItemCode';
 
 export default function ScannerScreen() {
   const navigation = useNavigation<any>();
@@ -29,8 +29,8 @@ export default function ScannerScreen() {
         } catch {
           // el QR trae el sku en texto plano
         }
-        const item = await getItemBySku(sku);
-        setFound(item);
+        // const item = await getItemBySku(sku);
+        // setFound(item);
       } catch (e: any) {
         hapticError();
         Alert.alert('No encontrado', e?.message ?? 'No se pudo buscar el articulo');
@@ -115,9 +115,9 @@ export default function ScannerScreen() {
             </View>
             <View className="flex-1">
               <Text className="text-base font-bold text-slate-800" numberOfLines={1}>
-                {found.name || found.sku}
+                {found.name || found.productLookup?.sku}
               </Text>
-              <Text className="text-slate-400 text-xs">SKU {found.sku}</Text>
+              <Text className="text-slate-400 text-xs">SKU {found.productLookup?.sku || ''}</Text>
               <Text className="text-slate-500 text-xs mt-0.5">Stock: {found.qty}</Text>
             </View>
           </View>
@@ -151,10 +151,10 @@ export default function ScannerScreen() {
           onClose={() => setShowPrint(false)}
           product={{
             id: found.id,
-            sku: found.sku,
             name: found.name || '',
             qty: found.qty,
             location: found.location || '',
+            code: formatItemCode(found.code),
           }}
           onGoToPrinterSetup={() => {
             setShowPrint(false);
