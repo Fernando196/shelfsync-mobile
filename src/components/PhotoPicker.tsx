@@ -1,8 +1,8 @@
-import React from "react";
-import { View, Image, Pressable, ScrollView, Alert } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import { Camera, ImagePlus, X } from "lucide-react-native";
-import { hapticTap, hapticSelect } from "../lib/haptics";
+import React from 'react';
+import { View, Image, Pressable, ScrollView, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { Camera, ImagePlus, X } from 'lucide-react-native';
+import { hapticTap, hapticSelect } from '../lib/haptics';
 
 interface PhotoPickerProps {
   photos: string[];
@@ -13,7 +13,7 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
   const addFromCamera = async () => {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert("Permiso requerido", "Se necesita acceso a la camara para tomar fotos.");
+      Alert.alert('Permiso requerido', 'Se necesita acceso a la camara para tomar fotos.');
       return;
     }
     const result = await ImagePicker.launchCameraAsync({ quality: 0.6 });
@@ -25,10 +25,13 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
   const addFromLibrary = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert("Permiso requerido", "Se necesita acceso a la galeria para elegir fotos.");
+      Alert.alert('Permiso requerido', 'Se necesita acceso a la galeria para elegir fotos.');
       return;
     }
-    const result = await ImagePicker.launchImageLibraryAsync({ quality: 0.6, allowsMultipleSelection: true });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      quality: 0.6,
+      allowsMultipleSelection: true,
+    });
     if (!result.canceled && result.assets?.length) {
       onChange([...photos, ...result.assets.map((a) => a.uri)]);
     }
@@ -36,10 +39,10 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
 
   const openPicker = () => {
     hapticTap();
-    Alert.alert("Agregar foto", "Elige una opcion", [
-      { text: "Tomar foto", onPress: addFromCamera },
-      { text: "Elegir de galeria", onPress: addFromLibrary },
-      { text: "Cancelar", style: "cancel" },
+    Alert.alert('Agregar foto', 'Elige una opcion', [
+      { text: 'Tomar foto', onPress: addFromCamera },
+      { text: 'Elegir de galeria', onPress: addFromLibrary },
+      { text: 'Cancelar', style: 'cancel' },
     ]);
   };
 
