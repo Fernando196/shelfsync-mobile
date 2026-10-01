@@ -245,7 +245,13 @@ export default function CreateProductScreen() {
       <ThermalPreviewModal
         visible={showPrint}
         onClose={() => setShowPrint(false)}
-        product={{ id: '', code: '', name: form.name, qty: form.qty, location: form.location }}
+        product={{
+          id: form.localId,
+          code: '',
+          name: form.name,
+          qty: form.qty,
+          location: form.location,
+        }}
         onGoToPrinterSetup={() => {
           setShowPrint(false);
           navigation.navigate('Settings');

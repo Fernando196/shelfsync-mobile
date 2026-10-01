@@ -21,14 +21,14 @@ export default function ThermalPreviewModal({
     if (visible) setPrinterName(getConnectedPrinter()?.name ?? null);
   }, [visible]);
 
-  const qrPayload = product.id;
+  const qrPayload = `${prefixQRItem}${product.id}`;
   const today = formatDateEs(new Date());
 
   const handlePrint = async () => {
     hapticTap();
     setPrinting(true);
     try {
-      await printInventoryTicket(product, `${prefixQRItem}${product.id}`);
+      await printInventoryTicket(product, qrPayload);
       hapticSuccess();
       Alert.alert('Etiqueta enviada', 'La MP210 deberia estar imprimiendo la etiqueta ahora.');
     } catch (e: any) {
