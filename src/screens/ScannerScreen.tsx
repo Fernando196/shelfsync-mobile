@@ -8,6 +8,7 @@ import { prefixQRItem } from '../const/prefix.const';
 import { findProductByCode } from '../services/productLookup.service';
 import { IProductLookup } from '../interfaces/productLookup.interface';
 import { ReceiveBoxSheet } from '../components/ReceiveBoxSheet';
+import { NotFoundSheet } from '../components/NotFoundSheet';
 
 export default function ScannerScreen() {
   const navigation = useNavigation<any>();
@@ -15,6 +16,7 @@ export default function ScannerScreen() {
   const [torch, setTorch] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lookup, setLookup] = useState<IProductLookup | null>(null);
+  const [notFoundCode, setNotFoundCode] = useState<string | null>(null);
 
   const onScanned = useCallback(
     async ({ data }: { data: string }) => {
@@ -33,7 +35,7 @@ export default function ScannerScreen() {
           // TODO: codigo externo para buscar producto o agregar nuevo
           const product = await findProductByCode(data);
           if (!product) {
-            Alert.alert('No encontrado', data);
+            setNotFoundCode(data);
             return;
           }
           console.log(product);
@@ -81,7 +83,7 @@ export default function ScannerScreen() {
         barcodeScannerSettings={{
           barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93', 'ean13', 'upc_a', 'ean8'],
         }}
-        onBarcodeScanned={loading || lookup ? undefined : onScanned}
+        onBarcodeScanned={loading || lookup || notFoundCode ? undefined : onScanned}
       />
 
       {/* Retícula de enfoque */}
@@ -114,6 +116,16 @@ export default function ScannerScreen() {
       )}
 
       {lookup && <ReceiveBoxSheet product={lookup} onClose={() => setLookup(null)} />}
+      {notFoundCode && (
+        <NotFoundSheet
+          code={notFoundCode}
+          onClose={() => setNotFoundCode(null)}
+          onFound={(product) => {
+            setNotFoundCode(null);
+            setLookup(product);
+          }}
+        />
+      )}
     </View>
   );
 }
