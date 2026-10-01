@@ -8,6 +8,7 @@ import { hapticSelect, hapticError } from '../lib/haptics';
 import { InventoryItem } from '../interfaces/item.interface';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
+import { prefixQRItem } from '../const/prefix.const';
 
 export default function ScannerScreen() {
   const navigation = useNavigation<any>();
@@ -22,15 +23,17 @@ export default function ScannerScreen() {
       if (loading || found) return;
       setLoading(true);
       try {
-        let sku = data;
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed?.sku) sku = parsed.sku;
-        } catch {
-          // el QR trae el sku en texto plano
+        if (data.startsWith(prefixQRItem)) {
+          const id = data.slice(prefixQRItem.length);
+          if (!id) {
+            hapticError();
+            Alert.alert('QR incorrecto', 'El id del qr es incorrecto');
+            return;
+          }
+          navigation.navigate('ItemDetail', { id: id });
+        } else {
+          // TODO: codigo externo para buscar producto o agregar nuevo
         }
-        // const item = await getItemBySku(sku);
-        // setFound(item);
       } catch (e: any) {
         hapticError();
         Alert.alert('No encontrado', e?.message ?? 'No se pudo buscar el articulo');
@@ -70,7 +73,9 @@ export default function ScannerScreen() {
       <CameraView
         style={{ flex: 1 }}
         enableTorch={torch}
-        barcodeScannerSettings={{ barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93'] }}
+        barcodeScannerSettings={{
+          barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93', 'ean13', 'upc_a', 'ean8'],
+        }}
         onBarcodeScanned={loading || found ? undefined : onScanned}
       />
 
