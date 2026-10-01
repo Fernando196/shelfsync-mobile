@@ -26,6 +26,7 @@ import Chip from '../components/Chip';
 import { useSession } from '../state/SessionContext';
 import { hapticTap, hapticSuccess, hapticError } from '../lib/haptics';
 import { readJSON, writeJSON, STORAGE_KEYS } from '../lib/storage';
+import { prefixQRItem } from '../const/prefix.const';
 
 const LABEL_FORMATS = ['58mm', '80mm'];
 
@@ -123,7 +124,7 @@ export default function SettingsScreen() {
     try {
       await printInventoryTicket(
         { id: 'pruebas', code: 'BOD-001', name: 'Ticket de prueba', qty: 1, location: 'Bodega' },
-        `shelfsync://item/pruebas`,
+        `${prefixQRItem}pruebas`,
       );
       hapticSuccess();
     } catch (e: any) {

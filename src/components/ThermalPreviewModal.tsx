@@ -6,6 +6,7 @@ import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterSe
 import { hapticSuccess, hapticError, hapticTap } from '../lib/haptics';
 import { formatDateEs } from '../lib/formatDate';
 import { ThermalPreviewModalProps } from '../interfaces/thermal.interface';
+import { prefixQRItem } from '../const/prefix.const';
 
 export default function ThermalPreviewModal({
   visible,
@@ -27,7 +28,7 @@ export default function ThermalPreviewModal({
     hapticTap();
     setPrinting(true);
     try {
-      await printInventoryTicket(product, `shelfsync://item/${product.id}`);
+      await printInventoryTicket(product, `${prefixQRItem}${product.id}`);
       hapticSuccess();
       Alert.alert('Etiqueta enviada', 'La MP210 deberia estar imprimiendo la etiqueta ahora.');
     } catch (e: any) {
