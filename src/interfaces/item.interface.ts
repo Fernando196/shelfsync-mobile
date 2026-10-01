@@ -19,6 +19,7 @@ export interface InventoryItem extends IAuditable {
   latitude: number | null;
   longitude: number | null;
   files?: InventoryPhoto[];
+  notes: string | null;
 
   category?: ICategoryItem | null;
   productLookupId?: string;
@@ -33,6 +34,7 @@ export interface UpsertItemInput {
   location: string;
   latitude?: number;
   longitude?: number;
+  notes?: string;
   productLookupId?: string;
   productLookup?: CreateProductLookupInput;
 }
