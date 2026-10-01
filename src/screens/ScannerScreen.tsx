@@ -9,6 +9,7 @@ import { InventoryItem } from '../interfaces/item.interface';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import { prefixQRItem } from '../const/prefix.const';
+import { findProductByCode } from '../services/productLookup.service';
 
 export default function ScannerScreen() {
   const navigation = useNavigation<any>();
@@ -33,6 +34,15 @@ export default function ScannerScreen() {
           navigation.navigate('ItemDetail', { id: id });
         } else {
           // TODO: codigo externo para buscar producto o agregar nuevo
+          const product = await findProductByCode(data);
+          if (!product) {
+            Alert.alert('No encontrado', data);
+            return;
+          }
+          Alert.alert(
+            'Producto encontrado',
+            `Descripcion: ${product.description} \nSKU: ${product?.sku || 'No cuenta con SKU'}`,
+          );
         }
       } catch (e: any) {
         hapticError();
