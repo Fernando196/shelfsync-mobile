@@ -1,15 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, Text, Pressable, ActivityIndicator, Image, Alert } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
-import {
-  Flashlight,
-  FlashlightOff,
-  Package,
-  Printer,
-  FileText,
-  CheckCircle2,
-} from 'lucide-react-native';
+import { Flashlight, FlashlightOff, CheckCircle2 } from 'lucide-react-native';
 import { hapticSelect, hapticError } from '../lib/haptics';
 import { prefixQRItem } from '../const/prefix.const';
 import { findProductByCode } from '../services/productLookup.service';
@@ -29,7 +22,7 @@ export default function ScannerScreen() {
   const [lookup, setLookup] = useState<IProductLookup | null>(null);
   const [notFoundCode, setNotFoundCode] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState<{ barcode: string; sku: string } | null>(null);
-  const [savedItem, setSavedItem] = useState<InventoryItem | null>();
+  const [savedItem, setSavedItem] = useState<InventoryItem | null>(null);
 
   useEffect(() => {
     if (!savedItem) return;
@@ -102,7 +95,7 @@ export default function ScannerScreen() {
           className="absolute left-0 right-0 items-center z-10"
           pointerEvents="none"
           style={{
-            top: insets.top + 64,
+            top: insets.top + 10,
           }}
         >
           <View className="flex-row items-center bg-emerald-600 rounded-2xl px-4 py-3 mx-4">

@@ -102,7 +102,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           <View className="w-12 h-12 rounded-xl bg-slate-200 items-center justify-center mr-3">
             <Package size={22} color="#64748b" />
           </View>
-          <View>
+          <View className="flex-1">
             <Text className="text-base font-semibold text-slate-800" numberOfLines={2}>
               {product?.description || form.description.trim() || 'Sin descripción'}
             </Text>
