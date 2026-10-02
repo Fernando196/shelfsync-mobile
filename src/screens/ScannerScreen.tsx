@@ -1,16 +1,27 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator, Image, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
-import { Flashlight, FlashlightOff, Package, Printer, FileText } from 'lucide-react-native';
+import {
+  Flashlight,
+  FlashlightOff,
+  Package,
+  Printer,
+  FileText,
+  CheckCircle2,
+} from 'lucide-react-native';
 import { hapticSelect, hapticError } from '../lib/haptics';
 import { prefixQRItem } from '../const/prefix.const';
 import { findProductByCode } from '../services/productLookup.service';
 import { IProductLookup } from '../interfaces/productLookup.interface';
 import { ReceiveBoxSheet } from '../components/ReceiveBoxSheet';
 import { NotFoundSheet } from '../components/NotFoundSheet';
+import { InventoryItem } from '../interfaces/item.interface';
+import { formatItemCode } from '../lib/formatItemCode';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ScannerScreen() {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const [permission, requestPermission] = useCameraPermissions();
   const [torch, setTorch] = useState(false);
@@ -18,6 +29,14 @@ export default function ScannerScreen() {
   const [lookup, setLookup] = useState<IProductLookup | null>(null);
   const [notFoundCode, setNotFoundCode] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState<{ barcode: string; sku: string } | null>(null);
+  const [savedItem, setSavedItem] = useState<InventoryItem | null>();
+
+  useEffect(() => {
+    if (!savedItem) return;
+
+    const timer = setTimeout(() => setSavedItem(null), 3000);
+    return () => clearTimeout(timer);
+  }, [savedItem]);
 
   const onScanned = useCallback(
     async ({ data }: { data: string }) => {
@@ -78,6 +97,28 @@ export default function ScannerScreen() {
 
   return (
     <View className="flex-1 bg-black">
+      {savedItem && (
+        <View
+          className="absolute left-0 right-0 items-center z-10"
+          pointerEvents="none"
+          style={{
+            top: insets.top + 64,
+          }}
+        >
+          <View className="flex-row items-center bg-emerald-600 rounded-2xl px-4 py-3 mx-4">
+            <CheckCircle2 size={22} color="#fff" />
+            <View className="ml-3">
+              <Text className="text-white font-bold text-lg">
+                {formatItemCode(savedItem.code)} guardada
+              </Text>
+              <Text className="text-white/80 text-base" numberOfLines={1}>
+                {savedItem.name}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
       <CameraView
         style={{ flex: 1 }}
         enableTorch={torch}
@@ -105,7 +146,10 @@ export default function ScannerScreen() {
           hapticSelect();
           setTorch((t) => !t);
         }}
-        className="absolute top-14 right-6 bg-black/50 rounded-full w-11 h-11 items-center justify-center active:scale-95"
+        className="absolute right-6 bg-black/50 rounded-full w-11 h-11 items-center justify-center active:scale-95"
+        style={{
+          top: insets.top + 12,
+        }}
       >
         {torch ? <FlashlightOff size={20} color="#fff" /> : <Flashlight size={20} color="#fff" />}
       </Pressable>
@@ -123,6 +167,11 @@ export default function ScannerScreen() {
           onClose={() => {
             setLookup(null);
             setNewProduct(null);
+          }}
+          onSaved={(item) => {
+            setLookup(null);
+            setNewProduct(null);
+            setSavedItem(item);
           }}
         />
       )}

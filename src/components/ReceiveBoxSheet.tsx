@@ -25,7 +25,7 @@ function emptyForm() {
   };
 }
 
-export function ReceiveBoxSheet({ product, newProduct, onClose }: IReceiveBoxSheetProps) {
+export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IReceiveBoxSheetProps) {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState<boolean>(false);
 
@@ -46,7 +46,6 @@ export function ReceiveBoxSheet({ product, newProduct, onClose }: IReceiveBoxShe
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
         }));
-        hapticSuccess();
       } catch (e: any) {
         hapticError();
         Alert.alert('No se pudo obtener la ubicacion', e?.message ?? String(e));
@@ -87,7 +86,8 @@ export function ReceiveBoxSheet({ product, newProduct, onClose }: IReceiveBoxShe
       for (const uri of form.photos) {
         await uploadPhoto(newItem.id, uri);
       }
-      onClose();
+      hapticSuccess();
+      onSaved(newItem);
     } catch (e: any) {
       hapticError();
     } finally {
@@ -198,4 +198,5 @@ export interface IReceiveBoxSheetProps {
   product: IProductLookup | null;
   newProduct?: { barcode: string; sku: string } | null;
   onClose: () => void;
+  onSaved: (item: InventoryItem) => void;
 }
