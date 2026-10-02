@@ -1,6 +1,5 @@
 import { Boxes, Minus, Package, Plus } from 'lucide-react-native';
-import { View, Text, Pressable, TextInput, KeyboardAvoidingView, Alert } from 'react-native';
-import { IReceiveBoxSheetProps } from '../interfaces/components/ReceiveBoxSheetProps.interface';
+import { View, Text, Pressable, Alert, Switch } from 'react-native';
 import { useEffect, useState } from 'react';
 import { Input } from './ui/Input';
 import { InventoryItem, UpsertItemInput } from '../interfaces/item.interface';
@@ -11,6 +10,7 @@ import * as Location from 'expo-location';
 import PhotoPicker from './PhotoPicker';
 import { uploadPhoto } from '../services/files.service';
 import { BottomSheet } from './ui/BottomSheet';
+import { IProductLookup } from '../interfaces/productLookup.interface';
 
 function emptyForm() {
   return {
@@ -20,10 +20,12 @@ function emptyForm() {
     latitude: null as number | null,
     longitude: null as number | null,
     photos: [] as string[],
+    description: '',
+    needAssembly: false,
   };
 }
 
-export function ReceiveBoxSheet({ product, onClose }: IReceiveBoxSheetProps) {
+export function ReceiveBoxSheet({ product, newProduct, onClose }: IReceiveBoxSheetProps) {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState<boolean>(false);
 
@@ -62,14 +64,24 @@ export function ReceiveBoxSheet({ product, onClose }: IReceiveBoxSheetProps) {
     try {
       const item: UpsertItemInput = {
         id: generateUuid(),
-        productLookupId: product.id,
-        name: product.description || '',
+        name: product?.description || form.description.trim() || '',
         qty: form.qty,
         location: form.location,
         notes: form.notes?.trim(),
         longitude: form.longitude || undefined,
         latitude: form.latitude || undefined,
+        ...(product
+          ? { productLookupId: product.id }
+          : {
+              productLookup: {
+                barcode: newProduct?.barcode,
+                sku: newProduct?.sku,
+                description: form.description,
+                needAssembly: form.needAssembly,
+              },
+            }),
       };
+
       const newItem: InventoryItem = await createItem(item);
 
       for (const uri of form.photos) {
@@ -84,17 +96,39 @@ export function ReceiveBoxSheet({ product, onClose }: IReceiveBoxSheetProps) {
   };
 
   return (
-    <BottomSheet title="Recibir caja">
-      <View className="flex-row items-center bg-slate-50 rounded-2xl p-3">
-        <View className="w-12 h-12 rounded-xl bg-slate-200 items-center justify-center mr-3">
-          <Package size={22} color="#64748b" />
+    <BottomSheet title={newProduct ? 'Producto nuevo' : 'Recibir caja'}>
+      <View className="bg-slate-50 rounded-2xl p-3">
+        <View className="flex flex-row items-center">
+          <View className="w-12 h-12 rounded-xl bg-slate-200 items-center justify-center mr-3">
+            <Package size={22} color="#64748b" />
+          </View>
+          <View>
+            <Text className="text-base font-semibold text-slate-800" numberOfLines={2}>
+              {product?.description || form.description.trim() || 'Sin descripción'}
+            </Text>
+            <Text className="text-slate-500 text-sm mt-0.5">
+              Barcode: {product?.barcode || newProduct?.barcode || 'Sin codigo de barras'}
+            </Text>
+            <Text className="text-slate-500 text-sm mt-0.5">
+              SKU: {product?.sku || newProduct?.sku || 'Sin sku'}
+            </Text>
+          </View>
         </View>
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-slate-800" numberOfLines={2}>
-            {product?.description || 'Sin descripción'}
-          </Text>
-          <Text className="text-slate-500 text-sm mt-0.5">SKU: {product?.sku || 'Sin sku'}</Text>
-        </View>
+        {newProduct && (
+          <View className="flex-1 mt-2">
+            <Input
+              label="Descripción del manifiesto"
+              value={form.description}
+              onChangeText={(v) => set('description', v)}
+              multiline
+              textAlignVertical="top"
+            />
+            <View className="flex flex-row items-center gap-4 mt-3">
+              <Text>Requiere ensamble</Text>
+              <Switch value={form.needAssembly} onValueChange={(v) => set('needAssembly', v)} />
+            </View>
+          </View>
+        )}
       </View>
 
       <View className="flex flex-col bg-slate-50 rounded-2xl p-3 mt-3">
@@ -149,8 +183,8 @@ export function ReceiveBoxSheet({ product, onClose }: IReceiveBoxSheetProps) {
           <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
         </Pressable>
         <Pressable
-          className={`flex-1 bg-primary-600 rounded-xl py-3 items-center ${saving ? 'opacity-50' : ''}`}
-          disabled={saving}
+          className={`flex-1 bg-primary-600 rounded-xl py-3 items-center ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
+          disabled={saving || (!!newProduct && !form.description.trim())}
           onPress={() => handleSanvig()}
         >
           <Text className="text-sm font-semibold text-white">Guardar</Text>
@@ -158,4 +192,10 @@ export function ReceiveBoxSheet({ product, onClose }: IReceiveBoxSheetProps) {
       </View>
     </BottomSheet>
   );
+}
+
+export interface IReceiveBoxSheetProps {
+  product: IProductLookup | null;
+  newProduct?: { barcode: string; sku: string } | null;
+  onClose: () => void;
 }

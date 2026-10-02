@@ -17,6 +17,7 @@ export default function ScannerScreen() {
   const [loading, setLoading] = useState(false);
   const [lookup, setLookup] = useState<IProductLookup | null>(null);
   const [notFoundCode, setNotFoundCode] = useState<string | null>(null);
+  const [newProduct, setNewProduct] = useState<{ barcode: string; sku: string } | null>(null);
 
   const onScanned = useCallback(
     async ({ data }: { data: string }) => {
@@ -83,7 +84,7 @@ export default function ScannerScreen() {
         barcodeScannerSettings={{
           barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93', 'ean13', 'upc_a', 'ean8'],
         }}
-        onBarcodeScanned={loading || lookup || notFoundCode ? undefined : onScanned}
+        onBarcodeScanned={loading || lookup || notFoundCode || newProduct ? undefined : onScanned}
       />
 
       {/* Retícula de enfoque */}
@@ -115,7 +116,16 @@ export default function ScannerScreen() {
         </View>
       )}
 
-      {lookup && <ReceiveBoxSheet product={lookup} onClose={() => setLookup(null)} />}
+      {(lookup || newProduct) && (
+        <ReceiveBoxSheet
+          newProduct={newProduct}
+          product={lookup}
+          onClose={() => {
+            setLookup(null);
+            setNewProduct(null);
+          }}
+        />
+      )}
       {notFoundCode && (
         <NotFoundSheet
           code={notFoundCode}
@@ -123,6 +133,10 @@ export default function ScannerScreen() {
           onFound={(product) => {
             setNotFoundCode(null);
             setLookup(product);
+          }}
+          onCreateNew={(sku) => {
+            setNewProduct({ barcode: notFoundCode, sku });
+            setNotFoundCode(null);
           }}
         />
       )}

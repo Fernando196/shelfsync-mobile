@@ -6,7 +6,7 @@ import { Input } from './ui/Input';
 import { attachBarcode, findProductByCode } from '../services/productLookup.service';
 import { hapticError } from '../lib/haptics';
 
-export function NotFoundSheet({ code, onClose, onFound }: NotFoundSheetProps) {
+export function NotFoundSheet({ code, onClose, onFound, onCreateNew }: NotFoundSheetProps) {
   const [sku, setSku] = useState<string>('');
   const [searching, setSearching] = useState<boolean>(false);
 
@@ -15,8 +15,20 @@ export function NotFoundSheet({ code, onClose, onFound }: NotFoundSheetProps) {
     try {
       const productLookup = await findProductByCode(sku.trim());
       if (!productLookup) {
-        hapticError();
-        Alert.alert('SKU no encontrado', `No existe ningun producto con el SKU ${sku.trim()}`);
+        if (!productLookup) {
+          const typed = sku.trim();
+          Alert.alert(
+            'SKU no encontrado',
+            `No existe ningun producto con el SKU ${typed}.\n¿Es un producto nuevo?`,
+            [
+              { text: 'Corregir', style: 'cancel' },
+              {
+                text: 'Crear producto',
+                onPress: () => onCreateNew(typed),
+              },
+            ],
+          );
+        }
         return;
       }
 
@@ -70,4 +82,5 @@ interface NotFoundSheetProps {
   code: string;
   onClose: () => void;
   onFound: (product: IProductLookup) => void;
+  onCreateNew: (sku: string) => void;
 }

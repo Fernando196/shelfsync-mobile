@@ -5,10 +5,12 @@ export interface IProductLookup extends IAuditable {
   barcode: string | null;
   sku: string | null;
   description: string | null;
+  needAssembly: boolean;
 }
 
 export interface CreateProductLookupInput {
   barcode?: string;
   sku?: string;
   description?: string;
+  needAssembly?: boolean;
 }
