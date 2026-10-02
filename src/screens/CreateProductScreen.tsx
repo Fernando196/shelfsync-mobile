@@ -28,6 +28,7 @@ import { generateUuid } from '../lib/uuid';
 import { enqueueProduct, syncEntry } from '../lib/syncQueue';
 import { hapticSuccess, hapticTap } from '../lib/haptics';
 import CategoryAutocomplete from '../components/CategoryAutocomplete';
+import { Screen } from '../components/ui/Screen';
 
 function emptyForm() {
   return {
@@ -97,9 +98,9 @@ export default function CreateProductScreen() {
   const canSave = form.sku.trim().length > 0;
 
   return (
-    <View className="flex-1 bg-surface">
+    <Screen>
       <ScrollView
-        contentContainerStyle={{ padding: 20, paddingBottom: 48 }}
+        contentContainerStyle={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 48 }}
         keyboardShouldPersistTaps="handled"
       >
         <Text className="text-2xl font-bold text-slate-800 mb-1">Registrar mueble</Text>
@@ -257,6 +258,6 @@ export default function CreateProductScreen() {
           navigation.navigate('Settings');
         }}
       />
-    </View>
+    </Screen>
   );
 }

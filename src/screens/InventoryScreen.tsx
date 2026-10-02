@@ -11,6 +11,8 @@ import { ProductCardData } from '../interfaces/product.interface';
 import { listItems } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Screen } from '../components/ui/Screen';
 
 type Row = {
   key: string;
@@ -106,8 +108,8 @@ export default function InventoryScreen() {
   const rows = [...pendingRows, ...backendRows];
 
   return (
-    <View className="flex-1 bg-surface">
-      <View className="px-5 pt-4 pb-2">
+    <Screen>
+      <View className="px-5 pb-2">
         <Text className="text-2xl font-bold text-slate-800">Inventario</Text>
         <Text className="text-slate-400 text-sm mt-0.5">{rows.length} articulos</Text>
 
@@ -152,6 +154,6 @@ export default function InventoryScreen() {
           </View>
         }
       />
-    </View>
+    </Screen>
   );
 }
