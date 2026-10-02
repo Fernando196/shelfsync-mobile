@@ -8,6 +8,8 @@ import { InventoryItem } from '../interfaces/item.interface';
 import { deleteItem, getItemById } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
+import StatusPill from '../components/StatusPill';
+import { getItemStatus } from '../lib/statusItem';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -86,6 +88,8 @@ export default function ItemDetailScreen() {
 
   if (!item) return null;
 
+  const status = getItemStatus(item);
+
   return (
     <View className="flex-1 bg-surface">
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
@@ -113,6 +117,7 @@ export default function ItemDetailScreen() {
             <Text className="text-base font-semibold text-slate-500">
               {formatItemCode(item.code)}
             </Text>
+            <StatusPill label={status.label} tone={status.tone} />
             {item.productLookup?.sku && (
               <Text className="text-slate-400 text-sm mb-4">SKU {item.productLookup.sku}</Text>
             )}

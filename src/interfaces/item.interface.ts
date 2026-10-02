@@ -1,4 +1,5 @@
 import { ICategoryItem } from './category.interface';
+import { ItemStatus } from './enum/itemStatus.type';
 import { IAuditable } from './generic.interface';
 import { CreateProductLookupInput, IProductLookup } from './productLookup.interface';
 
@@ -24,6 +25,8 @@ export interface InventoryItem extends IAuditable {
   category?: ICategoryItem | null;
   productLookupId?: string;
   productLookup: IProductLookup;
+
+  status: ItemStatus;
 }
 
 export interface UpsertItemInput {

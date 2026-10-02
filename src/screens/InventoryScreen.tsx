@@ -11,8 +11,8 @@ import { ProductCardData } from '../interfaces/product.interface';
 import { listItems } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Screen } from '../components/ui/Screen';
+import { getItemStatus } from '../lib/statusItem';
 
 type Row = {
   key: string;
@@ -56,18 +56,23 @@ export default function InventoryScreen() {
     setRefreshing(false);
   };
 
-  const backendRows: Row[] = items.map((item) => ({
-    key: `remote-${item.id}`,
-    card: {
-      name: item.name || '',
-      qty: item.qty,
-      location: item.location || '',
-      category: item.category?.name,
-      thumbnailUri: item?.files?.length ? photoUrl(item.files[0].url) : undefined,
-      code: formatItemCode(item.code),
-    },
-    onPress: () => navigation.navigate('ItemDetail', { id: item.id }),
-  }));
+  const backendRows: Row[] = items.map((item) => {
+    const status = getItemStatus(item);
+    return {
+      key: `remote-${item.id}`,
+      card: {
+        name: item.name || '',
+        qty: item.qty,
+        location: item.location || '',
+        category: item.category?.name,
+        thumbnailUri: item?.files?.length ? photoUrl(item.files[0].url) : undefined,
+        code: formatItemCode(item.code),
+      },
+      onPress: () => navigation.navigate('ItemDetail', { id: item.id }),
+      statusLabel: status.label,
+      statusTone: status.tone,
+    };
+  });
 
   const pendingRows: Row[] = queue
     .filter((e) => e.status !== 'synced')
