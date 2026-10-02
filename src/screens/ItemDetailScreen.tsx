@@ -174,7 +174,7 @@ export default function ItemDetailScreen() {
           name: item.name || '',
           qty: item.qty,
           location: item.location || '',
-          code: formatItemCode(item.code),
+          code: item.code,
         }}
         onGoToPrinterSetup={() => {
           setShowPrint(false);

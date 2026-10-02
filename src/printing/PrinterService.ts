@@ -6,15 +6,16 @@
 // enviamos "48656C6C6F0A" (bytes crudos) a la characteristic de escritura y
 // vimos "Hello" salir impreso. Ver README.md para el detalle de como se
 // dedujeron.
-import { BleManager, Device } from "react-native-ble-plx";
-import { Platform, PermissionsAndroid } from "react-native";
-import { buildInventoryTicket, InventoryTicketData } from "./escpos";
-import { bytesToBase64, chunkBytes } from "./bytes";
-import { readJSON, writeJSON, STORAGE_KEYS } from "../lib/storage";
+import { BleManager, Device } from 'react-native-ble-plx';
+import { Platform, PermissionsAndroid } from 'react-native';
+import { buildInventoryTicket, InventoryTicketData } from './escpos';
+import { bytesToBase64, chunkBytes } from './bytes';
+import { readJSON, writeJSON, STORAGE_KEYS } from '../lib/storage';
+import { prefixQRItem } from '../const/prefix.const';
 
-export const PRINTER_SERVICE_UUID = "49535343-fe7d-4ae5-8fa9-9fafd205e455";
-export const PRINTER_WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
-export const PRINTER_NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616";
+export const PRINTER_SERVICE_UUID = '49535343-fe7d-4ae5-8fa9-9fafd205e455';
+export const PRINTER_WRITE_CHARACTERISTIC_UUID = '49535343-8841-43f4-a8d4-ecbe34729bb3';
+export const PRINTER_NOTIFY_CHARACTERISTIC_UUID = '49535343-1e4d-4bd9-ba61-23c647249616';
 
 // El MTU por defecto de BLE deja ~20 bytes utiles por paquete. Si mas adelante
 // negocias un MTU mayor con device.requestMTU(...), puedes subir esto.
@@ -38,8 +39,8 @@ function getManager(): BleManager {
       managerInstance = new BleManager();
     } catch {
       throw new Error(
-        "Bluetooth (BLE) no esta disponible en esta app. La impresora solo funciona " +
-          "con el 'dev client' compilado (ver README), no en Expo Go."
+        'Bluetooth (BLE) no esta disponible en esta app. La impresora solo funciona ' +
+          "con el 'dev client' compilado (ver README), no en Expo Go.",
       );
     }
   }
@@ -55,7 +56,7 @@ function sleep(ms: number) {
  * el propio sistema muestra su dialogo cuando haga falta (NSBluetoothAlwaysUsageDescription
  * en Info.plist, ya configurado en app.json). */
 export async function requestBlePermissions(): Promise<boolean> {
-  if (Platform.OS !== "android") return true;
+  if (Platform.OS !== 'android') return true;
 
   if (Platform.Version >= 31) {
     const results = await PermissionsAndroid.requestMultiple([
@@ -67,7 +68,7 @@ export async function requestBlePermissions(): Promise<boolean> {
   }
 
   const granted = await PermissionsAndroid.request(
-    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
   );
   return granted === PermissionsAndroid.RESULTS.GRANTED;
 }
@@ -83,7 +84,7 @@ export async function requestBlePermissions(): Promise<boolean> {
  */
 export function scanForPrinters(
   onFound: (device: Device) => void,
-  onError?: (e: Error) => void
+  onError?: (e: Error) => void,
 ): void {
   getManager().startDeviceScan(null, { allowDuplicates: false }, (error, device) => {
     if (error) {
@@ -117,7 +118,10 @@ export async function connectToPrinter(deviceId: string): Promise<Device> {
   const device = await getManager().connectToDevice(deviceId, { autoConnect: false });
   await device.discoverAllServicesAndCharacteristics();
   connectedDevice = device;
-  await writeJSON(STORAGE_KEYS.lastPrinter, { id: device.id, name: device.name ?? null } as SavedPrinter);
+  await writeJSON(STORAGE_KEYS.lastPrinter, {
+    id: device.id,
+    name: device.name ?? null,
+  } as SavedPrinter);
 
   device.onDisconnected(() => {
     if (connectedDevice?.id === deviceId) connectedDevice = null;
@@ -159,7 +163,7 @@ export async function tryAutoReconnect(): Promise<Device | null> {
  */
 async function writeRawBytes(bytes: number[]): Promise<void> {
   if (!connectedDevice) {
-    throw new Error("No hay una impresora conectada. Conecta la MP210 primero.");
+    throw new Error('No hay una impresora conectada. Conecta la MP210 primero.');
   }
 
   const chunks = chunkBytes(bytes, CHUNK_SIZE);
@@ -169,21 +173,21 @@ async function writeRawBytes(bytes: number[]): Promise<void> {
       await connectedDevice.writeCharacteristicWithResponseForService(
         PRINTER_SERVICE_UUID,
         PRINTER_WRITE_CHARACTERISTIC_UUID,
-        payload
+        payload,
       );
     } else {
       await connectedDevice.writeCharacteristicWithoutResponseForService(
         PRINTER_SERVICE_UUID,
         PRINTER_WRITE_CHARACTERISTIC_UUID,
-        payload
+        payload,
       );
     }
     await sleep(CHUNK_DELAY_MS);
   }
 }
 
-export async function printInventoryTicket(data: InventoryTicketData,payloadQr: string): Promise<void> {
-  const ticketBytes = buildInventoryTicket(data, payloadQr);
+export async function printInventoryTicket(data: InventoryTicketData): Promise<void> {
+  const ticketBytes = buildInventoryTicket(data, `${prefixQRItem}${data.id}`);
   await writeRawBytes(ticketBytes);
 }
 

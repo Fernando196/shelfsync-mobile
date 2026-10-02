@@ -58,7 +58,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
     value: ReturnType<typeof emptyForm>[K],
   ) => setForm((f) => ({ ...f, [key]: value }));
 
-  const handleSanvig = async () => {
+  const handleSave = async (print: boolean) => {
     setSaving(true);
     try {
       const item: UpsertItemInput = {
@@ -87,7 +87,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         await uploadPhoto(newItem.id, uri);
       }
       hapticSuccess();
-      onSaved(newItem);
+      onSaved(newItem, print);
     } catch (e: any) {
       hapticError();
     } finally {
@@ -175,6 +175,14 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         </View>
       </View>
 
+      <Pressable
+        className={` bg-primary-600 rounded-xl py-3 items-center mt-3 ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
+        disabled={saving || (!!newProduct && !form.description.trim())}
+        onPress={() => handleSave(true)}
+      >
+        <Text className="text-sm font-semibold text-white">Guardar e imprimir</Text>
+      </Pressable>
+
       <View className="flex-row mt-5">
         <Pressable
           onPress={() => onClose()}
@@ -183,11 +191,11 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
         </Pressable>
         <Pressable
-          className={`flex-1 bg-primary-600 rounded-xl py-3 items-center ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
+          className={`flex-1 bg-slate-100 rounded-xl py-3 items-center ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
           disabled={saving || (!!newProduct && !form.description.trim())}
-          onPress={() => handleSanvig()}
+          onPress={() => handleSave(false)}
         >
-          <Text className="text-sm font-semibold text-white">Guardar</Text>
+          <Text className="text-sm font-semibold text-slate-700">Solo guardar</Text>
         </Pressable>
       </View>
     </BottomSheet>
@@ -198,5 +206,5 @@ export interface IReceiveBoxSheetProps {
   product: IProductLookup | null;
   newProduct?: { barcode: string; sku: string } | null;
   onClose: () => void;
-  onSaved: (item: InventoryItem) => void;
+  onSaved: (item: InventoryItem, print: boolean) => void;
 }

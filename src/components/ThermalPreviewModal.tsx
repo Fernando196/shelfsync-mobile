@@ -7,6 +7,8 @@ import { hapticSuccess, hapticError, hapticTap } from '../lib/haptics';
 import { formatDateEs } from '../lib/formatDate';
 import { ThermalPreviewModalProps } from '../interfaces/thermal.interface';
 import { prefixQRItem } from '../const/prefix.const';
+import { toTicket } from '../lib/toTicket';
+import { formatItemCode } from '../lib/formatItemCode';
 
 export default function ThermalPreviewModal({
   visible,
@@ -28,7 +30,7 @@ export default function ThermalPreviewModal({
     hapticTap();
     setPrinting(true);
     try {
-      await printInventoryTicket(product, qrPayload);
+      await printInventoryTicket(toTicket(product));
       hapticSuccess();
       Alert.alert('Etiqueta enviada', 'La MP210 deberia estar imprimiendo la etiqueta ahora.');
     } catch (e: any) {
@@ -54,7 +56,9 @@ export default function ThermalPreviewModal({
           <View className="items-center border border-dashed border-slate-300 rounded-2xl py-5 bg-slate-50">
             <QRCode value={qrPayload} size={128} color="#0f172a" backgroundColor="#f8fafc" />
             <Text className="font-bold text-slate-900 mt-3">{product.name || product.code}</Text>
-            <Text className="text-slate-600 text-xs mt-1">Codigo {product.code}</Text>
+            <Text className="text-slate-600 text-xs mt-1">
+              Codigo {formatItemCode(product.code)}
+            </Text>
             <Text className="text-slate-600 text-xs">{product.location || 'Sin ubicacion'}</Text>
             <Text className="text-slate-400 text-[10px] mt-1">{today}</Text>
           </View>

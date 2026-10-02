@@ -26,8 +26,8 @@ import Chip from '../components/Chip';
 import { useSession } from '../state/SessionContext';
 import { hapticTap, hapticSuccess, hapticError } from '../lib/haptics';
 import { readJSON, writeJSON, STORAGE_KEYS } from '../lib/storage';
-import { prefixQRItem } from '../const/prefix.const';
 import { Screen } from '../components/ui/Screen';
+import { toTicket } from '../lib/toTicket';
 
 const LABEL_FORMATS = ['58mm', '80mm'];
 
@@ -123,10 +123,14 @@ export default function SettingsScreen() {
     hapticTap();
     setTesting(true);
     try {
-      await printInventoryTicket(
-        { id: 'pruebas', code: 'BOD-001', name: 'Ticket de prueba', qty: 1, location: 'Bodega' },
-        `${prefixQRItem}pruebas`,
-      );
+      const item = {
+        id: 'pruebas',
+        code: 1,
+        name: 'Ticket de prueba',
+        qty: 1,
+        location: 'Bodega',
+      };
+      await printInventoryTicket(toTicket(item));
       hapticSuccess();
     } catch (e: any) {
       hapticError();

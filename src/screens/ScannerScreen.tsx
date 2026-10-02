@@ -12,6 +12,9 @@ import { NotFoundSheet } from '../components/NotFoundSheet';
 import { InventoryItem } from '../interfaces/item.interface';
 import { formatItemCode } from '../lib/formatItemCode';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import ThermalPreviewModal from '../components/ThermalPreviewModal';
+import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
+import { toTicket } from '../lib/toTicket';
 
 export default function ScannerScreen() {
   const insets = useSafeAreaInsets();
@@ -23,11 +26,16 @@ export default function ScannerScreen() {
   const [notFoundCode, setNotFoundCode] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState<{ barcode: string; sku: string } | null>(null);
   const [savedItem, setSavedItem] = useState<InventoryItem | null>(null);
+  const [printItem, setPrintItem] = useState<InventoryItem | null>(null);
+  const [printed, setPrinted] = useState<boolean>(false);
 
   useEffect(() => {
     if (!savedItem) return;
 
-    const timer = setTimeout(() => setSavedItem(null), 3000);
+    const timer = setTimeout(() => {
+      setSavedItem(null);
+      setPrinted(false);
+    }, 3000);
     return () => clearTimeout(timer);
   }, [savedItem]);
 
@@ -63,6 +71,31 @@ export default function ScannerScreen() {
     },
     [loading, lookup],
   );
+
+  const handleSaveItem = async (item: InventoryItem, print: boolean) => {
+    setLookup(null);
+    setNewProduct(null);
+    if (print) {
+      const printer = getConnectedPrinter();
+      if (!printer) {
+        setPrintItem(item);
+      } else {
+        try {
+          setLoading(true);
+          await printInventoryTicket(toTicket(item));
+          setSavedItem(item);
+          setPrinted(true);
+        } catch (err) {
+          hapticError();
+          setPrintItem(item);
+        } finally {
+          setLoading(false);
+        }
+      }
+    } else {
+      setSavedItem(item);
+    }
+  };
 
   if (!permission) {
     return (
@@ -107,6 +140,7 @@ export default function ScannerScreen() {
               <Text className="text-white/80 text-base" numberOfLines={1}>
                 {savedItem.name}
               </Text>
+              {printed && <Text className="text-white/80 text-base">Etiqueta impresa</Text>}
             </View>
           </View>
         </View>
@@ -118,7 +152,9 @@ export default function ScannerScreen() {
         barcodeScannerSettings={{
           barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93', 'ean13', 'upc_a', 'ean8'],
         }}
-        onBarcodeScanned={loading || lookup || notFoundCode || newProduct ? undefined : onScanned}
+        onBarcodeScanned={
+          loading || lookup || notFoundCode || newProduct || printItem ? undefined : onScanned
+        }
       />
 
       {/* Retícula de enfoque */}
@@ -161,11 +197,7 @@ export default function ScannerScreen() {
             setLookup(null);
             setNewProduct(null);
           }}
-          onSaved={(item) => {
-            setLookup(null);
-            setNewProduct(null);
-            setSavedItem(item);
-          }}
+          onSaved={(item, print) => handleSaveItem(item, print)}
         />
       )}
       {notFoundCode && (
@@ -179,6 +211,27 @@ export default function ScannerScreen() {
           onCreateNew={(sku) => {
             setNewProduct({ barcode: notFoundCode, sku });
             setNotFoundCode(null);
+          }}
+        />
+      )}
+
+      {printItem && (
+        <ThermalPreviewModal
+          visible
+          onClose={() => {
+            setSavedItem(printItem);
+            setPrintItem(null);
+          }}
+          product={{
+            id: printItem.id,
+            name: printItem.name || '',
+            qty: printItem.qty,
+            location: printItem.location || '',
+            code: printItem.code,
+          }}
+          onGoToPrinterSetup={() => {
+            setPrintItem(null);
+            navigation.navigate('Settings');
           }}
         />
       )}

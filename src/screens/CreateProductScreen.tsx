@@ -248,7 +248,7 @@ export default function CreateProductScreen() {
         onClose={() => setShowPrint(false)}
         product={{
           id: form.localId,
-          code: '',
+          code: 0,
           name: form.name,
           qty: form.qty,
           location: form.location,
