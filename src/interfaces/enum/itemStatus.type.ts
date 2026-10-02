@@ -4,4 +4,5 @@ export type ItemStatus =
   | 'assembling'
   | 'ready'
   | 'sold'
-  | 'damaged';
+  | 'damaged'
+  | 'paused';

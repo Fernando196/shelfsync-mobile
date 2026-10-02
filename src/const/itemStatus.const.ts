@@ -26,4 +26,8 @@ export const ITEM_STATUS: Record<ItemStatus, { label: string; tone: PillTone }> 
     label: 'Dañado',
     tone: 'danger',
   },
+  paused: {
+    label: 'En pausa',
+    tone: 'warning',
+  },
 };
