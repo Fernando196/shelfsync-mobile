@@ -10,10 +10,10 @@ import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import StatusPill from '../components/StatusPill';
 import { getItemStatus } from '../lib/statusItem';
-import { ITEM_ACTIONS, ItemAction } from '../const/itemStatus.const';
-import { hapticError } from '../lib/haptics';
+import { ITEM_ACTIONS } from '../const/itemStatus.const';
 import ButtonPill from '../components/ui/ButtonPill';
 import { CommentSheet } from '../components/CommentSheet';
+import { useItemStatusAction } from '../hooks/useItemStatusAction';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -24,8 +24,10 @@ export default function ItemDetailScreen() {
   const [showPrint, setShowPrint] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [changing, setChanging] = useState(false);
-  const [pendingAction, setPendingAction] = useState<ItemAction | null>(null);
+  const { changing, pendingAction, handleAction, runAction, cancelComment } = useItemStatusAction(
+    id,
+    setItem,
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -73,24 +75,6 @@ export default function ItemDetailScreen() {
         },
       ],
     );
-  };
-
-  const handleAction = (action: ItemAction) => {
-    if (action.needsComment) setPendingAction(action);
-    else runAction(action);
-  };
-
-  const runAction = async (action: ItemAction, comment?: string) => {
-    setChanging(true);
-    try {
-      setItem(await updateItemStatus(id, action.to, comment));
-      setPendingAction(null);
-    } catch (err: any) {
-      hapticError();
-      Alert.alert('No se pudo cambiar', err.message);
-    } finally {
-      setChanging(false);
-    }
   };
 
   if (error) {
@@ -224,7 +208,7 @@ export default function ItemDetailScreen() {
 
       {pendingAction && (
         <CommentSheet
-          onClose={() => setPendingAction(null)}
+          onClose={cancelComment}
           onConfirm={(comment) => runAction(pendingAction, comment)}
           loading={changing}
           title="Artículo dañado"
