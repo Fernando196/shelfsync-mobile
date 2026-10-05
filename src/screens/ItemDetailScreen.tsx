@@ -13,6 +13,7 @@ import { getItemStatus } from '../lib/statusItem';
 import { ITEM_ACTIONS, ItemAction } from '../const/itemStatus.const';
 import { hapticError } from '../lib/haptics';
 import ButtonPill from '../components/ui/ButtonPill';
+import { CommentSheet } from '../components/CommentSheet';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -24,6 +25,7 @@ export default function ItemDetailScreen() {
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [changing, setChanging] = useState(false);
+  const [pendingAction, setPendingAction] = useState<ItemAction | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -73,11 +75,16 @@ export default function ItemDetailScreen() {
     );
   };
 
-  const handleAction = async (action: ItemAction) => {
+  const handleAction = (action: ItemAction) => {
+    if (action.needsComment) setPendingAction(action);
+    else runAction(action);
+  };
+
+  const runAction = async (action: ItemAction, comment?: string) => {
+    setChanging(true);
     try {
-      setChanging(true);
-      const updateItem = await updateItemStatus(id, action.to);
-      setItem(updateItem);
+      setItem(await updateItemStatus(id, action.to, comment));
+      setPendingAction(null);
     } catch (err: any) {
       hapticError();
       Alert.alert('No se pudo cambiar', err.message);
@@ -214,6 +221,15 @@ export default function ItemDetailScreen() {
           navigation.navigate('Settings');
         }}
       />
+
+      {pendingAction && (
+        <CommentSheet
+          onClose={() => setPendingAction(null)}
+          onConfirm={(comment) => runAction(pendingAction, comment)}
+          loading={changing}
+          title="Artículo dañado"
+        />
+      )}
     </View>
   );
 }
