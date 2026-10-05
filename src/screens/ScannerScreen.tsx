@@ -15,6 +15,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
 import { toTicket } from '../lib/toTicket';
+import { getItemById } from '../services/items.service';
+import { DETAIL_ON_SCAN } from '../const/itemStatus.const';
+import { ItemStatusSheet } from '../components/ItemStatusSheet';
+import { IToast, Toast } from '../components/ui/Toast';
+import { getItemStatus } from '../lib/statusItem';
 
 export default function ScannerScreen() {
   const insets = useSafeAreaInsets();
@@ -25,23 +30,26 @@ export default function ScannerScreen() {
   const [lookup, setLookup] = useState<IProductLookup | null>(null);
   const [notFoundCode, setNotFoundCode] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState<{ barcode: string; sku: string } | null>(null);
-  const [savedItem, setSavedItem] = useState<InventoryItem | null>(null);
   const [printItem, setPrintItem] = useState<InventoryItem | null>(null);
   const [printed, setPrinted] = useState<boolean>(false);
+  const [scannedItem, setScannedItem] = useState<InventoryItem | null>(null);
+  const [toast, setToast] = useState<IToast | null>(null);
+
+  const navigateDetailItem = (id: string) => navigation.navigate('ItemDetail', { id: id });
 
   useEffect(() => {
-    if (!savedItem) return;
+    if (!toast) return;
 
     const timer = setTimeout(() => {
-      setSavedItem(null);
+      setToast(null);
       setPrinted(false);
     }, 3000);
     return () => clearTimeout(timer);
-  }, [savedItem]);
+  }, [toast]);
 
   const onScanned = useCallback(
     async ({ data }: { data: string }) => {
-      if (loading || lookup) return;
+      if (loading || lookup || scannedItem) return;
       setLoading(true);
       try {
         if (data.startsWith(prefixQRItem)) {
@@ -51,7 +59,13 @@ export default function ScannerScreen() {
             Alert.alert('QR incorrecto', 'El id del qr es incorrecto');
             return;
           }
-          navigation.navigate('ItemDetail', { id: id });
+
+          const item = await getItemById(id);
+          if (DETAIL_ON_SCAN.includes(item.status)) {
+            navigateDetailItem(item.id);
+          } else {
+            setScannedItem(item);
+          }
         } else {
           // TODO: codigo externo para buscar producto o agregar nuevo
           const product = await findProductByCode(data);
@@ -69,7 +83,7 @@ export default function ScannerScreen() {
         setLoading(false);
       }
     },
-    [loading, lookup],
+    [loading, lookup, scannedItem],
   );
 
   const handleSaveItem = async (item: InventoryItem, print: boolean) => {
@@ -83,7 +97,10 @@ export default function ScannerScreen() {
         try {
           setLoading(true);
           await printInventoryTicket(toTicket(item));
-          setSavedItem(item);
+          setToast({
+            title: `${formatItemCode(item.code)} guardada`,
+            subtitle: item.name || '',
+          });
           setPrinted(true);
         } catch (err) {
           hapticError();
@@ -93,7 +110,10 @@ export default function ScannerScreen() {
         }
       }
     } else {
-      setSavedItem(item);
+      setToast({
+        title: `${formatItemCode(item.code)} guardada`,
+        subtitle: item.name || '',
+      });
     }
   };
 
@@ -123,27 +143,10 @@ export default function ScannerScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      {savedItem && (
-        <View
-          className="absolute left-0 right-0 items-center z-10"
-          pointerEvents="none"
-          style={{
-            top: insets.top + 10,
-          }}
-        >
-          <View className="flex-row items-center bg-emerald-600 rounded-2xl px-4 py-3 mx-4">
-            <CheckCircle2 size={22} color="#fff" />
-            <View className="ml-3">
-              <Text className="text-white font-bold text-lg">
-                {formatItemCode(savedItem.code)} guardada
-              </Text>
-              <Text className="text-white/80 text-base" numberOfLines={1}>
-                {savedItem.name}
-              </Text>
-              {printed && <Text className="text-white/80 text-base">Etiqueta impresa</Text>}
-            </View>
-          </View>
-        </View>
+      {toast && (
+        <Toast toast={toast}>
+          {printed && <Text className="text-white/80 text-base">Etiqueta impresa</Text>}
+        </Toast>
       )}
 
       <CameraView
@@ -153,7 +156,9 @@ export default function ScannerScreen() {
           barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93', 'ean13', 'upc_a', 'ean8'],
         }}
         onBarcodeScanned={
-          loading || lookup || notFoundCode || newProduct || printItem ? undefined : onScanned
+          loading || lookup || notFoundCode || newProduct || printItem || scannedItem
+            ? undefined
+            : onScanned
         }
       />
 
@@ -219,7 +224,10 @@ export default function ScannerScreen() {
         <ThermalPreviewModal
           visible
           onClose={() => {
-            setSavedItem(printItem);
+            setToast({
+              title: `${formatItemCode(printItem.code)} guardada`,
+              subtitle: printItem.name || '',
+            });
             setPrintItem(null);
           }}
           product={{
@@ -232,6 +240,24 @@ export default function ScannerScreen() {
           onGoToPrinterSetup={() => {
             setPrintItem(null);
             navigation.navigate('Settings');
+          }}
+        />
+      )}
+
+      {scannedItem && (
+        <ItemStatusSheet
+          item={scannedItem}
+          onUpdate={(item) => {
+            setToast({
+              title: `${formatItemCode(item.code)} → ${getItemStatus(item).label}`,
+              subtitle: item.name || item.productLookup.description || '',
+            });
+            setScannedItem(null);
+          }}
+          onClose={() => setScannedItem(null)}
+          onViewDetail={() => {
+            setScannedItem(null);
+            navigateDetailItem(scannedItem.id);
           }}
         />
       )}

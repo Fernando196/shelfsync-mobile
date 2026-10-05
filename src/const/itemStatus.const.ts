@@ -136,3 +136,5 @@ export const ITEM_ACTIONS: Record<ItemStatus, ItemAction[]> = {
   ],
   [ItemStatus.DAMAGED]: [],
 };
+
+export const DETAIL_ON_SCAN = [ItemStatus.DAMAGED, ItemStatus.SOLD];
