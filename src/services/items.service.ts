@@ -1,4 +1,5 @@
 import { request } from '../api/http';
+import { ItemStatus } from '../interfaces/enum/itemStatus.type';
 import { InventoryItem, UpsertItemInput } from '../interfaces/item.interface';
 
 export function createItem(input: UpsertItemInput): Promise<InventoryItem> {
@@ -9,6 +10,20 @@ export function updateItem(id: string, patch: Partial<UpsertItemInput>): Promise
   return request(`/items/${encodeURIComponent(id)}`, {
     method: 'PATCH',
     body: JSON.stringify(patch),
+  });
+}
+
+export function updateItemStatus(
+  id: string,
+  status: ItemStatus,
+  comment?: string,
+): Promise<InventoryItem> {
+  return request(`/items/${encodeURIComponent(id)}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      status,
+      comment,
+    }),
   });
 }
 

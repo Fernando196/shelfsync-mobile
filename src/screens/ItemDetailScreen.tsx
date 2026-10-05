@@ -5,11 +5,14 @@ import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Trash2 } from 'luci
 import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { InventoryItem } from '../interfaces/item.interface';
-import { deleteItem, getItemById } from '../services/items.service';
+import { deleteItem, getItemById, updateItemStatus } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import StatusPill from '../components/StatusPill';
 import { getItemStatus } from '../lib/statusItem';
+import { ITEM_ACTIONS, ItemAction } from '../const/itemStatus.const';
+import { hapticError } from '../lib/haptics';
+import ButtonPill from '../components/ui/ButtonPill';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -20,6 +23,7 @@ export default function ItemDetailScreen() {
   const [showPrint, setShowPrint] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [changing, setChanging] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -69,6 +73,19 @@ export default function ItemDetailScreen() {
     );
   };
 
+  const handleAction = async (action: ItemAction) => {
+    try {
+      setChanging(true);
+      const updateItem = await updateItemStatus(id, action.to);
+      setItem(updateItem);
+    } catch (err: any) {
+      hapticError();
+      Alert.alert('No se pudo cambiar', err.message);
+    } finally {
+      setChanging(false);
+    }
+  };
+
   if (error) {
     return (
       <View className="flex-1 items-center justify-center bg-surface px-8">
@@ -89,6 +106,7 @@ export default function ItemDetailScreen() {
   if (!item) return null;
 
   const status = getItemStatus(item);
+  const actions = ITEM_ACTIONS[item.status] ?? [];
 
   return (
     <View className="flex-1 bg-surface">
@@ -147,6 +165,16 @@ export default function ItemDetailScreen() {
             <Text className="text-slate-500 ml-2 flex-1">Categoria</Text>
             <Text className="font-semibold text-slate-800">{item.category?.name || '-'}</Text>
           </View>
+
+          {actions.map((action) => (
+            <ButtonPill
+              disabled={changing}
+              key={action.to}
+              onPress={() => handleAction(action)}
+              label={action.label}
+              variant={action.variant}
+            />
+          ))}
         </View>
         <Pressable
           onPress={() => setShowPrint(true)}
