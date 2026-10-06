@@ -13,13 +13,13 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { Tag, Boxes, MapPin, Minus, Plus } from 'lucide-react-native';
 import AccordionSection from '../components/ui/AccordionSection';
 import { hapticSuccess, hapticError } from '../lib/haptics';
-import { EditForm, InventoryItem } from '../interfaces/item.interface';
+import { IEditForm, IInventoryItem } from '../interfaces/item.interface';
 import { getItemById, updateItem } from '../services/items.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import CategoryAutocomplete from '../components/form/CategoryAutocomplete';
 import LocationPickerMap from '../components/form/LocationPickerMap';
 
-function emptyForm(): EditForm {
+function emptyForm(): IEditForm {
   return {
     name: '',
     qty: 1,
@@ -36,9 +36,9 @@ export default function EditProductScreen() {
   const { id } = route.params;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [item, setItem] = useState<InventoryItem | null>(null);
+  const [item, setItem] = useState<IInventoryItem | null>(null);
 
-  const [form, setForm] = useState<EditForm>(emptyForm());
+  const [form, setForm] = useState<IEditForm>(emptyForm());
 
   useEffect(() => {
     getItemById(id)
@@ -78,7 +78,7 @@ export default function EditProductScreen() {
     }
   };
 
-  const onChangeForm = <K extends keyof EditForm>(key: K, value: EditForm[K]) =>
+  const onChangeForm = <K extends keyof IEditForm>(key: K, value: IEditForm[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
   if (loading) {

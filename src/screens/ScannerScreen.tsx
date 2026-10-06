@@ -9,7 +9,7 @@ import { findProductByCode } from '../services/productLookup.service';
 import { IProductLookup } from '../interfaces/productLookup.interface';
 import { ReceiveBoxSheet } from '../components/reception/ReceiveBoxSheet';
 import { NotFoundSheet } from '../components/reception/NotFoundSheet';
-import { InventoryItem } from '../interfaces/item.interface';
+import { IInventoryItem } from '../interfaces/item.interface';
 import { formatItemCode } from '../lib/formatItemCode';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
@@ -30,9 +30,9 @@ export default function ScannerScreen() {
   const [lookup, setLookup] = useState<IProductLookup | null>(null);
   const [notFoundCode, setNotFoundCode] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState<{ barcode: string; sku: string } | null>(null);
-  const [printItem, setPrintItem] = useState<InventoryItem | null>(null);
+  const [printItem, setPrintItem] = useState<IInventoryItem | null>(null);
   const [printed, setPrinted] = useState<boolean>(false);
-  const [scannedItem, setScannedItem] = useState<InventoryItem | null>(null);
+  const [scannedItem, setScannedItem] = useState<IInventoryItem | null>(null);
   const [toast, setToast] = useState<IToast | null>(null);
 
   const navigateDetailItem = (id: string) => navigation.navigate('ItemDetail', { id: id });
@@ -86,7 +86,7 @@ export default function ScannerScreen() {
     [loading, lookup, scannedItem],
   );
 
-  const handleSaveItem = async (item: InventoryItem, print: boolean) => {
+  const handleSaveItem = async (item: IInventoryItem, print: boolean) => {
     setLookup(null);
     setNewProduct(null);
     if (print) {

@@ -8,7 +8,7 @@ export interface IProductLookup extends IAuditable {
   needAssembly: boolean;
 }
 
-export interface CreateProductLookupInput {
+export interface ICreateProductLookupInput {
   barcode?: string;
   sku?: string;
   description?: string;

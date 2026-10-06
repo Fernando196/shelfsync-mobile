@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, Pressable } from 'react-native';
 import { Package, MapPin } from 'lucide-react-native';
 import StatusPill, { PillTone } from '../item/StatusPill';
-import { ProductCardData } from '../../interfaces/product.interface';
+import { IProductCardData } from '../../interfaces/product.interface';
 
 export default function ProductCard({
   item,
@@ -10,7 +10,7 @@ export default function ProductCard({
   statusTone,
   onPress,
 }: {
-  item: ProductCardData;
+  item: IProductCardData;
   statusLabel?: string;
   statusTone?: PillTone;
   onPress?: () => void;

@@ -3,19 +3,19 @@
 // crear el articulo en el backend (POST /items es upsert idempotente por
 // id), asi que reintentar un envio nunca duplica el articulo.
 import { readJSON, writeJSON, STORAGE_KEYS } from './storage';
-import { QueuedProduct, QueueEntry } from '../interfaces/queue.interface';
+import { IQueuedProduct, IQueueEntry } from '../interfaces/queue.interface';
 import { createItem } from '../services/items.service';
 import { uploadPhoto } from '../services/files.service';
 
-async function readQueue(): Promise<QueueEntry[]> {
-  return (await readJSON<QueueEntry[]>(STORAGE_KEYS.syncQueue)) ?? [];
+async function readQueue(): Promise<IQueueEntry[]> {
+  return (await readJSON<IQueueEntry[]>(STORAGE_KEYS.syncQueue)) ?? [];
 }
 
-async function writeQueue(entries: QueueEntry[]): Promise<void> {
+async function writeQueue(entries: IQueueEntry[]): Promise<void> {
   await writeJSON(STORAGE_KEYS.syncQueue, entries);
 }
 
-export async function listQueue(): Promise<QueueEntry[]> {
+export async function listQueue(): Promise<IQueueEntry[]> {
   const entries = await readQueue();
   // Ordena por createdAt descendente (mas reciente primero) con comparacion
   // lexicografica simple: createdAt es un string ISO 8601, que ya ordena
@@ -27,9 +27,9 @@ export async function listQueue(): Promise<QueueEntry[]> {
   );
 }
 
-export async function enqueueProduct(product: QueuedProduct): Promise<QueueEntry> {
+export async function enqueueProduct(product: IQueuedProduct): Promise<IQueueEntry> {
   const now = new Date().toISOString();
-  const entry: QueueEntry = {
+  const entry: IQueueEntry = {
     localId: product.localId,
     product,
     status: 'pending',
@@ -42,7 +42,7 @@ export async function enqueueProduct(product: QueuedProduct): Promise<QueueEntry
   return entry;
 }
 
-async function updateEntry(localId: string, patch: Partial<QueueEntry>): Promise<void> {
+async function updateEntry(localId: string, patch: Partial<IQueueEntry>): Promise<void> {
   const entries = await readQueue();
   const idx = entries.findIndex((e) => e.localId === localId);
   if (idx === -1) return;

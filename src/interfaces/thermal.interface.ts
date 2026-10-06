@@ -1,4 +1,4 @@
-export interface ThermalTicketProduct {
+export interface IThermalTicketProduct {
   id: string;
   code: number;
   name: string;
@@ -6,9 +6,9 @@ export interface ThermalTicketProduct {
   location: string;
 }
 
-export interface ThermalPreviewModalProps {
+export interface IThermalPreviewModalProps {
   visible: boolean;
   onClose: () => void;
-  product: ThermalTicketProduct;
+  product: IThermalTicketProduct;
   onGoToPrinterSetup?: () => void;
 }

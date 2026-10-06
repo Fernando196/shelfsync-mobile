@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { Printer, X, Bluetooth, TriangleAlert } from 'lucide-react-native';
-import { ThermalPreviewModalProps } from '../../interfaces/thermal.interface';
+import { IThermalPreviewModalProps } from '../../interfaces/thermal.interface';
 import { getConnectedPrinter, printInventoryTicket } from '../../printing/PrinterService';
 import { formatDateEs } from '../../lib/formatDate';
 import { hapticError, hapticSuccess, hapticTap } from '../../lib/haptics';
@@ -15,7 +15,7 @@ export default function ThermalPreviewModal({
   onClose,
   product,
   onGoToPrinterSetup,
-}: ThermalPreviewModalProps) {
+}: IThermalPreviewModalProps) {
   const [printerName, setPrinterName] = useState<string | null>(null);
   const [printing, setPrinting] = useState(false);
 

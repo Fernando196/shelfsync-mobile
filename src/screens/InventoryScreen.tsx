@@ -5,9 +5,9 @@ import { Search, PackageSearch, WifiOff } from 'lucide-react-native';
 import { listQueue } from '../lib/syncQueue';
 import ProductCard from '../components/reception/ProductCard';
 import { PillTone } from '../components/item/StatusPill';
-import { InventoryItem } from '../interfaces/item.interface';
-import { QueueEntry } from '../interfaces/queue.interface';
-import { ProductCardData } from '../interfaces/product.interface';
+import { IInventoryItem } from '../interfaces/item.interface';
+import { IQueueEntry } from '../interfaces/queue.interface';
+import { IProductCardData } from '../interfaces/product.interface';
 import { listItems } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
@@ -16,7 +16,7 @@ import { getItemStatus } from '../lib/statusItem';
 
 type Row = {
   key: string;
-  card: ProductCardData;
+  card: IProductCardData;
   statusLabel?: string;
   statusTone?: PillTone;
   onPress?: () => void;
@@ -25,8 +25,8 @@ type Row = {
 export default function InventoryScreen() {
   const navigation = useNavigation<any>();
   const [query, setQuery] = useState('');
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [queue, setQueue] = useState<QueueEntry[]>([]);
+  const [items, setItems] = useState<IInventoryItem[]>([]);
+  const [queue, setQueue] = useState<IQueueEntry[]>([]);
   const [offline, setOffline] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 

@@ -1,4 +1,4 @@
-export interface QueuedProduct {
+export interface IQueuedProduct {
   localId: string;
   code: string;
   categoryId?: string;
@@ -11,12 +11,12 @@ export interface QueuedProduct {
   longitude?: number;
 }
 
-export type QueueStatus = 'pending' | 'syncing' | 'synced' | 'error';
+export type IQueueStatus = 'pending' | 'syncing' | 'synced' | 'error';
 
-export interface QueueEntry {
+export interface IQueueEntry {
   localId: string;
-  product: QueuedProduct;
-  status: QueueStatus;
+  product: IQueuedProduct;
+  status: IQueueStatus;
   error?: string;
   createdAt: string;
   updatedAt: string;

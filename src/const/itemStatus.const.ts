@@ -1,8 +1,8 @@
 import { PillTone } from '../components/item/StatusPill';
-import { ItemStatus } from '../interfaces/enum/itemStatus.type';
+import { EnumItemStatus } from '../interfaces/enum/itemStatus.type';
 import { ButtonVariant } from './styles.const';
 
-export const ITEM_STATUS: Record<ItemStatus, { label: string; tone: PillTone }> = {
+export const ITEM_STATUS: Record<EnumItemStatus, { label: string; tone: PillTone }> = {
   received: {
     label: 'Recibido',
     tone: 'neutral',
@@ -35,106 +35,106 @@ export const ITEM_STATUS: Record<ItemStatus, { label: string; tone: PillTone }> 
 
 export type ItemAction = {
   label: string;
-  to: ItemStatus;
+  to: EnumItemStatus;
   needsComment?: boolean;
   variant: ButtonVariant;
 };
 
-export const ITEM_ACTIONS: Record<ItemStatus, ItemAction[]> = {
-  [ItemStatus.RECEIVED]: [
+export const ITEM_ACTIONS: Record<EnumItemStatus, ItemAction[]> = {
+  [EnumItemStatus.RECEIVED]: [
     {
       label: 'Requiere ensamble',
-      to: ItemStatus.PENDING_ASSEMBLY,
+      to: EnumItemStatus.PENDING_ASSEMBLY,
       variant: 'secondary',
     },
     {
       label: 'Vendido',
-      to: ItemStatus.SOLD,
+      to: EnumItemStatus.SOLD,
       variant: 'primary',
     },
     {
       label: 'Dañado',
-      to: ItemStatus.DAMAGED,
+      to: EnumItemStatus.DAMAGED,
       needsComment: true,
       variant: 'danger',
     },
   ],
-  [ItemStatus.PENDING_ASSEMBLY]: [
+  [EnumItemStatus.PENDING_ASSEMBLY]: [
     {
       label: 'Iniciar ensamble',
-      to: ItemStatus.ASSEMBLING,
+      to: EnumItemStatus.ASSEMBLING,
       variant: 'primary',
     },
     {
       label: 'Dañado',
-      to: ItemStatus.DAMAGED,
+      to: EnumItemStatus.DAMAGED,
       needsComment: true,
       variant: 'danger',
     },
   ],
-  [ItemStatus.ASSEMBLING]: [
+  [EnumItemStatus.ASSEMBLING]: [
     {
       label: 'Terminado',
-      to: ItemStatus.READY,
+      to: EnumItemStatus.READY,
       variant: 'primary',
     },
     {
       label: 'Pausar',
-      to: ItemStatus.PAUSED,
+      to: EnumItemStatus.PAUSED,
       variant: 'secondary',
     },
     {
       label: 'Cancelar ensamble',
-      to: ItemStatus.PENDING_ASSEMBLY,
+      to: EnumItemStatus.PENDING_ASSEMBLY,
       variant: 'secondary',
     },
     {
       label: 'Dañado',
-      to: ItemStatus.DAMAGED,
+      to: EnumItemStatus.DAMAGED,
       needsComment: true,
       variant: 'danger',
     },
   ],
-  [ItemStatus.PAUSED]: [
+  [EnumItemStatus.PAUSED]: [
     {
       label: 'Reanudar',
-      to: ItemStatus.ASSEMBLING,
+      to: EnumItemStatus.ASSEMBLING,
       variant: 'primary',
     },
     {
       label: 'Cancelar ensamble',
-      to: ItemStatus.PENDING_ASSEMBLY,
+      to: EnumItemStatus.PENDING_ASSEMBLY,
       variant: 'secondary',
     },
     {
       label: 'Dañado',
-      to: ItemStatus.DAMAGED,
+      to: EnumItemStatus.DAMAGED,
       needsComment: true,
       variant: 'danger',
     },
   ],
-  [ItemStatus.READY]: [
+  [EnumItemStatus.READY]: [
     {
       label: 'Vendido',
-      to: ItemStatus.SOLD,
+      to: EnumItemStatus.SOLD,
       variant: 'primary',
     },
     {
       label: 'Dañado',
-      to: ItemStatus.DAMAGED,
+      to: EnumItemStatus.DAMAGED,
       needsComment: true,
       variant: 'danger',
     },
   ],
-  [ItemStatus.SOLD]: [
+  [EnumItemStatus.SOLD]: [
     {
       label: 'Dañado',
-      to: ItemStatus.DAMAGED,
+      to: EnumItemStatus.DAMAGED,
       needsComment: true,
       variant: 'danger',
     },
   ],
-  [ItemStatus.DAMAGED]: [],
+  [EnumItemStatus.DAMAGED]: [],
 };
 
-export const DETAIL_ON_SCAN = [ItemStatus.DAMAGED, ItemStatus.SOLD];
+export const DETAIL_ON_SCAN = [EnumItemStatus.DAMAGED, EnumItemStatus.SOLD];

@@ -2,7 +2,7 @@ import { Boxes, Minus, Package, Plus } from 'lucide-react-native';
 import { View, Text, Pressable, Alert, Switch } from 'react-native';
 import { useEffect, useState } from 'react';
 import { Input } from '../ui/Input';
-import { InventoryItem, UpsertItemInput } from '../../interfaces/item.interface';
+import { IInventoryItem, IUpsertItemInput } from '../../interfaces/item.interface';
 import { generateUuid } from '../../lib/uuid';
 import { hapticError, hapticSuccess } from '../../lib/haptics';
 import { createItem } from '../../services/items.service';
@@ -61,7 +61,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
   const handleSave = async (print: boolean) => {
     setSaving(true);
     try {
-      const item: UpsertItemInput = {
+      const item: IUpsertItemInput = {
         id: generateUuid(),
         name: product?.description || form.description.trim() || '',
         qty: form.qty,
@@ -81,7 +81,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
             }),
       };
 
-      const newItem: InventoryItem = await createItem(item);
+      const newItem: IInventoryItem = await createItem(item);
 
       for (const uri of form.photos) {
         await uploadPhoto(newItem.id, uri);
@@ -206,5 +206,5 @@ export interface IReceiveBoxSheetProps {
   product: IProductLookup | null;
   newProduct?: { barcode: string; sku: string } | null;
   onClose: () => void;
-  onSaved: (item: InventoryItem, print: boolean) => void;
+  onSaved: (item: IInventoryItem, print: boolean) => void;
 }

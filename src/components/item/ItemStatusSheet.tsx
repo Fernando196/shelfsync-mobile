@@ -1,7 +1,7 @@
 import { BottomSheet } from '../ui/BottomSheet';
 import ButtonPill from '../ui/ButtonPill';
 import { Text, View } from 'react-native';
-import { InventoryItem } from '../../interfaces/item.interface';
+import { IInventoryItem } from '../../interfaces/item.interface';
 import { formatItemCode } from '../../lib/formatItemCode';
 import { ITEM_ACTIONS } from '../../const/itemStatus.const';
 import { useItemStatusAction } from '../../hooks/useItemStatusAction';
@@ -16,9 +16,9 @@ export function ItemStatusSheet({
   onUpdate,
   onViewDetail,
 }: {
-  item: InventoryItem;
+  item: IInventoryItem;
   onClose: () => void;
-  onUpdate: (item: InventoryItem) => void;
+  onUpdate: (item: IInventoryItem) => void;
   onViewDetail: () => void;
 }) {
   const actions = ITEM_ACTIONS[item.status] ?? [];

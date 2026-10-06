@@ -1,6 +1,6 @@
 import { ITEM_STATUS } from '../const/itemStatus.const';
-import { InventoryItem } from '../interfaces/item.interface';
+import { IInventoryItem } from '../interfaces/item.interface';
 
-export function getItemStatus(item: InventoryItem) {
+export function getItemStatus(item: IInventoryItem) {
   return ITEM_STATUS[item.status] ?? ITEM_STATUS.received;
 }

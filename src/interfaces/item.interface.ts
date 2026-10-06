@@ -1,16 +1,16 @@
 import { ICategoryItem } from './category.interface';
-import { ItemStatus } from './enum/itemStatus.type';
+import { EnumItemStatus } from './enum/itemStatus.type';
 import { IAuditable } from './generic.interface';
-import { CreateProductLookupInput, IProductLookup } from './productLookup.interface';
+import { ICreateProductLookupInput, IProductLookup } from './productLookup.interface';
 
-export interface InventoryPhoto {
+export interface IInventoryPhoto {
   id: string;
   filename: string;
   url: string;
   createdAt: string;
 }
 
-export interface InventoryItem extends IAuditable {
+export interface IInventoryItem extends IAuditable {
   id: string;
   code: number;
   categoryId: string | null;
@@ -19,17 +19,17 @@ export interface InventoryItem extends IAuditable {
   location: string | null;
   latitude: number | null;
   longitude: number | null;
-  files?: InventoryPhoto[];
+  files?: IInventoryPhoto[];
   notes: string | null;
 
   category?: ICategoryItem | null;
   productLookupId?: string;
   productLookup: IProductLookup;
 
-  status: ItemStatus;
+  status: EnumItemStatus;
 }
 
-export interface UpsertItemInput {
+export interface IUpsertItemInput {
   id?: string;
   categoryId?: string;
   name: string;
@@ -39,14 +39,28 @@ export interface UpsertItemInput {
   longitude?: number;
   notes?: string;
   productLookupId?: string;
-  productLookup?: CreateProductLookupInput;
+  productLookup?: ICreateProductLookupInput;
 }
 
-export interface EditForm {
+export interface IEditForm {
   name: string;
   qty: number;
   location: string;
   latitude: number | null;
   longitude: number | null;
   categoryId: string | null;
+}
+
+export interface IItemStatusHistory {
+  id: string;
+  fromStatus: EnumItemStatus | null;
+  toStatus: EnumItemStatus;
+  comment: string | null;
+  changedAt: string;
+  changedBy: { id: string; fullName: string | null } | null;
+}
+
+export interface IItemStatusHistoryResponse {
+  data: IItemStatusHistory[];
+  count: number;
 }

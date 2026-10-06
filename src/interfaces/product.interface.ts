@@ -1,4 +1,4 @@
-export interface ProductCardData {
+export interface IProductCardData {
   name: string;
   code?: string;
   qty: number;

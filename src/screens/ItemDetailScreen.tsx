@@ -3,7 +3,7 @@ import { View, Text, Image, ScrollView, ActivityIndicator, Pressable, Alert } fr
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
 import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Trash2 } from 'lucide-react-native';
 import type { RootStackParamList } from '../navigation/RootNavigator';
-import { InventoryItem } from '../interfaces/item.interface';
+import { IInventoryItem } from '../interfaces/item.interface';
 import { deleteItem, getItemById, updateItemStatus } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
@@ -19,7 +19,7 @@ export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
   const navigation = useNavigation<any>();
   const { id } = route.params;
-  const [item, setItem] = useState<InventoryItem | null>(null);
+  const [item, setItem] = useState<IInventoryItem | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showPrint, setShowPrint] = useState(false);
   const [deleting, setDeleting] = useState(false);

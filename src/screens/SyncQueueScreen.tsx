@@ -13,9 +13,9 @@ import { CloudUpload, RefreshCw, Trash2, CheckCheck, X } from 'lucide-react-nati
 import { listQueue, syncAll, syncEntry, clearSynced, removeEntry } from '../lib/syncQueue';
 import StatusPill, { PillTone } from '../components/item/StatusPill';
 import { hapticSuccess, hapticTap, hapticSelect } from '../lib/haptics';
-import { QueueEntry } from '../interfaces/queue.interface';
+import { IQueueEntry } from '../interfaces/queue.interface';
 
-const STATUS_META: Record<QueueEntry['status'], { label: string; tone: PillTone }> = {
+const STATUS_META: Record<IQueueEntry['status'], { label: string; tone: PillTone }> = {
   pending: { label: 'Pendiente', tone: 'warning' },
   syncing: { label: 'Sincronizando', tone: 'info' },
   synced: { label: 'Sincronizado', tone: 'success' },
@@ -23,7 +23,7 @@ const STATUS_META: Record<QueueEntry['status'], { label: string; tone: PillTone 
 };
 
 export default function SyncQueueScreen() {
-  const [entries, setEntries] = useState<QueueEntry[]>([]);
+  const [entries, setEntries] = useState<IQueueEntry[]>([]);
   const [syncingAll, setSyncingAll] = useState(false);
   const [retryingId, setRetryingId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -61,7 +61,7 @@ export default function SyncQueueScreen() {
     await load();
   };
 
-  const handleRemove = (entry: QueueEntry) => {
+  const handleRemove = (entry: IQueueEntry) => {
     Alert.alert(
       'Quitar de la cola',
       `"${entry.product.name || entry.product.sku}" se quita de este dispositivo. Esto no borra nada del servidor.`,

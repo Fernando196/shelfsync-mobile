@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { ItemAction } from '../const/itemStatus.const';
-import { InventoryItem } from '../interfaces/item.interface';
+import { IInventoryItem } from '../interfaces/item.interface';
 import { updateItemStatus } from '../services/items.service';
 import { hapticError } from '../lib/haptics';
 import { Alert } from 'react-native';
 
-export function useItemStatusAction(itemId: string, onUpdated: (item: InventoryItem) => void) {
+export function useItemStatusAction(itemId: string, onUpdated: (item: IInventoryItem) => void) {
   const [changing, setChanging] = useState<boolean>(false);
   const [pendingAction, setPendingAction] = useState<ItemAction | null>(null);
 
