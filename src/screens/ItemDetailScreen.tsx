@@ -14,6 +14,7 @@ import ButtonPill from '../components/ui/ButtonPill';
 import { CommentSheet } from '../components/item/CommentSheet';
 import { useItemStatusAction } from '../hooks/useItemStatusAction';
 import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
+import { StatusHistory } from '../components/item/StatusHistory';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -188,6 +189,7 @@ export default function ItemDetailScreen() {
             </>
           )}
         </Pressable>
+        <StatusHistory itemId={item.id} status={item.status} />
       </ScrollView>
 
       <ThermalPreviewModal

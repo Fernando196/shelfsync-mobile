@@ -1,8 +1,10 @@
-import { IItemStatusHistoryResponse } from './../interfaces/item.interface';
-
 import { request } from '../api/http';
 import { EnumItemStatus } from '../interfaces/enum/itemStatus.type';
-import { IInventoryItem, IUpsertItemInput } from '../interfaces/item.interface';
+import {
+  IInventoryItem,
+  IUpsertItemInput,
+  IItemStatusHistoryResponse,
+} from '../interfaces/item.interface';
 
 export function createItem(input: IUpsertItemInput): Promise<IInventoryItem> {
   return request('/items', { method: 'POST', body: JSON.stringify(input) });
