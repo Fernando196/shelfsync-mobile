@@ -28,7 +28,7 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
 
   if (loading && history.length === 0) return <ActivityIndicator color="#4f46e5" />;
   return (
-    <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4">
+    <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 mt-4">
       <Text className="text-sm font-semibold text-slate-500 mb-3">Historial</Text>
       {history.length === 0 ? (
         <Text className="text-slate-400 text-sm">Sin movimientos</Text>
