@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { View, Text, Pressable, Alert } from "react-native";
-import { Warehouse } from "lucide-react-native";
-import PinKeypad from "../../components/PinKeypad";
-import { verifyPin, resetSession } from "../../lib/auth";
-import { useSession } from "../../state/SessionContext";
-import { hapticError } from "../../lib/haptics";
+import React, { useState } from 'react';
+import { View, Text, Pressable, Alert } from 'react-native';
+import { Warehouse } from 'lucide-react-native';
+import { verifyPin, resetSession } from '../../lib/auth';
+import { useSession } from '../../state/SessionContext';
+import { hapticError } from '../../lib/haptics';
+import PinKeypad from '../../components/auth/PinKeypad';
 
 const PIN_LENGTH = 6;
 
 export default function PinUnlockScreen() {
   const { profile, unlock, resetSession: resetLocalSession } = useSession();
-  const [pin, setPin] = useState("");
+  const [pin, setPin] = useState('');
   const [error, setError] = useState(false);
   const [checking, setChecking] = useState(false);
 
@@ -29,7 +29,7 @@ export default function PinUnlockScreen() {
       hapticError();
       setError(true);
       setTimeout(() => {
-        setPin("");
+        setPin('');
         setError(false);
       }, 400);
     }
@@ -37,12 +37,12 @@ export default function PinUnlockScreen() {
 
   const handleForgotPin = () => {
     Alert.alert(
-      "Reiniciar sesion",
-      "Se borrara tu PIN, tu sesion y tu perfil local de este dispositivo. Tendras que iniciar sesion otra vez. El inventario ya sincronizado no se pierde.",
+      'Reiniciar sesion',
+      'Se borrara tu PIN, tu sesion y tu perfil local de este dispositivo. Tendras que iniciar sesion otra vez. El inventario ya sincronizado no se pierde.',
       [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Reiniciar", style: "destructive", onPress: () => resetLocalSession() },
-      ]
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Reiniciar', style: 'destructive', onPress: () => resetLocalSession() },
+      ],
     );
   };
 
@@ -53,12 +53,18 @@ export default function PinUnlockScreen() {
           <Warehouse size={28} color="#fff" />
         </View>
         <Text className="text-2xl font-bold text-slate-800">
-          Hola, {profile?.fullName?.split(" ")[0] ?? profile?.email?.split("@")[0] ?? "operario"}
+          Hola, {profile?.fullName?.split(' ')[0] ?? profile?.email?.split('@')[0] ?? 'operario'}
         </Text>
         <Text className="text-slate-400 mt-1">Ingresa tu PIN para continuar</Text>
       </View>
 
-      <PinKeypad value={pin} length={PIN_LENGTH} onChange={onPinChange} error={error} disabled={checking} />
+      <PinKeypad
+        value={pin}
+        length={PIN_LENGTH}
+        onChange={onPinChange}
+        error={error}
+        disabled={checking}
+      />
 
       <Pressable onPress={handleForgotPin} className="mt-10 items-center active:scale-95">
         <Text className="text-primary-600 font-medium">Olvide mi PIN / Reiniciar sesion</Text>

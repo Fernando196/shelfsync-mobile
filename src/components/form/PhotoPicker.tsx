@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Image, Pressable, ScrollView, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, ImagePlus, X } from 'lucide-react-native';
-import { hapticTap, hapticSelect } from '../lib/haptics';
+import { hapticTap, hapticSelect } from '../../lib/haptics';
 
 interface PhotoPickerProps {
   photos: string[];

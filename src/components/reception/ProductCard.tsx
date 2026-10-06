@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Image, Pressable } from 'react-native';
 import { Package, MapPin } from 'lucide-react-native';
-import StatusPill, { PillTone } from './StatusPill';
-import { ProductCardData } from '../interfaces/product.interface';
+import StatusPill, { PillTone } from '../item/StatusPill';
+import { ProductCardData } from '../../interfaces/product.interface';
 
 export default function ProductCard({
   item,

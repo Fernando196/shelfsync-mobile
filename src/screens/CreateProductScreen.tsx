@@ -20,15 +20,15 @@ import {
   Printer,
   RotateCcw,
 } from 'lucide-react-native';
-import AccordionSection from '../components/AccordionSection';
-import PhotoPicker from '../components/PhotoPicker';
-import LocationPickerMap from '../components/LocationPickerMap';
-import ThermalPreviewModal from '../components/ThermalPreviewModal';
+import AccordionSection from '../components/ui/AccordionSection';
 import { generateUuid } from '../lib/uuid';
 import { enqueueProduct, syncEntry } from '../lib/syncQueue';
 import { hapticSuccess, hapticTap } from '../lib/haptics';
-import CategoryAutocomplete from '../components/CategoryAutocomplete';
 import { Screen } from '../components/ui/Screen';
+import PhotoPicker from '../components/form/PhotoPicker';
+import CategoryAutocomplete from '../components/form/CategoryAutocomplete';
+import LocationPickerMap from '../components/form/LocationPickerMap';
+import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
 
 function emptyForm() {
   return {

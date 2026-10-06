@@ -1,29 +1,29 @@
-import React, { useState } from "react";
-import { View, Text, Alert } from "react-native";
-import { Warehouse } from "lucide-react-native";
-import PinKeypad from "../../components/PinKeypad";
-import { setPin as savePin } from "../../lib/auth";
-import { useSession } from "../../state/SessionContext";
-import { hapticError } from "../../lib/haptics";
+import React, { useState } from 'react';
+import { View, Text, Alert } from 'react-native';
+import { Warehouse } from 'lucide-react-native';
+import { setPin as savePin } from '../../lib/auth';
+import { useSession } from '../../state/SessionContext';
+import { hapticError } from '../../lib/haptics';
+import PinKeypad from '../../components/auth/PinKeypad';
 
 const PIN_LENGTH = 6;
 
 export default function CreatePinScreen() {
   const { profile, refreshPin, unlock } = useSession();
-  const [step, setStep] = useState<"create" | "confirm">("create");
-  const [firstPin, setFirstPin] = useState("");
-  const [pin, setPin] = useState("");
+  const [step, setStep] = useState<'create' | 'confirm'>('create');
+  const [firstPin, setFirstPin] = useState('');
+  const [pin, setPin] = useState('');
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const onPinChange = async (next: string) => {
     setError(false);
-    if (step === "create") {
+    if (step === 'create') {
       setPin(next);
       if (next.length === PIN_LENGTH) {
         setFirstPin(next);
-        setPin("");
-        setStep("confirm");
+        setPin('');
+        setStep('confirm');
       }
       return;
     }
@@ -34,7 +34,7 @@ export default function CreatePinScreen() {
         hapticError();
         setError(true);
         setTimeout(() => {
-          setPin("");
+          setPin('');
           setError(false);
         }, 400);
         return;
@@ -45,7 +45,7 @@ export default function CreatePinScreen() {
         await refreshPin();
         unlock();
       } catch (e: any) {
-        Alert.alert("No se pudo guardar", e?.message ?? String(e));
+        Alert.alert('No se pudo guardar', e?.message ?? String(e));
         setSaving(false);
       }
     }
@@ -58,16 +58,22 @@ export default function CreatePinScreen() {
           <Warehouse size={28} color="#fff" />
         </View>
         <Text className="text-2xl font-bold text-slate-800">
-          {step === "create" ? "Crea tu PIN" : "Confirma tu PIN"}
+          {step === 'create' ? 'Crea tu PIN' : 'Confirma tu PIN'}
         </Text>
         <Text className="text-slate-400 mt-1 text-center">
-          {step === "create"
-            ? `Hola${profile?.fullName ? `, ${profile.fullName.split(" ")[0]}` : ""}. Elige ${PIN_LENGTH} digitos para desbloquear la app sin volver a iniciar sesion.`
-            : "Ingresa el mismo PIN otra vez"}
+          {step === 'create'
+            ? `Hola${profile?.fullName ? `, ${profile.fullName.split(' ')[0]}` : ''}. Elige ${PIN_LENGTH} digitos para desbloquear la app sin volver a iniciar sesion.`
+            : 'Ingresa el mismo PIN otra vez'}
         </Text>
       </View>
 
-      <PinKeypad value={pin} length={PIN_LENGTH} onChange={onPinChange} error={error} disabled={saving} />
+      <PinKeypad
+        value={pin}
+        length={PIN_LENGTH}
+        onChange={onPinChange}
+        error={error}
+        disabled={saving}
+      />
     </View>
   );
 }

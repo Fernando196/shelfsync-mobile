@@ -1,10 +1,10 @@
 import { Alert, Pressable, Text, View } from 'react-native';
-import { BottomSheet } from './ui/BottomSheet';
-import { IProductLookup } from '../interfaces/productLookup.interface';
+import { BottomSheet } from '../ui/BottomSheet';
+import { IProductLookup } from '../../interfaces/productLookup.interface';
 import { useState } from 'react';
-import { Input } from './ui/Input';
-import { attachBarcode, findProductByCode } from '../services/productLookup.service';
-import { hapticError } from '../lib/haptics';
+import { Input } from '../ui/Input';
+import { attachBarcode, findProductByCode } from '../../services/productLookup.service';
+import { hapticError } from '../../lib/haptics';
 
 export function NotFoundSheet({ code, onClose, onFound, onCreateNew }: NotFoundSheetProps) {
   const [sku, setSku] = useState<string>('');

@@ -2,18 +2,18 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, Image, ScrollView, ActivityIndicator, Pressable, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
 import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Trash2 } from 'lucide-react-native';
-import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { InventoryItem } from '../interfaces/item.interface';
 import { deleteItem, getItemById, updateItemStatus } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
-import StatusPill from '../components/StatusPill';
+import StatusPill from '../components/item/StatusPill';
 import { getItemStatus } from '../lib/statusItem';
 import { ITEM_ACTIONS } from '../const/itemStatus.const';
 import ButtonPill from '../components/ui/ButtonPill';
-import { CommentSheet } from '../components/CommentSheet';
+import { CommentSheet } from '../components/item/CommentSheet';
 import { useItemStatusAction } from '../hooks/useItemStatusAction';
+import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();

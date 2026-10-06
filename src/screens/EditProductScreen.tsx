@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Tag, Boxes, MapPin, Minus, Plus } from 'lucide-react-native';
-import AccordionSection from '../components/AccordionSection';
-import LocationPickerMap from '../components/LocationPickerMap';
+import AccordionSection from '../components/ui/AccordionSection';
 import { hapticSuccess, hapticError } from '../lib/haptics';
 import { EditForm, InventoryItem } from '../interfaces/item.interface';
 import { getItemById, updateItem } from '../services/items.service';
-import CategoryAutocomplete from '../components/CategoryAutocomplete';
 import { formatItemCode } from '../lib/formatItemCode';
+import CategoryAutocomplete from '../components/form/CategoryAutocomplete';
+import LocationPickerMap from '../components/form/LocationPickerMap';
 
 function emptyForm(): EditForm {
   return {

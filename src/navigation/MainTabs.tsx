@@ -1,11 +1,11 @@
-import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import InventoryScreen from "../screens/InventoryScreen";
-import CreateProductScreen from "../screens/CreateProductScreen";
-import ScannerScreen from "../screens/ScannerScreen";
-import SyncQueueScreen from "../screens/SyncQueueScreen";
-import SettingsScreen from "../screens/SettingsScreen";
-import CustomTabBar from "../components/CustomTabBar";
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import InventoryScreen from '../screens/InventoryScreen';
+import CreateProductScreen from '../screens/CreateProductScreen';
+import ScannerScreen from '../screens/ScannerScreen';
+import SyncQueueScreen from '../screens/SyncQueueScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import CustomTabBar from '../components/navigation/CustomTabBar';
 
 export type MainTabParamList = {
   Inventory: undefined;

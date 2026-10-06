@@ -1,4 +1,4 @@
-import { PillTone } from '../components/StatusPill';
+import { PillTone } from '../components/item/StatusPill';
 import { ItemStatus } from '../interfaces/enum/itemStatus.type';
 import { ButtonVariant } from './styles.const';
 

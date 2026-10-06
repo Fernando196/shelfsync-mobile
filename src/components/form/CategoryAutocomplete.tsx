@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ICategory } from '../interfaces/category.interface';
-import { getCategories, refreshCategories } from '../lib/categoryCatalog';
 import { Alert, Pressable, Text, TextInput, View } from 'react-native';
 import { CirclePlus } from 'lucide-react-native';
-import { createCategory } from '../services/categories.service';
+import { ICategory } from '../../interfaces/category.interface';
+import { getCategories, refreshCategories } from '../../lib/categoryCatalog';
+import { createCategory } from '../../services/categories.service';
 
 export default function CategoryAutocomplete({
   label,

@@ -21,13 +21,13 @@ import {
   forgetSavedPrinter,
   printInventoryTicket,
 } from '../printing/PrinterService';
-import StatusPill from '../components/StatusPill';
-import Chip from '../components/Chip';
+import StatusPill from '../components/item/StatusPill';
 import { useSession } from '../state/SessionContext';
 import { hapticTap, hapticSuccess, hapticError } from '../lib/haptics';
 import { readJSON, writeJSON, STORAGE_KEYS } from '../lib/storage';
 import { Screen } from '../components/ui/Screen';
 import { toTicket } from '../lib/toTicket';
+import Chip from '../components/ui/Chip';
 
 const LABEL_FORMATS = ['58mm', '80mm'];
 

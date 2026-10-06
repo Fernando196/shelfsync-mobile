@@ -3,8 +3,8 @@ import { View, Text, TextInput, FlatList, RefreshControl, Alert } from 'react-na
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Search, PackageSearch, WifiOff } from 'lucide-react-native';
 import { listQueue } from '../lib/syncQueue';
-import ProductCard from '../components/ProductCard';
-import { PillTone } from '../components/StatusPill';
+import ProductCard from '../components/reception/ProductCard';
+import { PillTone } from '../components/item/StatusPill';
 import { InventoryItem } from '../interfaces/item.interface';
 import { QueueEntry } from '../interfaces/queue.interface';
 import { ProductCardData } from '../interfaces/product.interface';

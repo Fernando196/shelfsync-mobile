@@ -1,16 +1,16 @@
 import { Boxes, Minus, Package, Plus } from 'lucide-react-native';
 import { View, Text, Pressable, Alert, Switch } from 'react-native';
 import { useEffect, useState } from 'react';
-import { Input } from './ui/Input';
-import { InventoryItem, UpsertItemInput } from '../interfaces/item.interface';
-import { generateUuid } from '../lib/uuid';
-import { hapticError, hapticSuccess } from '../lib/haptics';
-import { createItem } from '../services/items.service';
+import { Input } from '../ui/Input';
+import { InventoryItem, UpsertItemInput } from '../../interfaces/item.interface';
+import { generateUuid } from '../../lib/uuid';
+import { hapticError, hapticSuccess } from '../../lib/haptics';
+import { createItem } from '../../services/items.service';
 import * as Location from 'expo-location';
-import PhotoPicker from './PhotoPicker';
-import { uploadPhoto } from '../services/files.service';
-import { BottomSheet } from './ui/BottomSheet';
-import { IProductLookup } from '../interfaces/productLookup.interface';
+import { uploadPhoto } from '../../services/files.service';
+import { BottomSheet } from '../ui/BottomSheet';
+import { IProductLookup } from '../../interfaces/productLookup.interface';
+import PhotoPicker from '../form/PhotoPicker';
 
 function emptyForm() {
   return {

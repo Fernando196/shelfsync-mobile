@@ -11,7 +11,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { CloudUpload, RefreshCw, Trash2, CheckCheck, X } from 'lucide-react-native';
 import { listQueue, syncAll, syncEntry, clearSynced, removeEntry } from '../lib/syncQueue';
-import StatusPill, { PillTone } from '../components/StatusPill';
+import StatusPill, { PillTone } from '../components/item/StatusPill';
 import { hapticSuccess, hapticTap, hapticSelect } from '../lib/haptics';
 import { QueueEntry } from '../interfaces/queue.interface';
 

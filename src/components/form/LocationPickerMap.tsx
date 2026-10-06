@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, ActivityIndicator, Alert } from "react-native";
-import { Image } from "expo-image";
-import * as Location from "expo-location";
-import { MapPin, LocateFixed } from "lucide-react-native";
-import { centeredTileGrid, tileSource, TileRef } from "../lib/staticMap";
-import { hapticSuccess, hapticError } from "../lib/haptics";
+import React, { useEffect, useState } from 'react';
+import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
+import { Image } from 'expo-image';
+import * as Location from 'expo-location';
+import { MapPin, LocateFixed } from 'lucide-react-native';
+import { hapticError, hapticSuccess } from '../../lib/haptics';
+import { centeredTileGrid, TileRef, tileSource } from '../../lib/staticMap';
 
 interface LocationPickerMapProps {
   latitude: number | null;
@@ -12,7 +12,11 @@ interface LocationPickerMapProps {
   onLocationChange: (coords: { latitude: number; longitude: number }) => void;
 }
 
-export default function LocationPickerMap({ latitude, longitude, onLocationChange }: LocationPickerMapProps) {
+export default function LocationPickerMap({
+  latitude,
+  longitude,
+  onLocationChange,
+}: LocationPickerMapProps) {
   const [loading, setLoading] = useState(false);
   const [failedTiles, setFailedTiles] = useState<Set<string>>(new Set());
 
@@ -22,7 +26,10 @@ export default function LocationPickerMap({ latitude, longitude, onLocationChang
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (!perm.granted) {
-        Alert.alert("Permiso requerido", "Se necesita acceso a la ubicacion para registrar donde esta el mueble.");
+        Alert.alert(
+          'Permiso requerido',
+          'Se necesita acceso a la ubicacion para registrar donde esta el mueble.',
+        );
         return;
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
@@ -30,7 +37,7 @@ export default function LocationPickerMap({ latitude, longitude, onLocationChang
       hapticSuccess();
     } catch (e: any) {
       hapticError();
-      Alert.alert("No se pudo obtener la ubicacion", e?.message ?? String(e));
+      Alert.alert('No se pudo obtener la ubicacion', e?.message ?? String(e));
     } finally {
       setLoading(false);
     }
@@ -60,25 +67,34 @@ export default function LocationPickerMap({ latitude, longitude, onLocationChang
           <>
             <LocateFixed size={18} color="#4f46e5" />
             <Text className="text-primary-700 font-semibold ml-2">
-              {hasCoords ? "Actualizar coordenadas" : "Obtener coordenadas actuales"}
+              {hasCoords ? 'Actualizar coordenadas' : 'Obtener coordenadas actuales'}
             </Text>
           </>
         )}
       </Pressable>
 
       {hasCoords && grid && (
-        <View className="mt-3 rounded-2xl overflow-hidden border border-slate-200" style={{ aspectRatio: 1 }}>
+        <View
+          className="mt-3 rounded-2xl overflow-hidden border border-slate-200"
+          style={{ aspectRatio: 1 }}
+        >
           <View className="flex-1 flex-row flex-wrap">
             {grid.flat().map((t) => {
               const key = tileKey(t);
               if (failedTiles.has(key)) {
-                return <View key={key} className="bg-slate-100" style={{ width: "33.334%", height: "33.334%" }} />;
+                return (
+                  <View
+                    key={key}
+                    className="bg-slate-100"
+                    style={{ width: '33.334%', height: '33.334%' }}
+                  />
+                );
               }
               return (
                 <Image
                   key={key}
                   source={tileSource(t)}
-                  style={{ width: "33.334%", height: "33.334%" }}
+                  style={{ width: '33.334%', height: '33.334%' }}
                   onError={() => setFailedTiles((prev) => new Set(prev).add(key))}
                 />
               );

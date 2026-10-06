@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { Printer, X, Bluetooth, TriangleAlert } from 'lucide-react-native';
-import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
-import { hapticSuccess, hapticError, hapticTap } from '../lib/haptics';
-import { formatDateEs } from '../lib/formatDate';
-import { ThermalPreviewModalProps } from '../interfaces/thermal.interface';
-import { prefixQRItem } from '../const/prefix.const';
-import { toTicket } from '../lib/toTicket';
-import { formatItemCode } from '../lib/formatItemCode';
+import { ThermalPreviewModalProps } from '../../interfaces/thermal.interface';
+import { getConnectedPrinter, printInventoryTicket } from '../../printing/PrinterService';
+import { formatDateEs } from '../../lib/formatDate';
+import { hapticError, hapticSuccess, hapticTap } from '../../lib/haptics';
+import { toTicket } from '../../lib/toTicket';
+import { prefixQRItem } from '../../const/prefix.const';
+import { formatItemCode } from '../../lib/formatItemCode';
 
 export default function ThermalPreviewModal({
   visible,

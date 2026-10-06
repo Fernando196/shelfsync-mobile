@@ -7,19 +7,19 @@ import { hapticSelect, hapticError } from '../lib/haptics';
 import { prefixQRItem } from '../const/prefix.const';
 import { findProductByCode } from '../services/productLookup.service';
 import { IProductLookup } from '../interfaces/productLookup.interface';
-import { ReceiveBoxSheet } from '../components/ReceiveBoxSheet';
-import { NotFoundSheet } from '../components/NotFoundSheet';
+import { ReceiveBoxSheet } from '../components/reception/ReceiveBoxSheet';
+import { NotFoundSheet } from '../components/reception/NotFoundSheet';
 import { InventoryItem } from '../interfaces/item.interface';
 import { formatItemCode } from '../lib/formatItemCode';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ThermalPreviewModal from '../components/ThermalPreviewModal';
 import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
 import { toTicket } from '../lib/toTicket';
 import { getItemById } from '../services/items.service';
 import { DETAIL_ON_SCAN } from '../const/itemStatus.const';
-import { ItemStatusSheet } from '../components/ItemStatusSheet';
+import { ItemStatusSheet } from '../components/item/ItemStatusSheet';
 import { IToast, Toast } from '../components/ui/Toast';
 import { getItemStatus } from '../lib/statusItem';
+import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
 
 export default function ScannerScreen() {
   const insets = useSafeAreaInsets();

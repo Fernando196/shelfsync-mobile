@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { BottomSheet } from './ui/BottomSheet';
-import { Input } from './ui/Input';
-import ButtonPill from './ui/ButtonPill';
+import { BottomSheet } from '../ui/BottomSheet';
+import { Input } from '../ui/Input';
+import ButtonPill from '../ui/ButtonPill';
 import { View } from 'react-native';
 
 export function CommentSheet({

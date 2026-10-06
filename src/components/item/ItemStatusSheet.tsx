@@ -1,13 +1,13 @@
-import { BottomSheet } from './ui/BottomSheet';
-import ButtonPill from './ui/ButtonPill';
+import { BottomSheet } from '../ui/BottomSheet';
+import ButtonPill from '../ui/ButtonPill';
 import { Text, View } from 'react-native';
-import { InventoryItem } from '../interfaces/item.interface';
-import { formatItemCode } from '../lib/formatItemCode';
-import { ITEM_ACTIONS } from '../const/itemStatus.const';
-import { useItemStatusAction } from '../hooks/useItemStatusAction';
+import { InventoryItem } from '../../interfaces/item.interface';
+import { formatItemCode } from '../../lib/formatItemCode';
+import { ITEM_ACTIONS } from '../../const/itemStatus.const';
+import { useItemStatusAction } from '../../hooks/useItemStatusAction';
 import { CommentSheet } from './CommentSheet';
 import { Package } from 'lucide-react-native';
-import { getItemStatus } from '../lib/statusItem';
+import { getItemStatus } from '../../lib/statusItem';
 import StatusPill from './StatusPill';
 
 export function ItemStatusSheet({
