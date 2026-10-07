@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const STORAGE_KEYS = {
   profile: 'shelfsync:profile',
-  syncQueue: 'shelfsync:sync-queue',
   lastPrinter: 'shelfsync:last-printer',
   labelFormat: 'shelfsync:label-format',
   categories: 'shelfsync:categories',

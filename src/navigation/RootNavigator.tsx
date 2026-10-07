@@ -10,15 +10,12 @@ import PinUnlockScreen from '../screens/auth/PinUnlockScreen';
 import MainTabs from './MainTabs';
 import ItemDetailScreen from '../screens/ItemDetailScreen';
 import EditProductScreen from '../screens/EditProductScreen';
-import { useAutoSyncOnReconnect } from '../hooks/useAutoSync';
 import { useRefreshCategories } from '../hooks/useRefreshCategories';
-import SyncQueueScreen from '../screens/SyncQueueScreen';
 
 export type RootStackParamList = {
   MainTabs: undefined;
   ItemDetail: { id: string };
   EditProduct: { id: string };
-  SyncQueue: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -33,7 +30,6 @@ function Splash() {
 
 function Gate() {
   const { loading, hasToken, hasPin, unlocked } = useSession();
-  useAutoSyncOnReconnect(unlocked);
   useAutoReconnectPrinter(unlocked);
   useRefreshCategories(unlocked);
 
@@ -54,11 +50,6 @@ function Gate() {
         name="EditProduct"
         component={EditProductScreen}
         options={{ headerShown: true, title: 'Editar', headerTintColor: '#4f46e5' }}
-      />
-      <Stack.Screen
-        name="SyncQueue"
-        component={SyncQueueScreen}
-        options={{ headerShown: true, title: 'Sincronizar', headerTintColor: '#4f46e5' }}
       />
     </Stack.Navigator>
   );

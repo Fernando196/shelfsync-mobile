@@ -2,10 +2,9 @@
 // el Intl.DateTimeFormat del motor JS, y en builds de Hermes/Android sin
 // ICU completo eso truena con un error interno tipo "Unsupported
 // formatDataPart implementation". Formateo manual, sin locale, para no
-// depender de eso (ver tambien src/lib/syncQueue.ts por el mismo motivo con
-// localeCompare).
+// depender de eso.
 function pad2(n: number): string {
-  return String(n).padStart(2, "0");
+  return String(n).padStart(2, '0');
 }
 
 export function formatDateEs(date: Date): string {
@@ -15,6 +14,6 @@ export function formatDateEs(date: Date): string {
 export function formatDateTimeEs(date: Date): string {
   const hours24 = date.getHours();
   const hours12 = hours24 % 12 || 12;
-  const ampm = hours24 < 12 ? "a.m." : "p.m.";
+  const ampm = hours24 < 12 ? 'a.m.' : 'p.m.';
   return `${formatDateEs(date)} ${pad2(hours12)}:${pad2(date.getMinutes())} ${ampm}`;
 }
