@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
-import { Flashlight, FlashlightOff, CheckCircle2 } from 'lucide-react-native';
+import { Flashlight, FlashlightOff } from 'lucide-react-native';
 import { hapticSelect, hapticError } from '../lib/haptics';
 import { prefixQRItem } from '../const/prefix.const';
 import { findProductByCode } from '../services/productLookup.service';
@@ -22,20 +22,17 @@ import { getItemStatus } from '../lib/statusItem';
 import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
 
 export default function ScannerScreen() {
+  const [sheet, setSheet] = useState<Sheet | null>(null);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const [permission, requestPermission] = useCameraPermissions();
   const [torch, setTorch] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [lookup, setLookup] = useState<IProductLookup | null>(null);
-  const [notFoundCode, setNotFoundCode] = useState<string | null>(null);
-  const [newProduct, setNewProduct] = useState<{ barcode: string; sku: string } | null>(null);
-  const [printItem, setPrintItem] = useState<IInventoryItem | null>(null);
   const [printed, setPrinted] = useState<boolean>(false);
-  const [scannedItem, setScannedItem] = useState<IInventoryItem | null>(null);
   const [toast, setToast] = useState<IToast | null>(null);
 
   const navigateDetailItem = (id: string) => navigation.navigate('ItemDetail', { id: id });
+  const cleanSheet = () => setSheet(null);
 
   useEffect(() => {
     if (!toast) return;
@@ -49,7 +46,7 @@ export default function ScannerScreen() {
 
   const onScanned = useCallback(
     async ({ data }: { data: string }) => {
-      if (loading || lookup || scannedItem) return;
+      if (loading || sheet) return;
       setLoading(true);
       try {
         if (data.startsWith(prefixQRItem)) {
@@ -64,17 +61,16 @@ export default function ScannerScreen() {
           if (DETAIL_ON_SCAN.includes(item.status)) {
             navigateDetailItem(item.id);
           } else {
-            setScannedItem(item);
+            setSheet({ kind: 'status', item });
           }
         } else {
           // TODO: codigo externo para buscar producto o agregar nuevo
           const product = await findProductByCode(data);
           if (!product) {
-            setNotFoundCode(data);
+            setSheet({ kind: 'notFound', code: data });
             return;
           }
-          console.log(product);
-          setLookup(product);
+          setSheet({ kind: 'receive', product });
         }
       } catch (e: any) {
         hapticError();
@@ -83,16 +79,15 @@ export default function ScannerScreen() {
         setLoading(false);
       }
     },
-    [loading, lookup, scannedItem],
+    [loading, sheet],
   );
 
   const handleSaveItem = async (item: IInventoryItem, print: boolean) => {
-    setLookup(null);
-    setNewProduct(null);
+    cleanSheet();
     if (print) {
       const printer = getConnectedPrinter();
       if (!printer) {
-        setPrintItem(item);
+        setSheet({ kind: 'print', item });
       } else {
         try {
           setLoading(true);
@@ -104,7 +99,7 @@ export default function ScannerScreen() {
           setPrinted(true);
         } catch (err) {
           hapticError();
-          setPrintItem(item);
+          setSheet({ kind: 'print', item });
         } finally {
           setLoading(false);
         }
@@ -155,11 +150,7 @@ export default function ScannerScreen() {
         barcodeScannerSettings={{
           barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93', 'ean13', 'upc_a', 'ean8'],
         }}
-        onBarcodeScanned={
-          loading || lookup || notFoundCode || newProduct || printItem || scannedItem
-            ? undefined
-            : onScanned
-        }
+        onBarcodeScanned={loading || sheet ? undefined : onScanned}
       />
 
       {/* Retícula de enfoque */}
@@ -194,73 +185,75 @@ export default function ScannerScreen() {
         </View>
       )}
 
-      {(lookup || newProduct) && (
+      {(sheet?.kind === 'receive' || sheet?.kind === 'new') && (
         <ReceiveBoxSheet
-          newProduct={newProduct}
-          product={lookup}
-          onClose={() => {
-            setLookup(null);
-            setNewProduct(null);
-          }}
+          newProduct={sheet.kind === 'new' ? { barcode: sheet.barcode, sku: sheet.sku } : null}
+          product={sheet.kind === 'receive' ? sheet.product : null}
+          onClose={cleanSheet}
           onSaved={(item, print) => handleSaveItem(item, print)}
         />
       )}
-      {notFoundCode && (
+      {sheet?.kind === 'notFound' && (
         <NotFoundSheet
-          code={notFoundCode}
-          onClose={() => setNotFoundCode(null)}
+          code={sheet.code}
+          onClose={cleanSheet}
           onFound={(product) => {
-            setNotFoundCode(null);
-            setLookup(product);
+            setSheet({ kind: 'receive', product });
           }}
           onCreateNew={(sku) => {
-            setNewProduct({ barcode: notFoundCode, sku });
-            setNotFoundCode(null);
+            setSheet({ kind: 'new', barcode: sheet.code, sku });
           }}
         />
       )}
 
-      {printItem && (
+      {sheet?.kind === 'print' && (
         <ThermalPreviewModal
           visible
           onClose={() => {
             setToast({
-              title: `${formatItemCode(printItem.code)} guardada`,
-              subtitle: printItem.name || '',
+              title: `${formatItemCode(sheet.item.code)} guardada`,
+              subtitle: sheet.item.name || '',
             });
-            setPrintItem(null);
+            cleanSheet();
           }}
           product={{
-            id: printItem.id,
-            name: printItem.name || '',
-            qty: printItem.qty,
-            location: printItem.location || '',
-            code: printItem.code,
+            id: sheet.item.id,
+            name: sheet.item.name || '',
+            qty: sheet.item.qty,
+            location: sheet.item.location || '',
+            code: sheet.item.code,
           }}
           onGoToPrinterSetup={() => {
-            setPrintItem(null);
+            cleanSheet();
             navigation.navigate('Settings');
           }}
         />
       )}
 
-      {scannedItem && (
+      {sheet?.kind === 'status' && (
         <ItemStatusSheet
-          item={scannedItem}
+          item={sheet.item}
           onUpdate={(item) => {
             setToast({
               title: `${formatItemCode(item.code)} → ${getItemStatus(item).label}`,
               subtitle: item.name || item.productLookup.description || '',
             });
-            setScannedItem(null);
+            cleanSheet();
           }}
-          onClose={() => setScannedItem(null)}
+          onClose={cleanSheet}
           onViewDetail={() => {
-            setScannedItem(null);
-            navigateDetailItem(scannedItem.id);
+            cleanSheet();
+            navigateDetailItem(sheet.item.id);
           }}
         />
       )}
     </View>
   );
 }
+
+type Sheet =
+  | { kind: 'receive'; product: IProductLookup }
+  | { kind: 'new'; barcode: string; sku: string }
+  | { kind: 'notFound'; code: string }
+  | { kind: 'print'; item: IInventoryItem }
+  | { kind: 'status'; item: IInventoryItem };
