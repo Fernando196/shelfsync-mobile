@@ -2,20 +2,16 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, Pressable, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { Boxes, PlusCircle, RefreshCw, Settings, ScanLine } from 'lucide-react-native';
+import { Boxes, Settings, ScanLine } from 'lucide-react-native';
 import { hapticTap } from '../../lib/haptics';
 
 const ICONS: Record<string, any> = {
   Inventory: Boxes,
-  CreateProduct: PlusCircle,
-  SyncQueue: RefreshCw,
   Settings: Settings,
 };
 
 const LABELS: Record<string, string> = {
   Inventory: 'Inventario',
-  CreateProduct: 'Registrar',
-  SyncQueue: 'Sincronizar',
   Settings: 'Ajustes',
 };
 
@@ -37,8 +33,9 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const visibleRoutes = state.routes.filter((r) => r.name !== 'Scanner');
   const scannerFocused = state.routes[state.index]?.name === 'Scanner';
 
-  const leftRoutes = visibleRoutes.slice(0, 2);
-  const rightRoutes = visibleRoutes.slice(2);
+  const half = Math.ceil(visibleRoutes.length / 2);
+  const leftRoutes = visibleRoutes.slice(0, half);
+  const rightRoutes = visibleRoutes.slice(half);
 
   const renderTab = (route: (typeof visibleRoutes)[number]) => {
     const routeIndex = state.routes.findIndex((r) => r.key === route.key);
