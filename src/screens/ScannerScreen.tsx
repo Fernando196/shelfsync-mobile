@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Flashlight, FlashlightOff } from 'lucide-react-native';
 import { hapticSelect, hapticError } from '../lib/haptics';
 import { prefixQRItem } from '../const/prefix.const';
@@ -30,6 +30,7 @@ export default function ScannerScreen() {
   const [loading, setLoading] = useState(false);
   const [printed, setPrinted] = useState<boolean>(false);
   const [toast, setToast] = useState<IToast | null>(null);
+  const isFocused = useIsFocused();
 
   const navigateDetailItem = (id: string) => navigation.navigate('ItemDetail', { id: id });
   const cleanSheet = () => setSheet(null);
@@ -144,14 +145,25 @@ export default function ScannerScreen() {
         </Toast>
       )}
 
-      <CameraView
-        style={{ flex: 1 }}
-        enableTorch={torch}
-        barcodeScannerSettings={{
-          barcodeTypes: ['qr', 'codabar', 'code128', 'code39', 'code93', 'ean13', 'upc_a', 'ean8'],
-        }}
-        onBarcodeScanned={loading || sheet ? undefined : onScanned}
-      />
+      {isFocused && (
+        <CameraView
+          style={{ flex: 1 }}
+          enableTorch={torch}
+          barcodeScannerSettings={{
+            barcodeTypes: [
+              'qr',
+              'codabar',
+              'code128',
+              'code39',
+              'code93',
+              'ean13',
+              'upc_a',
+              'ean8',
+            ],
+          }}
+          onBarcodeScanned={loading || sheet ? undefined : onScanned}
+        />
+      )}
 
       {/* Retícula de enfoque */}
       <View className="absolute inset-0 items-center justify-center" pointerEvents="none">

@@ -17,6 +17,7 @@ export default function MainTabs() {
     <Tab.Navigator
       screenOptions={{ headerShown: false }}
       tabBar={(props) => <CustomTabBar {...props} />}
+      initialRouteName="Scanner"
     >
       <Tab.Screen name="Inventory" component={InventoryScreen} />
       <Tab.Screen name="Scanner" component={ScannerScreen} />
