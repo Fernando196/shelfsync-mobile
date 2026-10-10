@@ -55,7 +55,7 @@ export default function LoginScreen() {
 
         <Text className="text-xs font-semibold text-slate-500 mb-1">Correo</Text>
         <TextInput
-          className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base"
+          className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base text-slate-800"
           value={email}
           onChangeText={setEmail}
           placeholder="operario@bodega.com"
@@ -67,7 +67,7 @@ export default function LoginScreen() {
 
         <Text className="text-xs font-semibold text-slate-500 mb-1">Contrasena</Text>
         <TextInput
-          className="border border-slate-200 rounded-xl px-4 py-3 mb-6 text-base"
+          className="border border-slate-200 rounded-xl px-4 py-3 mb-6 text-base text-slate-800"
           value={password}
           onChangeText={setPassword}
           placeholder="********"

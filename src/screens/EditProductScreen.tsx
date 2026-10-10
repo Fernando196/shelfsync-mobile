@@ -111,7 +111,7 @@ export default function EditProductScreen() {
         </Text>
         <Text className="text-xs font-semibold text-slate-500 mb-1">Nombre del mueble</Text>
         <TextInput
-          className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base"
+          className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base text-slate-800"
           value={form.name}
           onChangeText={(name) => onChangeForm('name', name)}
         />
@@ -146,7 +146,7 @@ export default function EditProductScreen() {
 
         <Text className="text-xs font-semibold text-slate-500 mb-1">Ubicacion en bodega</Text>
         <TextInput
-          className="border border-slate-200 rounded-xl px-4 py-3 text-base"
+          className="border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-800"
           value={form.location}
           onChangeText={(location) => onChangeForm('location', location)}
         />
