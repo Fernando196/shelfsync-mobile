@@ -18,3 +18,7 @@ export function attachBarcode(id: string, barcode: string): Promise<IProductLook
     body: JSON.stringify({ barcode }),
   });
 }
+
+export function searchProducts(term: string): Promise<IProductLookup[]> {
+  return request(`/product-lookup?filters[description][like]=${encodeURIComponent(term)}&limit=10`);
+}

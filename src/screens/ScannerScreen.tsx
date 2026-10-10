@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Flashlight, FlashlightOff } from 'lucide-react-native';
+import { Flashlight, FlashlightOff, Search } from 'lucide-react-native';
 import { hapticSelect, hapticError } from '../lib/haptics';
 import { prefixQRItem } from '../const/prefix.const';
 import { findProductByCode } from '../services/productLookup.service';
@@ -20,6 +20,7 @@ import { ItemStatusSheet } from '../components/item/ItemStatusSheet';
 import { IToast, Toast } from '../components/ui/Toast';
 import { getItemStatus } from '../lib/statusItem';
 import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
+import { NoLabelSheet } from '../components/reception/NoLabelSheet';
 
 export default function ScannerScreen() {
   const [sheet, setSheet] = useState<Sheet | null>(null);
@@ -199,7 +200,11 @@ export default function ScannerScreen() {
 
       {(sheet?.kind === 'receive' || sheet?.kind === 'new') && (
         <ReceiveBoxSheet
-          newProduct={sheet.kind === 'new' ? { barcode: sheet.barcode, sku: sheet.sku } : null}
+          newProduct={
+            sheet.kind === 'new'
+              ? { barcode: sheet.barcode, sku: sheet.sku, description: sheet.description }
+              : null
+          }
           product={sheet.kind === 'receive' ? sheet.product : null}
           onClose={cleanSheet}
           onSaved={(item, print) => handleSaveItem(item, print)}
@@ -259,13 +264,37 @@ export default function ScannerScreen() {
           }}
         />
       )}
+
+      {sheet?.kind === 'search' && (
+        <NoLabelSheet
+          onSelect={(product) => setSheet({ kind: 'receive', product })}
+          onCreate={(description) => setSheet({ kind: 'new', description })}
+          onClose={cleanSheet}
+        />
+      )}
+
+      {!sheet && (
+        <View className="absolute left-0 right-0 items-center" style={{ bottom: 56 }}>
+          <Pressable
+            onPress={() => {
+              hapticSelect();
+              setSheet({ kind: 'search' });
+            }}
+            className="flex-row items-center bg-black/50 rounded-full px-5 py-3 active:scale-95"
+          >
+            <Search size={18} color="#fff" />
+            <Text className="text-white font-semibold text-sm ml-2">Sin etiqueta</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }
 
 type Sheet =
   | { kind: 'receive'; product: IProductLookup }
-  | { kind: 'new'; barcode: string; sku: string }
+  | { kind: 'new'; barcode?: string; sku?: string; description?: string }
   | { kind: 'notFound'; code: string }
   | { kind: 'print'; item: IInventoryItem }
-  | { kind: 'status'; item: IInventoryItem };
+  | { kind: 'status'; item: IInventoryItem }
+  | { kind: 'search' };

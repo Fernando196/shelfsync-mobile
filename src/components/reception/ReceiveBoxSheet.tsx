@@ -26,7 +26,10 @@ function emptyForm() {
 }
 
 export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IReceiveBoxSheetProps) {
-  const [form, setForm] = useState(emptyForm());
+  const [form, setForm] = useState(() => ({
+    ...emptyForm(),
+    description: newProduct?.description ?? '',
+  }));
   const [saving, setSaving] = useState<boolean>(false);
 
   useEffect(() => {
@@ -73,8 +76,8 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           ? { productLookupId: product.id }
           : {
               productLookup: {
-                barcode: newProduct?.barcode,
-                sku: newProduct?.sku,
+                barcode: newProduct?.barcode || undefined,
+                sku: newProduct?.sku || undefined,
                 description: form.description,
                 needAssembly: form.needAssembly,
               },
@@ -205,7 +208,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
 
 export interface IReceiveBoxSheetProps {
   product: IProductLookup | null;
-  newProduct?: { barcode: string; sku: string } | null;
+  newProduct?: { barcode?: string; sku?: string; description?: string } | null;
   onClose: () => void;
   onSaved: (item: IInventoryItem, print: boolean) => void;
 }
