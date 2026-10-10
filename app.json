@@ -68,6 +68,13 @@
           "imageWidth": 160,
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": false,
+          "style": "dark"
+        }
       ]
     ],
     "extra": {
@@ -75,6 +82,12 @@
         "projectId": "0724c623-46f0-440f-b2a1-ba31e4ba1911"
       }
     },
-    "owner": "ferdev196"
+    "owner": "ferdev196",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0724c623-46f0-440f-b2a1-ba31e4ba1911"
+    }
   }
 }
