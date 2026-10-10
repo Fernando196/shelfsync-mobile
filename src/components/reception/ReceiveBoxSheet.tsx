@@ -90,6 +90,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
       onSaved(newItem, print);
     } catch (e: any) {
       hapticError();
+      Alert.alert('No se pudo guardar', e?.message ?? String(e));
     } finally {
       setSaving(false);
     }
