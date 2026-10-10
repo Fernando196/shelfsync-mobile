@@ -1,20 +1,25 @@
 {
   "expo": {
-    "name": "MP210 Inventario",
+    "name": "ShelfSync",
     "slug": "mp210-inventario",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tuempresa.mp210inventario",
+      "bundleIdentifier": "dev.fernandomorales.shelfsync",
       "infoPlist": {
         "NSCameraUsageDescription": "Se usa la camara para escanear codigos QR y fotografiar articulos del inventario.",
         "NSLocationWhenInUseUsageDescription": "Se usa la ubicacion para registrar donde esta el mueble dentro de la bodega."
       }
     },
     "android": {
-      "package": "com.tuempresa.mp210inventario",
+      "package": "dev.fernandomorales.shelfsync",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#4f46e5"
+      },
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.BLUETOOTH_SCAN",
@@ -31,9 +36,7 @@
         "react-native-ble-plx",
         {
           "isBackgroundEnabled": false,
-          "modes": [
-            "central"
-          ],
+          "modes": ["central"],
           "bluetoothAlwaysPermission": "Se usa Bluetooth para conectarse a la impresora MP210 y generar etiquetas."
         }
       ],
@@ -57,7 +60,15 @@
           "locationWhenInUsePermission": "Se usa la ubicacion para registrar donde esta el mueble dentro de la bodega."
         }
       ],
-      "expo-image"
+      "expo-image",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "backgroundColor": "#ffffff"
+        }
+      ]
     ],
     "extra": {
       "eas": {
