@@ -5,9 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 interface BottomSheetProps {
   title: string;
   children: ReactNode;
+  header?: ReactNode;
+  footer?: ReactNode;
 }
 
-export function BottomSheet({ title, children }: BottomSheetProps) {
+export function BottomSheet({ title, header, children, footer }: BottomSheetProps) {
   const insets = useSafeAreaInsets();
   return (
     <KeyboardAvoidingView
@@ -19,9 +21,11 @@ export function BottomSheet({ title, children }: BottomSheetProps) {
       <View className="bg-white rounded-t-3xl p-5 pb-10" style={{ flexShrink: 1 }}>
         <View className="self-center w-10 h-1 rounded-full bg-slate-300 mb-4" />
         <Text className="text-lg font-bold text-slate-800 mb-3">{title}</Text>
+        {header && <View>{header}</View>}
         <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled">
           {children}
         </ScrollView>
+        {footer && <View className="pt-3">{footer}</View>}
       </View>
     </KeyboardAvoidingView>
   );
