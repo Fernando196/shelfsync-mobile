@@ -8,6 +8,7 @@ export interface IInventoryPhoto {
   filename: string;
   url: string;
   createdAt: string;
+  thumbnailUrl: string | null;
 }
 
 export interface IInventoryItem extends IAuditable {
@@ -27,6 +28,7 @@ export interface IInventoryItem extends IAuditable {
   productLookup: IProductLookup;
 
   status: EnumItemStatus;
+  cover?: IInventoryPhoto | null;
 }
 
 export interface IUpsertItemInput {

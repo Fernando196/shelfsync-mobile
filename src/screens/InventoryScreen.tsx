@@ -62,7 +62,7 @@ export default function InventoryScreen() {
         qty: item.qty,
         location: item.location || '',
         category: item.category?.name,
-        thumbnailUri: item?.files?.length ? photoUrl(item.files[0].url) : undefined,
+        thumbnailUri: item.cover ? photoUrl(item.cover.thumbnailUrl ?? item.cover.url) : undefined,
         code: formatItemCode(item.code),
       },
       onPress: () => navigation.navigate('ItemDetail', { id: item.id }),
