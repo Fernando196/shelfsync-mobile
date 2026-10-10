@@ -13,6 +13,9 @@
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://shelfsync-api.fernandomorales.dev"
+      },
       "android": {
         "buildType": "apk"
       }
