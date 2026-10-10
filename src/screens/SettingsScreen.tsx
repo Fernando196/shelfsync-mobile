@@ -1,13 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-} from 'react-native';
+import { View, Text, Pressable, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { Device } from 'react-native-ble-plx';
 import { User, Bluetooth, BluetoothOff, Radar, LogOut, Printer, Ruler } from 'lucide-react-native';
@@ -230,31 +222,29 @@ export default function SettingsScreen() {
           )}
 
           {scanning && (
-            <FlatList
-              data={devices}
-              keyExtractor={(d) => d.id}
-              className="mt-3"
-              style={{ maxHeight: 180 }}
-              renderItem={({ item }) => (
-                <Pressable
-                  onPress={() => handleConnect(item)}
-                  className="flex-row items-center justify-between py-3 border-b border-slate-100 active:bg-slate-50"
-                >
-                  <View>
-                    <Text className="text-slate-700 font-medium">
-                      {item.name || 'Dispositivo sin nombre'}
-                    </Text>
-                    <Text className="text-slate-400 text-xs">{item.id}</Text>
-                  </View>
-                  {connecting && <ActivityIndicator size="small" />}
-                </Pressable>
-              )}
-              ListEmptyComponent={
+            <View className="mt-3">
+              {devices.length === 0 ? (
                 <Text className="text-slate-400 text-sm py-3">
                   Buscando dispositivos cercanos...
                 </Text>
-              }
-            />
+              ) : (
+                devices.map((item) => (
+                  <Pressable
+                    key={item.id}
+                    onPress={() => handleConnect(item)}
+                    className="flex-row items-center justify-between py-3 border-b border-slate-100 active:bg-slate-50"
+                  >
+                    <View>
+                      <Text className="text-slate-700 font-medium">
+                        {item.name || 'Dispositivo sin nombre'}
+                      </Text>
+                      <Text className="text-slate-400 text-xs">{item.id}</Text>
+                    </View>
+                    {connecting && <ActivityIndicator size="small" />}
+                  </Pressable>
+                ))
+              )}
+            </View>
           )}
         </View>
 
