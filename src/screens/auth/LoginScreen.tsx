@@ -5,7 +5,6 @@ import {
   TextInput,
   Pressable,
   KeyboardAvoidingView,
-  Platform,
   Alert,
   ActivityIndicator,
 } from 'react-native';
@@ -42,10 +41,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 bg-white"
-    >
+    <KeyboardAvoidingView behavior="padding" className="flex-1 bg-white">
       <View className="flex-1 px-6 justify-center">
         <View className="items-center mb-10">
           <View className="w-16 h-16 rounded-2xl bg-primary-600 items-center justify-center mb-4">
@@ -66,6 +62,7 @@ export default function LoginScreen() {
           autoCapitalize="none"
           keyboardType="email-address"
           editable={!loading}
+          placeholderTextColor="#94a3b8"
         />
 
         <Text className="text-xs font-semibold text-slate-500 mb-1">Contrasena</Text>
@@ -76,6 +73,7 @@ export default function LoginScreen() {
           placeholder="********"
           secureTextEntry
           editable={!loading}
+          placeholderTextColor="#94a3b8"
         />
 
         <Pressable
