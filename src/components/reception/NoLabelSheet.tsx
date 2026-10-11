@@ -82,7 +82,7 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
             <Text className="text-sm font-semibold text-slate-800">
               {product.description || 'Sin descripción'}
             </Text>
-            <Text className="text-xs font-semibold text-slate-800">
+            <Text className="text-xs font-semibold text-slate-500">
               Requiere ensamble: {product.needAssembly ? 'Si' : 'No'}
             </Text>
           </Pressable>
