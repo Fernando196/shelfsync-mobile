@@ -1,5 +1,6 @@
 import { request } from '../api/http';
 import { EnumItemStatus } from '../interfaces/enum/itemStatus.type';
+import { IPaginated } from '../interfaces/generic.interface';
 import {
   IInventoryItem,
   IUpsertItemInput,
@@ -39,9 +40,14 @@ export function getItemById(id: string): Promise<IInventoryItem> {
   return request(`/items/${encodeURIComponent(id)}`);
 }
 
-export function listItems(query?: string): Promise<IInventoryItem[]> {
-  const qs = query ? `?q=${encodeURIComponent(query)}` : '';
-  return request(`/items${qs}`);
+export function listItems(
+  query?: string,
+  offset: number = 0,
+  limit: number = 20,
+): Promise<IPaginated<IInventoryItem[]>> {
+  const params = new URLSearchParams({ offset: String(offset), limit: String(limit) });
+  if (query) params.set('q', query);
+  return request(`/items?${params}`);
 }
 
 export function getStatusHistory(id: string): Promise<IItemStatusHistoryResponse> {

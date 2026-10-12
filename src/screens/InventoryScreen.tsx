@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, FlatList, RefreshControl } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, TextInput, FlatList, RefreshControl, ActivityIndicator } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Search, PackageSearch, WifiOff } from 'lucide-react-native';
 import ProductCard from '../components/reception/ProductCard';
@@ -20,33 +20,72 @@ type Row = {
   onPress?: () => void;
 };
 
+const PAGE_SIZE = 10;
+
 export default function InventoryScreen() {
   const navigation = useNavigation<any>();
   const [query, setQuery] = useState('');
   const [items, setItems] = useState<IInventoryItem[]>([]);
+  const [total, setTotal] = useState<number>(0);
   const [offline, setOffline] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [debounceQuery, setDebounceQuery] = useState<string>('');
+  const requestId = useRef(0);
 
-  const load = useCallback(async (q: string) => {
+  useEffect(() => {
+    const time = setTimeout(() => {
+      setDebounceQuery(query);
+    }, 300);
+
+    return () => {
+      clearTimeout(time);
+    };
+  }, [query]);
+
+  const loadFirst = useCallback(async (q: string) => {
     try {
-      const itemsLoad = await listItems(q);
-      setItems(itemsLoad);
+      const id = ++requestId.current;
+      const { data, count } = await listItems(q, 0, PAGE_SIZE);
+      if (id !== requestId.current) return;
+      setItems(data);
+      setTotal(count);
       setOffline(false);
     } catch (err: any) {
       setOffline(true);
     }
   }, []);
 
+  const loadMore = async () => {
+    const id = requestId.current;
+    if (loadingMore || items.length >= total) return;
+    try {
+      setLoadingMore(true);
+      const { data, count } = await listItems(debounceQuery, items.length, PAGE_SIZE);
+      if (id !== requestId.current) return;
+      setItems((prev) => {
+        const seen = new Set(prev.map((i) => i.id));
+        const fresh = data.filter((i) => !seen.has(i.id));
+        return [...prev, ...fresh];
+      });
+      setTotal(count);
+    } catch (err) {
+      setOffline(true);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
-      load(query);
-    }, [load, query]),
+      loadFirst(debounceQuery);
+    }, [loadFirst, debounceQuery]),
   );
 
   const onRefresh = async () => {
     try {
       setRefreshing(true);
-      await load(query);
+      await loadFirst(debounceQuery);
     } catch (err: any) {
     } finally {
       setRefreshing(false);
@@ -75,7 +114,7 @@ export default function InventoryScreen() {
     <Screen>
       <View className="px-5 pb-2">
         <Text className="text-2xl font-bold text-slate-800">Inventario</Text>
-        <Text className="text-slate-400 text-sm mt-0.5">{backendRows.length} articulos</Text>
+        <Text className="text-slate-400 text-sm mt-0.5">{total} articulos</Text>
 
         <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-3 mt-4">
           <Search size={16} color="#94a3b8" />
@@ -100,6 +139,8 @@ export default function InventoryScreen() {
 
       <FlatList
         data={backendRows}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
         keyExtractor={(r) => r.key}
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -117,6 +158,7 @@ export default function InventoryScreen() {
             <Text className="text-slate-400 mt-3">No hay articulos que coincidan</Text>
           </View>
         }
+        ListFooterComponent={loadingMore ? <ActivityIndicator className="pt-4 pb-10" /> : null}
       />
     </Screen>
   );

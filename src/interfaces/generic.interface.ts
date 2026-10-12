@@ -13,3 +13,8 @@ export interface IAuditable {
 export interface QueryFilters {
   [name: string]: string | Array<number> | Array<string> | number | boolean | null;
 }
+
+export interface IPaginated<T> {
+  data: T;
+  count: number;
+}
