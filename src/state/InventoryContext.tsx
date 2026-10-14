@@ -14,16 +14,30 @@ interface InventoryState {
   items: IInventoryItem[];
   setItems: Dispatch<SetStateAction<IInventoryItem[]>>;
   updateItem: (item: IInventoryItem) => void;
+  total: number;
+  setTotal: Dispatch<SetStateAction<number>>;
+  removeItem: (id: string) => void;
 }
 
 const InventoryContext = createContext<InventoryState | null>(null);
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<IInventoryItem[]>([]);
+  const [total, setTotal] = useState<number>(0);
 
   const updateItem = useCallback(
     (item: IInventoryItem) => setItems((prev) => prev.map((i) => (i.id === item.id ? item : i))),
     [],
+  );
+
+  const removeItem = useCallback(
+    (id: string) => {
+      const exist = items.find((i) => i.id === id);
+      if (!exist) return;
+      setItems((prev) => prev.filter((p) => p.id !== id));
+      setTotal((prev) => prev - 1);
+    },
+    [items],
   );
 
   const value = useMemo(
@@ -31,8 +45,11 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       setItems,
       updateItem,
       items,
+      total,
+      setTotal,
+      removeItem,
     }),
-    [items, updateItem],
+    [items, updateItem, total, removeItem],
   );
 
   return <InventoryContext.Provider value={value}>{children}</InventoryContext.Provider>;

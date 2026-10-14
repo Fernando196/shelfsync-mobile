@@ -25,8 +25,7 @@ const PAGE_SIZE = 20;
 export default function InventoryScreen() {
   const navigation = useNavigation<any>();
   const [query, setQuery] = useState('');
-  const { items, setItems } = useInventory();
-  const [total, setTotal] = useState<number>(0);
+  const { items, setItems, total, setTotal } = useInventory();
   const [offline, setOffline] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);

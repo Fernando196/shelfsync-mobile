@@ -30,7 +30,7 @@ export default function ItemDetailScreen() {
     id,
     setItem,
   );
-  const { updateItem } = useInventory();
+  const { updateItem, removeItem } = useInventory();
 
   useEffect(() => {
     if (item != null) {
@@ -74,6 +74,7 @@ export default function ItemDetailScreen() {
             setDeleting(true);
             try {
               await deleteItem(id);
+              removeItem(id);
               navigation.goBack();
             } catch (e: any) {
               Alert.alert('No se pudo eliminar', e?.message ?? String(e));
