@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView, ActivityIndicator, Pressable, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
 import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Trash2 } from 'lucide-react-native';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { IInventoryItem } from '../interfaces/item.interface';
-import { deleteItem, getItemById, updateItemStatus } from '../services/items.service';
+import { deleteItem, getItemById } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import StatusPill from '../components/item/StatusPill';
@@ -15,6 +15,7 @@ import { CommentSheet } from '../components/item/CommentSheet';
 import { useItemStatusAction } from '../hooks/useItemStatusAction';
 import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
 import { StatusHistory } from '../components/item/StatusHistory';
+import { useInventory } from '../state/InventoryContext';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -29,6 +30,13 @@ export default function ItemDetailScreen() {
     id,
     setItem,
   );
+  const { updateItem } = useInventory();
+
+  useEffect(() => {
+    if (item != null) {
+      updateItem(item);
+    }
+  }, [item, updateItem]);
 
   useFocusEffect(
     useCallback(() => {

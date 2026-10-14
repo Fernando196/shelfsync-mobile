@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, FlatList, RefreshControl, ActivityIndicator } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { Search, PackageSearch, WifiOff } from 'lucide-react-native';
 import ProductCard from '../components/reception/ProductCard';
 import { PillTone } from '../components/item/StatusPill';
-import { IInventoryItem } from '../interfaces/item.interface';
 import { IProductCardData } from '../interfaces/product.interface';
 import { listItems } from '../services/items.service';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import { Screen } from '../components/ui/Screen';
 import { getItemStatus } from '../lib/statusItem';
+import { useInventory } from '../state/InventoryContext';
 
 type Row = {
   key: string;
@@ -20,12 +20,12 @@ type Row = {
   onPress?: () => void;
 };
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 export default function InventoryScreen() {
   const navigation = useNavigation<any>();
   const [query, setQuery] = useState('');
-  const [items, setItems] = useState<IInventoryItem[]>([]);
+  const { items, setItems } = useInventory();
   const [total, setTotal] = useState<number>(0);
   const [offline, setOffline] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -76,11 +76,9 @@ export default function InventoryScreen() {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      loadFirst(debounceQuery);
-    }, [loadFirst, debounceQuery]),
-  );
+  useEffect(() => {
+    loadFirst(debounceQuery);
+  }, [loadFirst, debounceQuery]);
 
   const onRefresh = async () => {
     try {
