@@ -40,6 +40,6 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 
 export function useInventory(): InventoryState {
   const ctx = useContext(InventoryContext);
-  if (!ctx) throw new Error('useIventory debe usarse dentro de InventoryProvider');
+  if (!ctx) throw new Error('useInventory debe usarse dentro de InventoryProvider');
   return ctx;
 }
