@@ -11,6 +11,7 @@ import MainTabs from './MainTabs';
 import ItemDetailScreen from '../screens/ItemDetailScreen';
 import EditProductScreen from '../screens/EditProductScreen';
 import { useRefreshCategories } from '../hooks/useRefreshCategories';
+import { InventoryProvider } from '../state/InventoryContext';
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -58,9 +59,11 @@ function Gate() {
 export default function RootNavigator() {
   return (
     <SessionProvider>
-      <NavigationContainer>
-        <Gate />
-      </NavigationContainer>
+      <InventoryProvider>
+        <NavigationContainer>
+          <Gate />
+        </NavigationContainer>
+      </InventoryProvider>
     </SessionProvider>
   );
 }
