@@ -19,6 +19,7 @@ interface InventoryState {
   total: number;
   setTotal: Dispatch<SetStateAction<number>>;
   removeItem: (id: string) => void;
+  addItem: (item: IInventoryItem) => void;
 }
 
 const InventoryContext = createContext<InventoryState | null>(null);
@@ -39,6 +40,11 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const addItem = useCallback((item: IInventoryItem) => {
+    setItems((prev) => [item, ...prev]);
+    setTotal((prev) => prev + 1);
+  }, []);
+
   const removeItem = useCallback(
     (id: string) => {
       const exist = items.find((i) => i.id === id);
@@ -57,8 +63,9 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
       total,
       setTotal,
       removeItem,
+      addItem,
     }),
-    [items, updateItem, total, removeItem],
+    [items, updateItem, total, removeItem, addItem],
   );
 
   return <InventoryContext.Provider value={value}>{children}</InventoryContext.Provider>;
