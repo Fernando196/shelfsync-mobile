@@ -28,12 +28,11 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   const [total, setTotal] = useState<number>(0);
   const { hasToken } = useSession();
 
-
   useEffect(() => {
     if (hasToken) return;
     setItems([]);
-    setTotal(0)
-  },[hasToken])
+    setTotal(0);
+  }, [hasToken]);
 
   const updateItem = useCallback(
     (item: IInventoryItem) => setItems((prev) => prev.map((i) => (i.id === item.id ? item : i))),
