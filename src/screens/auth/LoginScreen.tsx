@@ -16,18 +16,18 @@ import { login } from '../../services/auth.service';
 
 export default function LoginScreen() {
   const { refreshToken, refreshProfile } = useSession();
-  const [email, setEmail] = useState('');
+  const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!email.trim() || !password) {
-      Alert.alert('Faltan datos', 'Ingresa tu correo y contrasena.');
+    if (!userName.trim() || !password) {
+      Alert.alert('Faltan datos', 'Ingresa tu usuario y contrasena.');
       return;
     }
     setLoading(true);
     try {
-      const res = await login(email.trim(), password);
+      const res = await login(userName.trim(), password);
       await saveAccessToken(res.accessToken);
       await saveProfileFromUser(res.user);
       hapticSuccess();
@@ -53,14 +53,13 @@ export default function LoginScreen() {
           </Text>
         </View>
 
-        <Text className="text-xs font-semibold text-slate-500 mb-1">Correo</Text>
+        <Text className="text-xs font-semibold text-slate-500 mb-1">Usuario</Text>
         <TextInput
           className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base text-slate-800"
-          value={email}
-          onChangeText={setEmail}
-          placeholder="operario@bodega.com"
+          value={userName}
+          onChangeText={setUserName}
+          placeholder="jperez"
           autoCapitalize="none"
-          keyboardType="email-address"
           editable={!loading}
           placeholderTextColor="#94a3b8"
         />
