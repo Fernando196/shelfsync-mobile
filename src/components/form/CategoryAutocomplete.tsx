@@ -54,7 +54,7 @@ export default function CategoryAutocomplete({
   };
 
   return (
-    <View className="flex-1">
+    <View>
       <View className="flex flex-row">
         <TextInput
           value={query}
