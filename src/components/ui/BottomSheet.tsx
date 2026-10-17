@@ -1,16 +1,75 @@
-import { ReactNode } from 'react';
-import { KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
+import { ReactNode, Ref, useEffect, useImperativeHandle, useRef } from 'react';
+import {
+  Animated,
+  Dimensions,
+  KeyboardAvoidingView,
+  PanResponder,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Distancia (px) o velocidad hacia abajo a partir de la cual soltar cierra el sheet.
+const CLOSE_DISTANCE = 120;
+const CLOSE_VELOCITY = 1;
+
+export interface BottomSheetHandle {
+  // Baja el sheet animado y al terminar llama a onClose.
+  close: () => void;
+}
 
 interface BottomSheetProps {
   title: string;
   children: ReactNode;
   header?: ReactNode;
   footer?: ReactNode;
+  onClose: () => void;
+  ref?: Ref<BottomSheetHandle>;
 }
 
-export function BottomSheet({ title, header, children, footer }: BottomSheetProps) {
+export function BottomSheet({ title, header, children, footer, onClose, ref }: BottomSheetProps) {
   const insets = useSafeAreaInsets();
+  const screenHeight = Dimensions.get('window').height;
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+
+  // El PanResponder se crea una sola vez; el ref evita que use un onClose viejo.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  const closingRef = useRef(false);
+  const close = () => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    Animated.timing(translateY, {
+      toValue: screenHeight,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => onCloseRef.current());
+  };
+
+  useImperativeHandle(ref, () => ({ close }));
+
+  useEffect(() => {
+    Animated.timing(translateY, { toValue: 0, duration: 250, useNativeDriver: true }).start();
+  }, []);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) translateY.setValue(g.dy);
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > CLOSE_DISTANCE || g.vy > CLOSE_VELOCITY) {
+          close();
+        } else {
+          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
+        }
+      },
+    }),
+  ).current;
+
   return (
     <KeyboardAvoidingView
       pointerEvents="box-none"
@@ -18,15 +77,20 @@ export function BottomSheet({ title, header, children, footer }: BottomSheetProp
       behavior="padding"
       style={{ top: insets.top + 20 }}
     >
-      <View className="bg-white rounded-t-3xl p-5 pb-10" style={{ flexShrink: 1 }}>
-        <View className="self-center w-10 h-1 rounded-full bg-slate-300 mb-4" />
-        <Text className="text-lg font-bold text-slate-800 mb-3">{title}</Text>
+      <Animated.View
+        className="bg-white rounded-t-3xl px-5 pb-10"
+        style={{ flexShrink: 1, transform: [{ translateY }] }}
+      >
+        <View className="pt-5" {...panResponder.panHandlers}>
+          <View className="self-center w-10 h-1 rounded-full bg-slate-300 mb-4" />
+          <Text className="text-lg font-bold text-slate-800 mb-3">{title}</Text>
+        </View>
         {header && <View>{header}</View>}
         <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled">
           {children}
         </ScrollView>
         {footer && <View className="pt-3">{footer}</View>}
-      </View>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }

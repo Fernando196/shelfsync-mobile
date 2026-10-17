@@ -1,4 +1,5 @@
-import { BottomSheet } from '../ui/BottomSheet';
+import { useRef } from 'react';
+import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import ButtonPill from '../ui/ButtonPill';
 import { Text, View } from 'react-native';
 import { IInventoryItem } from '../../interfaces/item.interface';
@@ -21,6 +22,7 @@ export function ItemStatusSheet({
   onUpdate: (item: IInventoryItem) => void;
   onViewDetail: () => void;
 }) {
+  const sheetRef = useRef<BottomSheetHandle>(null);
   const actions = ITEM_ACTIONS[item.status] ?? [];
   const { changing, handleAction, pendingAction, runAction, cancelComment } = useItemStatusAction(
     item.id,
@@ -37,7 +39,11 @@ export function ItemStatusSheet({
       loading={changing}
     />
   ) : (
-    <BottomSheet title={`Cambiar estatus de la caja ${formatItemCode(item.code)}`}>
+    <BottomSheet
+      ref={sheetRef}
+      title={`Cambiar estatus de la caja ${formatItemCode(item.code)}`}
+      onClose={onClose}
+    >
       <View className="flex flex-row items-center bg-slate-200 p-3 rounded-md">
         <View className="w-12 h-12 rounded-xl bg-slate-100 items-center justify-center mr-3">
           <Package size={22} color="#64748b" />
@@ -73,7 +79,11 @@ export function ItemStatusSheet({
           label={'Ver detalle'}
           variant={'secondary'}
         />
-        <ButtonPill label="Cancelar" variant="secondary" onPress={() => onClose()} />
+        <ButtonPill
+          label="Cancelar"
+          variant="secondary"
+          onPress={() => sheetRef.current?.close()}
+        />
       </View>
     </BottomSheet>
   );

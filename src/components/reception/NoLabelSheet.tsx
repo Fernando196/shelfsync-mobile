@@ -1,12 +1,13 @@
 import { Pressable, Text, View } from 'react-native';
-import { BottomSheet } from '../ui/BottomSheet';
+import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { IProductLookup } from '../../interfaces/productLookup.interface';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Input } from '../ui/Input';
 import { searchProducts } from '../../services/productLookup.service';
 import { normalize } from '../../lib/normalize';
 
 export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps) {
+  const sheetRef = useRef<BottomSheetHandle>(null);
   const [term, setTerm] = useState<string>('');
   const [results, setResults] = useState<IProductLookup[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -64,7 +65,7 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
         <Text className="text-white font-semibold text-sm">Crear producto nuevo</Text>
       </Pressable>
       <Pressable
-        onPress={() => onClose()}
+        onPress={() => sheetRef.current?.close()}
         className="flex-1 bg-slate-100 rounded-xl py-3 items-center"
       >
         <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
@@ -73,7 +74,13 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
   );
 
   return (
-    <BottomSheet title="Caja sin etiqueta" header={header} footer={actions}>
+    <BottomSheet
+      ref={sheetRef}
+      title="Caja sin etiqueta"
+      header={header}
+      footer={actions}
+      onClose={onClose}
+    >
       {exactMatch && (
         <Text className="text-xs text-slate-500 mb-2">
           Ya existe «{exactMatch.description}», selecciónalo de la lista

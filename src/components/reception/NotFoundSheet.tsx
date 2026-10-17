@@ -1,12 +1,13 @@
 import { Alert, Pressable, Text, View } from 'react-native';
-import { BottomSheet } from '../ui/BottomSheet';
+import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { IProductLookup } from '../../interfaces/productLookup.interface';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Input } from '../ui/Input';
 import { attachBarcode, findProductByCode } from '../../services/productLookup.service';
 import { hapticError } from '../../lib/haptics';
 
 export function NotFoundSheet({ code, onClose, onFound, onCreateNew }: NotFoundSheetProps) {
+  const sheetRef = useRef<BottomSheetHandle>(null);
   const [sku, setSku] = useState<string>('');
   const [searching, setSearching] = useState<boolean>(false);
 
@@ -45,7 +46,7 @@ export function NotFoundSheet({ code, onClose, onFound, onCreateNew }: NotFoundS
   };
 
   return (
-    <BottomSheet title="Producto no encontrado">
+    <BottomSheet ref={sheetRef} title="Producto no encontrado" onClose={onClose}>
       <View className="flex flex-row">
         <Text className="font-bold text-base">Código:</Text>
         <Text className="text-base ml-2">{code}</Text>
@@ -61,7 +62,7 @@ export function NotFoundSheet({ code, onClose, onFound, onCreateNew }: NotFoundS
 
       <View className="flex-row mt-5">
         <Pressable
-          onPress={() => onClose()}
+          onPress={() => sheetRef.current?.close()}
           className="flex-1 bg-slate-100 rounded-xl py-3 mr-2 items-center"
         >
           <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>

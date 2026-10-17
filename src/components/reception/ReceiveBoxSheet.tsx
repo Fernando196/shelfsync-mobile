@@ -1,6 +1,6 @@
 import { Boxes, Minus, Package, Plus } from 'lucide-react-native';
 import { View, Text, Pressable, Alert, Switch } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Input } from '../ui/Input';
 import { IInventoryItem, IUpsertItemInput } from '../../interfaces/item.interface';
 import { generateUuid } from '../../lib/uuid';
@@ -8,9 +8,11 @@ import { hapticError, hapticSuccess } from '../../lib/haptics';
 import { createItem } from '../../services/items.service';
 import * as Location from 'expo-location';
 import { uploadPhoto } from '../../services/files.service';
-import { BottomSheet } from '../ui/BottomSheet';
+import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { IProductLookup } from '../../interfaces/productLookup.interface';
 import PhotoPicker from '../form/PhotoPicker';
+import { useInventory } from '../../state/InventoryContext';
+import CategoryAutocomplete from '../form/CategoryAutocomplete';
 
 function emptyForm() {
   return {
@@ -22,15 +24,18 @@ function emptyForm() {
     photos: [] as string[],
     description: '',
     needAssembly: false,
+    categoryId: '',
   };
 }
 
 export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IReceiveBoxSheetProps) {
+  const sheetRef = useRef<BottomSheetHandle>(null);
   const [form, setForm] = useState(() => ({
     ...emptyForm(),
     description: newProduct?.description ?? '',
   }));
   const [saving, setSaving] = useState<boolean>(false);
+  const { addItem } = useInventory();
 
   useEffect(() => {
     (async () => {
@@ -72,6 +77,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         notes: form.notes?.trim(),
         longitude: form.longitude || undefined,
         latitude: form.latitude || undefined,
+        categoryId: form.categoryId || undefined,
         ...(product
           ? { productLookupId: product.id }
           : {
@@ -84,11 +90,14 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
             }),
       };
 
-      const newItem: IInventoryItem = await createItem(item);
+      let newItem: IInventoryItem = await createItem(item);
 
       for (const uri of form.photos) {
-        await uploadPhoto(newItem.id, uri);
+        newItem = await uploadPhoto(newItem.id, uri);
       }
+
+      addItem(newItem);
+
       hapticSuccess();
       onSaved(newItem, print);
     } catch (e: any) {
@@ -100,7 +109,11 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
   };
 
   return (
-    <BottomSheet title={newProduct ? 'Producto nuevo' : 'Recibir caja'}>
+    <BottomSheet
+      ref={sheetRef}
+      title={newProduct ? 'Producto nuevo' : 'Recibir caja'}
+      onClose={onClose}
+    >
       <View className="bg-slate-50 rounded-2xl p-3">
         <View className="flex flex-row items-center">
           <View className="w-12 h-12 rounded-xl bg-slate-200 items-center justify-center mr-3">
@@ -119,7 +132,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           </View>
         </View>
         {newProduct && (
-          <View className="flex-1 mt-2">
+          <View className="mt-2">
             <Input
               label="Descripción del manifiesto"
               value={form.description}
@@ -129,7 +142,12 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
             />
             <View className="flex flex-row items-center gap-4 mt-3">
               <Text>Requiere ensamble</Text>
-              <Switch value={form.needAssembly} onValueChange={(v) => set('needAssembly', v)} />
+              <Switch
+                trackColor={{ false: '#cbd5e1', true: '#a5b4fc' }}
+                thumbColor="#4f46e5"
+                value={form.needAssembly}
+                onValueChange={(v) => set('needAssembly', v)}
+              />
             </View>
           </View>
         )}
@@ -171,6 +189,14 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           onChangeText={(v) => set('notes', v)}
           placeholder="Caja abierta, le faltan piezas, etc."
           placeholderTextColor="#94a3b8"
+          className="mt-2"
+        />
+
+        <Text className="text-sm font-semibold text-slate-500 my-2">Categoria (Opcional)</Text>
+        <CategoryAutocomplete
+          label="Buscar categoria"
+          onChange={(id) => set('categoryId', id)}
+          selected={form.categoryId || ''}
         />
 
         <View className="mt-4">
@@ -189,7 +215,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
 
       <View className="flex-row mt-5">
         <Pressable
-          onPress={() => onClose()}
+          onPress={() => sheetRef.current?.close()}
           className="flex-1 bg-slate-100 rounded-xl py-3 mr-2 items-center"
         >
           <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
