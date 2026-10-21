@@ -110,9 +110,14 @@ export default function InventoryScreen() {
       const { data, count } = await listItems(debounceQuery, 0, PAGE_SIZE, status);
       if (id !== requestId.current) return;
       setItems((prev) => {
+        if (!prev.length) return data;
         const fresh = new Map(data.map((i) => [i.id, i]));
         const known = new Set(prev.map((i) => i.id));
-        const added = data.filter((i) => !known.has(i.id));
+        // Solo es nuevo lo que viene ANTES del primer item ya cargado. Lo desconocido
+        // que aparece despues es un item viejo que se recorrio (p. ej. tras borrar uno);
+        // ese llega en su lugar con la siguiente pagina.
+        const firstKnown = data.findIndex((i) => known.has(i.id));
+        const added = firstKnown === -1 ? [] : data.slice(0, firstKnown);
         return [...added, ...prev.map((i) => fresh.get(i.id) ?? i)];
       });
       setTotal(count);
