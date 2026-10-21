@@ -17,6 +17,7 @@ import { PillTone } from '../components/item/StatusPill';
 import { IProductCardData } from '../interfaces/product.interface';
 import { getStatusCounts, listItems } from '../services/items.service';
 import { StatusFilterChips } from '../components/item/StatusFilterChips';
+import { InventorySkeleton } from '../components/item/InventorySkeleton';
 import { EnumItemStatus } from '../interfaces/enum/itemStatus.type';
 import { IItemStatusCounts } from '../interfaces/item.interface';
 import { photoUrl } from '../services/files.service';
@@ -43,6 +44,7 @@ export default function InventoryScreen() {
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [skeleton, setSkeleton] = useState(true);
   const [status, setStatus] = useState<EnumItemStatus | null>(null);
   const [counts, setCounts] = useState<IItemStatusCounts | null>(null);
   const { items, setItems, total, setTotal } = useInventory();
@@ -62,22 +64,26 @@ export default function InventoryScreen() {
     };
   }, [query]);
 
+  // Devuelve false si una carga mas nueva la reemplazo (para no apagar su skeleton).
   const loadFirst = useCallback(async (q: string, s: EnumItemStatus | null) => {
+    const id = ++requestId.current;
     try {
-      const id = ++requestId.current;
       const { data, count } = await listItems(q, 0, PAGE_SIZE, s);
-      if (id !== requestId.current) return;
+      if (id !== requestId.current) return false;
       setItems(data);
       setTotal(count);
       setOffline(false);
     } catch (err: any) {
+      if (id !== requestId.current) return false;
       setOffline(true);
     }
+    return true;
   }, []);
 
   const loadMore = async () => {
     const id = requestId.current;
-    if (loadingMore || items.length >= total) return;
+    // Durante el skeleton `items` aun es del filtro anterior: no paginar con ese offset.
+    if (skeleton || loadingMore || items.length >= total) return;
     try {
       setLoadingMore(true);
       const { data, count } = await listItems(debounceQuery, items.length, PAGE_SIZE, status);
@@ -95,8 +101,13 @@ export default function InventoryScreen() {
     }
   };
 
+  // Al abrir, cambiar de estatus o buscar: skeleton en vez de la lista anterior (que ya no
+  // corresponde al filtro). El pull-to-refresh no lo usa: ahi se queda la lista con su spinner.
   useEffect(() => {
-    loadFirst(debounceQuery, status);
+    setSkeleton(true);
+    loadFirst(debounceQuery, status).then((latest) => {
+      if (latest) setSkeleton(false);
+    });
   }, [loadFirst, debounceQuery, status]);
 
   const loadCounts = useCallback(() => {
@@ -268,7 +279,7 @@ export default function InventoryScreen() {
 
         <FlatList
           ref={listRef}
-          data={backendRows}
+          data={skeleton ? [] : backendRows}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
           keyExtractor={(r) => r.key}
@@ -283,10 +294,14 @@ export default function InventoryScreen() {
             />
           )}
           ListEmptyComponent={
-            <View className="items-center mt-24">
-              <PackageSearch size={40} color="#cbd5e1" />
-              <Text className="text-slate-400 mt-3">{t('inventory.empty')}</Text>
-            </View>
+            skeleton ? (
+              <InventorySkeleton />
+            ) : (
+              <View className="items-center mt-24">
+                <PackageSearch size={40} color="#cbd5e1" />
+                <Text className="text-slate-400 mt-3">{t('inventory.empty')}</Text>
+              </View>
+            )
           }
           ListFooterComponent={loadingMore ? <ActivityIndicator className="pt-4 pb-10" /> : null}
         />
