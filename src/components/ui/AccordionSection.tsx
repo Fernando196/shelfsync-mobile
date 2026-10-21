@@ -25,7 +25,7 @@ export default function AccordionSection({
   };
 
   return (
-    <View className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-4 overflow-hidden">
+    <View className="bg-white rounded-2xl border border-slate-200 shadow-sm web:shadow-none mb-4 overflow-hidden">
       <Pressable onPress={toggle} className="flex-row items-center justify-between px-4 py-4 active:bg-slate-50">
         <View className="flex-row items-center">
           {icon}

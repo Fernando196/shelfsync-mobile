@@ -18,7 +18,7 @@ export default function ProductCard({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row bg-white rounded-2xl p-3 mb-3 border border-slate-200 shadow-sm active:scale-95"
+      className="flex-row bg-white rounded-2xl p-3 mb-3 border border-slate-200 shadow-sm web:shadow-none active:scale-95"
     >
       <View className="w-16 h-16 rounded-xl bg-slate-100 items-center justify-center overflow-hidden mr-3">
         {item.thumbnailUri ? (
