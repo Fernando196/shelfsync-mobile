@@ -1,4 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from './secureStorage';
 import { readJSON, writeJSON, removeKey, STORAGE_KEYS } from './storage';
 
 // El PIN y el token del backend se guardan en SecureStore (Keychain/Keystore,
