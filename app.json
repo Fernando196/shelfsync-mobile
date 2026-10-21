@@ -18,7 +18,7 @@
       "package": "dev.fernandomorales.shelfsync",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#4f46e5"
+        "backgroundColor": "#334155"
       },
       "permissions": [
         "android.permission.CAMERA",
