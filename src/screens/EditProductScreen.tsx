@@ -125,13 +125,11 @@ export default function EditProductScreen() {
         />
 
         <Text className="text-xs font-semibold text-slate-500 mb-2">Categoria</Text>
-        <View className="flex-row flex-wrap">
-          <CategoryAutocomplete
-            label="Buscar categoria"
-            onChange={(id) => onChangeForm('categoryId', id)}
-            selected={form.categoryId || ''}
-          />
-        </View>
+        <CategoryAutocomplete
+          label="Buscar categoria"
+          onChange={(id) => onChangeForm('categoryId', id)}
+          selected={form.categoryId || ''}
+        />
       </AccordionSection>
 
       <AccordionSection title="Inventario y stock" icon={<Boxes size={18} color="#4f46e5" />}>
