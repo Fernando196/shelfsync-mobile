@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, ActivityIndicator, Pressable, Alert } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Pressable, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
 import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Trash2 } from 'lucide-react-native';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { IInventoryItem } from '../interfaces/item.interface';
 import { deleteItem, getItemById } from '../services/items.service';
-import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import StatusPill from '../components/item/StatusPill';
 import { getItemStatus } from '../lib/statusItem';
@@ -16,6 +15,7 @@ import { useItemStatusAction } from '../hooks/useItemStatusAction';
 import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
 import { StatusHistory } from '../components/item/StatusHistory';
 import { useInventory } from '../state/InventoryContext';
+import { ItemPhotoStrip } from '../components/item/ItemPhotoStrip';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -112,22 +112,7 @@ export default function ItemDetailScreen() {
   return (
     <View className="flex-1 bg-surface">
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
-        {(item.files?.length ?? 0) === 0 ? (
-          <View className="w-full h-[200px] bg-slate-100 rounded-2xl items-center justify-center mb-4">
-            <Text className="text-slate-400">Sin fotos</Text>
-          </View>
-        ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-1 mb-4">
-            {item.files?.map((p) => (
-              <Image
-                key={p.id}
-                source={{ uri: photoUrl(p.url) }}
-                className="rounded-2xl mx-1"
-                style={{ width: 260, height: 200 }}
-              />
-            ))}
-          </ScrollView>
-        )}
+        <ItemPhotoStrip item={item} onUploaded={setItem} />
         <View className="flex-row items-start justify-between">
           <View className="flex-1 mr-3">
             <Text className="text-2xl font-bold text-slate-800">

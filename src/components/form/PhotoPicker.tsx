@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Image, Pressable, ScrollView, Alert } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { Camera, ImagePlus, X } from 'lucide-react-native';
 import { hapticTap, hapticSelect } from '../../lib/haptics';
+import { pickFromLibrary } from '../../lib/pickFromLibrary';
 import { CameraCaptureModal } from '../camera/CameraCaptureModal';
 
 interface PhotoPickerProps {
@@ -14,18 +14,8 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
   const [cameraOpen, setCameraOpen] = useState(false);
 
   const addFromLibrary = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) {
-      Alert.alert('Permiso requerido', 'Se necesita acceso a la galeria para elegir fotos.');
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      quality: 0.6,
-      allowsMultipleSelection: true,
-    });
-    if (!result.canceled && result.assets?.length) {
-      onChange([...photos, ...result.assets.map((a) => a.uri)]);
-    }
+    const uris = await pickFromLibrary();
+    if (uris.length) onChange([...photos, ...uris]);
   };
 
   const openPicker = () => {

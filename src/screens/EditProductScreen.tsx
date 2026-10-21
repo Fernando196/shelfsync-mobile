@@ -7,10 +7,10 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
-  ReturnKeyType,
+  Image,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { Tag, Boxes, MapPin, Minus, Plus } from 'lucide-react-native';
+import { Tag, Boxes, MapPin, Minus, Plus, Camera } from 'lucide-react-native';
 import AccordionSection from '../components/ui/AccordionSection';
 import { hapticSuccess, hapticError } from '../lib/haptics';
 import { IEditForm, IInventoryItem } from '../interfaces/item.interface';
@@ -18,6 +18,8 @@ import { getItemById, updateItem } from '../services/items.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import CategoryAutocomplete from '../components/form/CategoryAutocomplete';
 import LocationPickerMap from '../components/form/LocationPickerMap';
+import PhotoPicker from '../components/form/PhotoPicker';
+import { photoUrl, uploadPhoto } from '../services/files.service';
 
 function emptyForm(): IEditForm {
   return {
@@ -39,6 +41,7 @@ export default function EditProductScreen() {
   const [item, setItem] = useState<IInventoryItem | null>(null);
 
   const [form, setForm] = useState<IEditForm>(emptyForm());
+  const [newPhotos, setNewPhotos] = useState<string[]>([]);
 
   useEffect(() => {
     getItemById(id)
@@ -68,6 +71,11 @@ export default function EditProductScreen() {
         longitude: form.longitude ?? undefined,
         categoryId: form.categoryId ?? undefined,
       });
+      // Se quitan una por una al subir, asi un reintento no duplica las que ya subieron.
+      for (const uri of newPhotos) {
+        await uploadPhoto(id, uri);
+        setNewPhotos((prev) => prev.filter((p) => p !== uri));
+      }
       hapticSuccess();
       navigation.goBack();
     } catch (e: any) {
@@ -150,6 +158,22 @@ export default function EditProductScreen() {
           value={form.location}
           onChangeText={(location) => onChangeForm('location', location)}
         />
+      </AccordionSection>
+
+      <AccordionSection title="Fotos" icon={<Camera size={18} color="#4f46e5" />}>
+        {(item?.files?.length ?? 0) > 0 && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
+            {item?.files?.map((p) => (
+              <Image
+                key={p.id}
+                source={{ uri: photoUrl(p.thumbnailUrl ?? p.url) }}
+                className="w-24 h-24 rounded-xl mr-3"
+              />
+            ))}
+          </ScrollView>
+        )}
+        <Text className="text-xs font-semibold text-slate-500 mb-2">Agregar fotos</Text>
+        <PhotoPicker photos={newPhotos} onChange={setNewPhotos} />
       </AccordionSection>
 
       <AccordionSection
