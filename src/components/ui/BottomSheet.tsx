@@ -7,6 +7,7 @@ import {
   ScrollView,
   Text,
   View,
+  useColorScheme,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -29,6 +30,7 @@ interface BottomSheetProps {
 }
 
 export function BottomSheet({ title, header, children, footer, onClose, ref }: BottomSheetProps) {
+  const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const screenHeight = Dimensions.get('window').height;
   const translateY = useRef(new Animated.Value(screenHeight)).current;
@@ -90,7 +92,8 @@ export function BottomSheet({ title, header, children, footer, onClose, ref }: B
     >
       <Animated.View
         style={{
-          backgroundColor: '#ffffff',
+          // En style (no className): NativeWind no aplica clases a Animated.View en web.
+          backgroundColor: scheme === 'dark' ? '#0f172a' : '#ffffff',
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
           paddingHorizontal: 20,
@@ -101,7 +104,7 @@ export function BottomSheet({ title, header, children, footer, onClose, ref }: B
       >
         <View className="pt-5" {...panResponder.panHandlers}>
           <View className="self-center w-10 h-1 rounded-full bg-slate-300 mb-4" />
-          <Text className="text-lg font-bold text-slate-800 mb-3">{title}</Text>
+          <Text className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-3">{title}</Text>
         </View>
         {header && <View>{header}</View>}
         <ScrollView style={{ flexShrink: 1 }} keyboardShouldPersistTaps="handled">

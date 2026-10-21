@@ -183,7 +183,7 @@ export default function InventoryScreen() {
       <View className="px-5 pb-2">
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-2xl font-bold text-slate-800">{t('inventory.title')}</Text>
+            <Text className="text-2xl font-bold text-slate-800 dark:text-slate-100">{t('inventory.title')}</Text>
             <Text className="text-slate-400 text-sm mt-0.5">
               {t('inventory.count', { count: total })}
             </Text>
@@ -193,7 +193,7 @@ export default function InventoryScreen() {
               <Pressable
                 onPress={() => setSearchOpen(true)}
                 hitSlop={8}
-                className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
+                className="w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 items-center justify-center active:opacity-70"
               >
                 <Search size={20} color={COLORS.primary} />
               </Pressable>
@@ -204,8 +204,8 @@ export default function InventoryScreen() {
         {searchOpen && (
           // El foco se marca en el contenedor (que es el que tiene el borde), no en el input.
           <View
-            className={`flex-row items-center bg-white border rounded-xl px-3 mt-4 ${
-              searchFocused ? 'border-primary-600' : 'border-slate-200'
+            className={`flex-row items-center bg-white dark:bg-slate-900 border rounded-xl px-3 mt-4 ${
+              searchFocused ? 'border-primary-600 dark:border-slate-300' : 'border-slate-200 dark:border-slate-700'
             }`}
           >
             <Search size={16} color={searchFocused ? COLORS.primary : '#94a3b8'} />
@@ -213,7 +213,7 @@ export default function InventoryScreen() {
               value={query}
               onChangeText={setQuery}
               placeholder={t('inventory.searchPlaceholder')}
-              className="flex-1 py-3 px-2 text-sm"
+              className="flex-1 py-3 px-2 text-sm text-slate-800 dark:text-slate-100"
               placeholderTextColor="#94a3b8"
               autoFocus
               onFocus={() => setSearchFocused(true)}
@@ -228,9 +228,9 @@ export default function InventoryScreen() {
         <StatusFilterChips selected={status} counts={counts} onChange={setStatus} />
 
         {offline && (
-          <View className="flex-row items-center bg-amber-50 rounded-xl px-3 py-2 mt-3">
+          <View className="flex-row items-center bg-amber-50 dark:bg-amber-950 rounded-xl px-3 py-2 mt-3">
             <WifiOff size={14} color="#f59e0b" />
-            <Text className="text-amber-700 text-xs ml-2">
+            <Text className="text-amber-700 dark:text-amber-300 text-xs ml-2">
               {Platform.OS === 'web'
                 ? t('inventory.offlinePull')
                 : t('inventory.offlineSwipe')}

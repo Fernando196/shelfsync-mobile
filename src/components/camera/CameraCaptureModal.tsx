@@ -31,13 +31,13 @@ export function CameraCaptureModal({ visible, onClose, onDone }: CameraCaptureMo
         {permission?.granted ? (
           <CameraView ref={cameraRef} style={{ flex: 1 }} />
         ) : (
-          <View className="flex-1 items-center justify-center bg-white px-8">
-            <Text className="text-slate-600 text-center mb-4">
+          <View className="flex-1 items-center justify-center bg-white dark:bg-slate-900 px-8">
+            <Text className="text-slate-600 dark:text-slate-300 text-center mb-4">
               {t('camera.permission')}
             </Text>
             <Pressable
               onPress={requestPermission}
-              className="bg-primary-600 rounded-xl px-5 py-3 active:scale-95"
+              className="bg-primary-600 dark:bg-slate-600 rounded-xl px-5 py-3 active:scale-95"
             >
               <Text className="text-white font-semibold">{t('scanner.grantPermission')}</Text>
             </Pressable>
@@ -70,18 +70,18 @@ export function CameraCaptureModal({ visible, onClose, onDone }: CameraCaptureMo
           <View className="flex-row items-center justify-between px-6 gap-4">
             <Pressable
               onPress={handleClose}
-              className="flex-1 bg-slate-100 rounded-xl py-3 items-center"
+              className="flex-1 bg-slate-100 dark:bg-slate-700 rounded-xl py-3 items-center"
             >
-              <Text className="text-slate-700 font-semibold text-sm">{t('common.cancel')}</Text>
+              <Text className="text-slate-700 dark:text-slate-200 font-semibold text-sm">{t('common.cancel')}</Text>
             </Pressable>
             <Pressable
-              className="w-20 h-20 rounded-full bg-white border-4 border-slate-300 justify-center items-center"
+              className="w-20 h-20 rounded-full bg-white dark:bg-slate-900 border-4 border-slate-300 dark:border-slate-600 justify-center items-center"
               onPress={takeShot}
             >
-              <Text>{shots.length}</Text>
+              <Text className="text-slate-800 dark:text-slate-100">{shots.length}</Text>
             </Pressable>
             <Pressable
-              className={`flex-1 rounded-xl py-3 items-center bg-primary-600 ${shots.length === 0 ? 'opacity-50' : ''}`}
+              className={`flex-1 rounded-xl py-3 items-center bg-primary-600 dark:bg-slate-600 ${shots.length === 0 ? 'opacity-50' : ''}`}
               onPress={() => {
                 onDone(shots);
                 setShots([]);

@@ -106,7 +106,7 @@ export default function ItemDetailScreen() {
         </View>
         <View className="flex-1 items-center justify-center px-8">
           <TriangleAlert size={32} color="#f43f5e" />
-          <Text className="text-slate-600 text-center mt-3">{error}</Text>
+          <Text className="text-slate-600 dark:text-slate-300 text-center mt-3">{error}</Text>
         </View>
       </Screen>
     );
@@ -114,7 +114,7 @@ export default function ItemDetailScreen() {
 
   if (loading && !item) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface">
+      <View className="flex-1 items-center justify-center bg-surface dark:bg-slate-950">
         <ActivityIndicator color={COLORS.primary} />
       </View>
     );
@@ -131,12 +131,12 @@ export default function ItemDetailScreen() {
       <View className="flex-row items-center justify-between px-5 pb-2">
         <View className="flex-row items-center">
           <BackButton />
-          <Text className="text-2xl font-bold text-slate-800 ml-3">{t('detail.title')}</Text>
+          <Text className="text-2xl font-bold text-slate-800 dark:text-slate-100 ml-3">{t('detail.title')}</Text>
         </View>
         <Pressable
           onPress={() => navigation.navigate('EditProduct', { id: item.id })}
           hitSlop={8}
-          className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
+          className="w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 items-center justify-center active:opacity-70"
         >
           <Pencil size={18} color={COLORS.primary} />
         </Pressable>
@@ -145,10 +145,10 @@ export default function ItemDetailScreen() {
       <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 8, paddingBottom: 40 }}>
         <ItemPhotoStrip item={item} onChange={setItem} />
         {/* Nombre, codigo/SKU y estatus con aire entre cada uno */}
-        <Text className="text-2xl font-bold text-slate-900 leading-tight">
+        <Text className="text-2xl font-bold text-slate-900 dark:text-slate-50 leading-tight">
           {item.name || item.productLookup.description}
         </Text>
-        <Text className="text-sm text-slate-500 mt-1">
+        <Text className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           {formatItemCode(item.code)}
           {item.productLookup?.sku ? `  ·  SKU ${item.productLookup.sku}` : ''}
         </Text>
@@ -156,23 +156,23 @@ export default function ItemDetailScreen() {
           <StatusPill label={status.label} tone={status.tone} />
         </View>
 
-        <View className="bg-white rounded-2xl border border-slate-200 px-4 py-2 mt-5">
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-2 mt-5">
           <View className="flex-row items-center py-2">
             <Boxes size={16} color="#64748b" />
-            <Text className="text-slate-500 ml-2 flex-1">{t('detail.quantity')}</Text>
-            <Text className="font-semibold text-slate-800">{item.qty}</Text>
+            <Text className="text-slate-500 dark:text-slate-400 ml-2 flex-1">{t('detail.quantity')}</Text>
+            <Text className="font-semibold text-slate-800 dark:text-slate-100">{item.qty}</Text>
           </View>
-          <View className="h-px bg-slate-100" />
+          <View className="h-px bg-slate-100 dark:bg-slate-700" />
           <View className="flex-row items-center py-2">
             <MapPin size={16} color="#64748b" />
-            <Text className="text-slate-500 ml-2 flex-1">{t('detail.location')}</Text>
-            <Text className="font-semibold text-slate-800">{item.location || '-'}</Text>
+            <Text className="text-slate-500 dark:text-slate-400 ml-2 flex-1">{t('detail.location')}</Text>
+            <Text className="font-semibold text-slate-800 dark:text-slate-100">{item.location || '-'}</Text>
           </View>
-          <View className="h-px bg-slate-100" />
+          <View className="h-px bg-slate-100 dark:bg-slate-700" />
           <View className="flex-row items-center py-2">
             <Tag size={16} color="#64748b" />
-            <Text className="text-slate-500 ml-2 flex-1">{t('detail.category')}</Text>
-            <Text className="font-semibold text-slate-800">{item.category?.name || '-'}</Text>
+            <Text className="text-slate-500 dark:text-slate-400 ml-2 flex-1">{t('detail.category')}</Text>
+            <Text className="font-semibold text-slate-800 dark:text-slate-100">{item.category?.name || '-'}</Text>
           </View>
         </View>
 
@@ -180,7 +180,7 @@ export default function ItemDetailScreen() {
             danado como enlace para que no compita con el siguiente paso. */}
         {actions.length > 0 && (
           <View className="mt-6">
-            <Text className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
               {t('detail.nextStep')}
             </Text>
             {actions
@@ -193,12 +193,12 @@ export default function ItemDetailScreen() {
                   className={`items-center rounded-xl py-3.5 mb-2 active:opacity-80 ${
                     action.variant === 'primary'
                       ? 'bg-accent-600'
-                      : 'bg-white border border-slate-300'
+                      : 'bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600'
                   } ${changing ? 'opacity-50' : ''}`}
                 >
                   <Text
                     className={`text-base font-semibold ${
-                      action.variant === 'primary' ? 'text-white' : 'text-slate-800'
+                      action.variant === 'primary' ? 'text-white' : 'text-slate-800 dark:text-slate-100'
                     }`}
                   >
                     {action.label}
@@ -215,7 +215,7 @@ export default function ItemDetailScreen() {
                   className="flex-row items-center justify-center py-3 active:opacity-70"
                 >
                   <TriangleAlert size={16} color="#e11d48" />
-                  <Text className="text-rose-600 font-semibold ml-2">
+                  <Text className="text-rose-600 dark:text-rose-400 font-semibold ml-2">
                     {t('detail.markAs', { status: ITEM_STATUS[action.to].label.toLowerCase() })}
                   </Text>
                 </Pressable>
@@ -228,14 +228,14 @@ export default function ItemDetailScreen() {
           <Pressable
             onPress={handlePrint}
             disabled={printing}
-            className="flex-row items-center justify-center bg-white border border-slate-300 rounded-xl py-3.5 mt-4 active:opacity-80"
+            className="flex-row items-center justify-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl py-3.5 mt-4 active:opacity-80"
           >
             {printing ? (
               <ActivityIndicator color={COLORS.primary} />
             ) : (
               <>
                 <Printer size={18} color={COLORS.primary} />
-                <Text className="text-slate-800 font-semibold ml-2">{t('detail.reprint')}</Text>
+                <Text className="text-slate-800 dark:text-slate-100 font-semibold ml-2">{t('detail.reprint')}</Text>
               </>
             )}
           </Pressable>

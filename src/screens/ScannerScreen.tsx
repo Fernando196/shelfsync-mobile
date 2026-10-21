@@ -131,13 +131,13 @@ export default function ScannerScreen() {
 
   if (!permission.granted) {
     return (
-      <View className="flex-1 items-center justify-center bg-white px-8">
-        <Text className="text-slate-600 text-center mb-4">
+      <View className="flex-1 items-center justify-center bg-white dark:bg-slate-900 px-8">
+        <Text className="text-slate-600 dark:text-slate-300 text-center mb-4">
           {t('scanner.cameraPermission')}
         </Text>
         <Pressable
           onPress={requestPermission}
-          className="bg-primary-600 rounded-xl px-5 py-3 active:scale-95"
+          className="bg-primary-600 dark:bg-slate-600 rounded-xl px-5 py-3 active:scale-95"
         >
           <Text className="text-white font-semibold">{t('scanner.grantPermission')}</Text>
         </Pressable>

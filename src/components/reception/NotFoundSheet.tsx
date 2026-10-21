@@ -50,8 +50,8 @@ export function NotFoundSheet({ code, onClose, onFound, onCreateNew }: NotFoundS
   return (
     <BottomSheet ref={sheetRef} title={t('reception.productNotFound')} onClose={onClose}>
       <View className="flex flex-row">
-        <Text className="font-bold text-base">{t('reception.codeLabel')}</Text>
-        <Text className="text-base ml-2">{code}</Text>
+        <Text className="font-bold text-base text-slate-800 dark:text-slate-100">{t('reception.codeLabel')}</Text>
+        <Text className="text-base ml-2 text-slate-800 dark:text-slate-100">{code}</Text>
       </View>
       <Input
         value={sku}
@@ -66,12 +66,12 @@ export function NotFoundSheet({ code, onClose, onFound, onCreateNew }: NotFoundS
       <View className="flex-row mt-5">
         <Pressable
           onPress={() => sheetRef.current?.close()}
-          className="flex-1 bg-slate-100 rounded-xl py-3 mr-2 items-center"
+          className="flex-1 bg-slate-100 dark:bg-slate-700 rounded-xl py-3 mr-2 items-center"
         >
-          <Text className="text-slate-700 font-semibold text-sm">{t('common.cancel')}</Text>
+          <Text className="text-slate-700 dark:text-slate-200 font-semibold text-sm">{t('common.cancel')}</Text>
         </Pressable>
         <Pressable
-          className={`flex-1 bg-primary-600 rounded-xl py-3 items-center ${searching ? 'opacity-50' : ''}`}
+          className={`flex-1 bg-primary-600 dark:bg-slate-600 rounded-xl py-3 items-center ${searching ? 'opacity-50' : ''}`}
           disabled={searching || !sku.trim()}
           onPress={() => handleSearch()}
         >

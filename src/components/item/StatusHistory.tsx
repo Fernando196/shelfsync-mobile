@@ -32,8 +32,8 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
 
   if (loading && history.length === 0) return <ActivityIndicator color={COLORS.primary} />;
   return (
-    <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 mt-4">
-      <Text className="text-sm font-semibold text-slate-500 mb-3">{t('history.title')}</Text>
+    <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 mb-4 mt-4">
+      <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3">{t('history.title')}</Text>
       {history.length === 0 ? (
         <Text className="text-slate-400 text-sm">{t('history.empty')}</Text>
       ) : (
@@ -45,12 +45,12 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
               <View className="w-5 items-center">
                 <View className={`w-3 h-3 rounded-full mt-1.5 ${dot}`} />
                 {index < history.length - 1 ? (
-                  <View className="w-px flex-1 bg-slate-200 mt-1" />
+                  <View className="w-px flex-1 bg-slate-200 dark:bg-slate-600 mt-1" />
                 ) : null}
               </View>
               <View className="flex-1 ml-2 pb-4">
                 <View className="flex-row justify-between">
-                  <Text className="font-semibold text-slate-800">{st.label}</Text>
+                  <Text className="font-semibold text-slate-800 dark:text-slate-100">{st.label}</Text>
                   <Text className="text-xs text-slate-400">
                     {new Date(item.changedAt).toLocaleString(dateLocale(), {
                       day: '2-digit',
@@ -61,12 +61,12 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
                   </Text>
                 </View>
                 <View className="mt-2">
-                  <Text className="text-sm text-slate-500">
+                  <Text className="text-sm text-slate-500 dark:text-slate-400">
                     {item.changedBy?.fullName ?? t('history.noUser')}
                   </Text>
                   {!!item.comment && (
-                    <View className="bg-rose-50 rounded-lg px-3 py-2 mt-2">
-                      <Text className="text-rose-700 text-sm">{item.comment}</Text>
+                    <View className="bg-rose-50 dark:bg-rose-950 rounded-lg px-3 py-2 mt-2">
+                      <Text className="text-rose-700 dark:text-rose-300 text-sm">{item.comment}</Text>
                     </View>
                   )}
                 </View>

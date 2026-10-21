@@ -62,14 +62,14 @@ export default function LocationPickerMap({
       <Pressable
         onPress={captureLocation}
         disabled={loading}
-        className="flex-row items-center justify-center bg-primary-50 border border-primary-100 rounded-xl py-3 active:scale-95"
+        className="flex-row items-center justify-center bg-primary-50 dark:bg-slate-800 border border-primary-100 dark:border-slate-700 rounded-xl py-3 active:scale-95"
       >
         {loading ? (
           <ActivityIndicator color={COLORS.primary} />
         ) : (
           <>
             <LocateFixed size={18} color={COLORS.primary} />
-            <Text className="text-primary-700 font-semibold ml-2">
+            <Text className="text-primary-700 dark:text-slate-200 font-semibold ml-2">
               {hasCoords ? t('location.update') : t('location.get')}
             </Text>
           </>
@@ -78,7 +78,7 @@ export default function LocationPickerMap({
 
       {hasCoords && grid && (
         <View
-          className="mt-3 rounded-2xl overflow-hidden border border-slate-200"
+          className="mt-3 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700"
           style={{ aspectRatio: 1 }}
         >
           <View className="flex-1 flex-row flex-wrap">
@@ -88,7 +88,7 @@ export default function LocationPickerMap({
                 return (
                   <View
                     key={key}
-                    className="bg-slate-100"
+                    className="bg-slate-100 dark:bg-slate-700"
                     style={{ width: '33.334%', height: '33.334%' }}
                   />
                 );

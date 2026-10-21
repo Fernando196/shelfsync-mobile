@@ -46,23 +46,23 @@ export function ItemStatusSheet({
       title={t('statusSheet.title', { code: formatItemCode(item.code) })}
       onClose={onClose}
     >
-      <View className="flex flex-row items-center bg-slate-200 p-3 rounded-md">
-        <View className="w-12 h-12 rounded-xl bg-slate-100 items-center justify-center mr-3">
+      <View className="flex flex-row items-center bg-slate-200 dark:bg-slate-600 p-3 rounded-md">
+        <View className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 items-center justify-center mr-3">
           <Package size={22} color="#64748b" />
         </View>
         <View className="flex-1">
           <View className="flex flex-row justify-between">
-            <Text className="text-base font-semibold text-slate-800 flex-1 mr-2" numberOfLines={2}>
+            <Text className="text-base font-semibold text-slate-800 dark:text-slate-100 flex-1 mr-2" numberOfLines={2}>
               {item.name || item.productLookup.description || t('reception.noDescription')}
             </Text>
             {status ? <StatusPill label={status.label} tone={status.tone} /> : null}
           </View>
-          <Text className="text-slate-500 text-sm mt-0.5">
+          <Text className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
             {t('reception.barcode', {
               value: item.productLookup.barcode || t('reception.noBarcode'),
             })}
           </Text>
-          <Text className="text-slate-500 text-sm mt-0.5">
+          <Text className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
             {t('reception.sku', { value: item.productLookup.sku || t('reception.noSku') })}
           </Text>
         </View>

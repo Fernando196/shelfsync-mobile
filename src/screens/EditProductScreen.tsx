@@ -126,7 +126,7 @@ export default function EditProductScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface">
+      <View className="flex-1 items-center justify-center bg-surface dark:bg-slate-950">
         <ActivityIndicator color={COLORS.primary} />
       </View>
     );
@@ -137,7 +137,7 @@ export default function EditProductScreen() {
       {/* Encabezado propio (sin header nativo), mismo estilo que Inventario */}
       <View className="flex-row items-center px-5 pb-2">
         <BackButton />
-        <Text className="text-2xl font-bold text-slate-800 ml-3">{t('edit.title')}</Text>
+        <Text className="text-2xl font-bold text-slate-800 dark:text-slate-100 ml-3">{t('edit.title')}</Text>
       </View>
       <ScrollView
         className="flex-1"
@@ -148,23 +148,23 @@ export default function EditProductScreen() {
         </Text>
 
         <AccordionSection title={t('edit.identification')} icon={<Tag size={18} color={COLORS.primary} />}>
-          <Text className="text-xs font-semibold text-slate-500 mb-1">
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
             {t('edit.code', { code: item ? formatItemCode(item.code) : '' })}
           </Text>
-          <Text className="text-xs font-semibold text-slate-500 mb-1">
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
             {t('edit.sku', { sku: item?.productLookup.sku ?? '' })}
           </Text>
-          <Text className="text-xs font-semibold text-slate-500 mb-1">
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
             {t('edit.product', { description: item?.productLookup.description ?? '' })}
           </Text>
-          <Text className="text-xs font-semibold text-slate-500 mb-1">{t('edit.name')}</Text>
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('edit.name')}</Text>
           <TextInput
-            className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base text-slate-800"
+            className="border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 mb-4 text-base text-slate-800 dark:text-slate-100"
             value={form.name}
             onChangeText={(name) => onChangeForm('name', name)}
           />
 
-          <Text className="text-xs font-semibold text-slate-500 mb-2">{t('edit.category')}</Text>
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">{t('edit.category')}</Text>
           <CategoryAutocomplete
             label={t('reception.searchCategory')}
             onChange={(id) => onChangeForm('categoryId', id)}
@@ -173,26 +173,26 @@ export default function EditProductScreen() {
         </AccordionSection>
 
         <AccordionSection title={t('edit.stock')} icon={<Boxes size={18} color={COLORS.primary} />}>
-          <Text className="text-xs font-semibold text-slate-500 mb-2">{t('edit.available')}</Text>
-          <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">{t('edit.available')}</Text>
+          <View className="flex-row items-center self-start bg-slate-100 dark:bg-slate-700 rounded-xl mb-4">
             <Pressable
               onPress={() => onChangeForm('qty', Math.max(0, form.qty - 1))}
               className="w-11 h-11 items-center justify-center active:scale-95"
             >
-              <Minus size={18} color="#334155" />
+              <Minus size={18} color={COLORS.primary} />
             </Pressable>
-            <Text className="w-10 text-center text-lg font-bold text-slate-800">{form.qty}</Text>
+            <Text className="w-10 text-center text-lg font-bold text-slate-800 dark:text-slate-100">{form.qty}</Text>
             <Pressable
               onPress={() => onChangeForm('qty', form.qty + 1)}
               className="w-11 h-11 items-center justify-center active:scale-95"
             >
-              <Plus size={18} color="#334155" />
+              <Plus size={18} color={COLORS.primary} />
             </Pressable>
           </View>
 
-          <Text className="text-xs font-semibold text-slate-500 mb-1">{t('edit.location')}</Text>
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">{t('edit.location')}</Text>
           <TextInput
-            className="border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-800"
+            className="border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-base text-slate-800 dark:text-slate-100"
             value={form.location}
             onChangeText={(location) => onChangeForm('location', location)}
           />
@@ -210,7 +210,7 @@ export default function EditProductScreen() {
               ))}
             </ScrollView>
           )}
-          <Text className="text-xs font-semibold text-slate-500 mb-2">{t('edit.addPhotos')}</Text>
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">{t('edit.addPhotos')}</Text>
           <PhotoPicker photos={newPhotos} onChange={setNewPhotos} />
         </AccordionSection>
 
@@ -232,7 +232,7 @@ export default function EditProductScreen() {
         <Pressable
           onPress={handleSave}
           disabled={saving}
-          className={`rounded-xl py-4 items-center mt-2 active:scale-95 ${saving ? 'bg-slate-200' : 'bg-primary-600'}`}
+          className={`rounded-xl py-4 items-center mt-2 active:scale-95 ${saving ? 'bg-slate-200 dark:bg-slate-600' : 'bg-primary-600 dark:bg-slate-600'}`}
         >
           {saving ? (
             <ActivityIndicator color="#fff" />
@@ -252,7 +252,7 @@ export default function EditProductScreen() {
           ) : (
             <>
               <Trash2 size={16} color="#e11d48" />
-              <Text className="text-rose-600 font-semibold ml-2">{t('edit.delete')}</Text>
+              <Text className="text-rose-600 dark:text-rose-400 font-semibold ml-2">{t('edit.delete')}</Text>
             </>
           )}
         </Pressable>

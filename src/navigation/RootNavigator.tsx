@@ -22,7 +22,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function Splash() {
   return (
-    <View className="flex-1 items-center justify-center bg-white">
+    <View className="flex-1 items-center justify-center bg-white dark:bg-slate-900">
       <ActivityIndicator color={COLORS.primary} />
     </View>
   );

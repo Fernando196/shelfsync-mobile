@@ -63,7 +63,7 @@ export default function CategoryAutocomplete({
           value={query}
           onChangeText={setQuery}
           placeholder={label}
-          className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base flex-1"
+          className="border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 mb-4 text-base text-slate-800 dark:text-slate-100 flex-1"
           placeholderTextColor="#94a3b8"
         />
         {text !== '' && !exists && (
@@ -88,12 +88,12 @@ export default function CategoryAutocomplete({
               }}
               className={`px-4 py-2 rounded-full mr-2 mb-2 border active:scale-95 ${
                 categorie.id === selected
-                  ? 'bg-primary-600 border-primary-600'
-                  : 'bg-white border-slate-200'
+                  ? 'bg-primary-600 dark:bg-slate-600 border-primary-600 dark:border-slate-300'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
               }`}
             >
               <Text
-                className={`text-sm font-medium ${categorie.id == selected ? 'text-white' : 'text-slate-600'}`}
+                className={`text-sm font-medium ${categorie.id == selected ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}
               >
                 {categorie.name}
               </Text>

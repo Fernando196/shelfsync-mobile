@@ -117,21 +117,21 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
       title={newProduct ? t('reception.newProduct') : t('reception.receiveBox')}
       onClose={onClose}
     >
-      <View className="bg-slate-50 rounded-2xl p-3">
+      <View className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-3">
         <View className="flex flex-row items-center">
-          <View className="w-12 h-12 rounded-xl bg-slate-200 items-center justify-center mr-3">
+          <View className="w-12 h-12 rounded-xl bg-slate-200 dark:bg-slate-600 items-center justify-center mr-3">
             <Package size={22} color="#64748b" />
           </View>
           <View className="flex-1">
-            <Text className="text-base font-semibold text-slate-800" numberOfLines={2}>
+            <Text className="text-base font-semibold text-slate-800 dark:text-slate-100" numberOfLines={2}>
               {product?.description || form.description.trim() || t('reception.noDescription')}
             </Text>
-            <Text className="text-slate-500 text-sm mt-0.5">
+            <Text className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
               {t('reception.barcode', {
                 value: product?.barcode || newProduct?.barcode || t('reception.noBarcode'),
               })}
             </Text>
-            <Text className="text-slate-500 text-sm mt-0.5">
+            <Text className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
               {t('reception.sku', { value: product?.sku || newProduct?.sku || t('reception.noSku') })}
             </Text>
           </View>
@@ -146,7 +146,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
               textAlignVertical="top"
             />
             <View className="flex flex-row items-center gap-4 mt-3">
-              <Text>{t('actions.requiresAssembly')}</Text>
+              <Text className="text-slate-800 dark:text-slate-100">{t('actions.requiresAssembly')}</Text>
               <Switch
                 trackColor={{ false: '#cbd5e1', true: '#6ee7b7' }}
                 thumbColor={COLORS.accent}
@@ -158,24 +158,24 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         )}
       </View>
 
-      <View className="flex flex-col bg-slate-50 rounded-2xl p-3 mt-3">
+      <View className="flex flex-col bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 mt-3">
         <View className="flex flex-row gap-4">
           <Boxes size={18} color={COLORS.primary} />
-          <Text className="text-base font-bold">{t('reception.stockSection')}</Text>
+          <Text className="text-base font-bold text-slate-800 dark:text-slate-100">{t('reception.stockSection')}</Text>
         </View>
-        <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
+        <View className="flex-row items-center self-start bg-slate-100 dark:bg-slate-700 rounded-xl mb-4">
           <Pressable
             onPress={() => set('qty', Math.max(1, form.qty - 1))}
             className="w-11 h-11 items-center justify-center active:scale-95"
           >
-            <Minus size={18} color="#334155" />
+            <Minus size={18} color={COLORS.primary} />
           </Pressable>
-          <Text className="w-10 text-center text-lg font-bold text-slate-800">{form.qty}</Text>
+          <Text className="w-10 text-center text-lg font-bold text-slate-800 dark:text-slate-100">{form.qty}</Text>
           <Pressable
             onPress={() => set('qty', form.qty + 1)}
             className="w-11 h-11 items-center justify-center active:scale-95"
           >
-            <Plus size={18} color="#334155" />
+            <Plus size={18} color={COLORS.primary} />
           </Pressable>
         </View>
 
@@ -197,7 +197,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           className="mt-2"
         />
 
-        <Text className="text-sm font-semibold text-slate-500 my-2">{t('reception.categoryOptional')}</Text>
+        <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400 my-2">{t('reception.categoryOptional')}</Text>
         <CategoryAutocomplete
           label={t('reception.searchCategory')}
           onChange={(id) => set('categoryId', id)}
@@ -205,7 +205,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         />
 
         <View className="mt-4">
-          <Text className="text-base font-bold mb-4">{t('reception.photosSection')}</Text>
+          <Text className="text-base font-bold mb-4 text-slate-800 dark:text-slate-100">{t('reception.photosSection')}</Text>
           <PhotoPicker photos={form.photos} onChange={(p) => set('photos', p)} />
         </View>
       </View>
@@ -213,7 +213,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
       {/* En web no hay Bluetooth; la impresion web llegara con la API de impresion */}
       {Platform.OS !== 'web' && (
         <Pressable
-          className={` bg-primary-600 rounded-xl py-3 items-center mt-3 ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
+          className={` bg-primary-600 dark:bg-slate-600 rounded-xl py-3 items-center mt-3 ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
           disabled={saving || (!!newProduct && !form.description.trim())}
           onPress={() => handleSave(true)}
         >
@@ -224,16 +224,16 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
       <View className="flex-row mt-5">
         <Pressable
           onPress={() => sheetRef.current?.close()}
-          className="flex-1 bg-slate-100 rounded-xl py-3 mr-2 items-center"
+          className="flex-1 bg-slate-100 dark:bg-slate-700 rounded-xl py-3 mr-2 items-center"
         >
-          <Text className="text-slate-700 font-semibold text-sm">{t('common.cancel')}</Text>
+          <Text className="text-slate-700 dark:text-slate-200 font-semibold text-sm">{t('common.cancel')}</Text>
         </Pressable>
         <Pressable
-          className={`flex-1 bg-slate-100 rounded-xl py-3 items-center ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
+          className={`flex-1 bg-slate-100 dark:bg-slate-700 rounded-xl py-3 items-center ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
           disabled={saving || (!!newProduct && !form.description.trim())}
           onPress={() => handleSave(false)}
         >
-          <Text className="text-sm font-semibold text-slate-700">{t('reception.saveOnly')}</Text>
+          <Text className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('reception.saveOnly')}</Text>
         </Pressable>
       </View>
     </BottomSheet>

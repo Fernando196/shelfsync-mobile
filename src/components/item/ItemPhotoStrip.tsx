@@ -132,7 +132,7 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
     <>
       {isEmpty ? (
         <View
-          className="w-full bg-primary-50 border border-dashed border-primary-200 rounded-2xl mb-4 overflow-hidden"
+          className="w-full bg-primary-50 dark:bg-slate-800 border border-dashed border-primary-200 dark:border-slate-600 rounded-2xl mb-4 overflow-hidden"
           style={{ height: PHOTO_HEIGHT }}
         >
           <Pressable
@@ -140,20 +140,20 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
             className="flex-1 items-center justify-center active:opacity-70"
           >
             <Camera size={32} color={COLORS.primary} />
-            <Text className="text-primary-600 font-semibold mt-2">{t('photos.takePhotos')}</Text>
+            <Text className="text-primary-600 dark:text-slate-200 font-semibold mt-2">{t('photos.takePhotos')}</Text>
           </Pressable>
           <Pressable
             onPress={openLibrary}
-            className="flex-row items-center justify-center py-3 border-t border-primary-200 active:opacity-70"
+            className="flex-row items-center justify-center py-3 border-t border-primary-200 dark:border-slate-600 active:opacity-70"
           >
             <ImagePlus size={16} color={COLORS.primary} />
-            <Text className="text-primary-600 ml-2">{t('photos.chooseFromGallery')}</Text>
+            <Text className="text-primary-600 dark:text-slate-200 ml-2">{t('photos.chooseFromGallery')}</Text>
           </Pressable>
         </View>
       ) : (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-1 mb-4">
           <View
-            className="mx-1 w-28 bg-primary-50 border border-dashed border-primary-200 rounded-2xl overflow-hidden"
+            className="mx-1 w-28 bg-primary-50 dark:bg-slate-800 border border-dashed border-primary-200 dark:border-slate-600 rounded-2xl overflow-hidden"
             style={{ height: PHOTO_HEIGHT }}
           >
             <Pressable
@@ -161,14 +161,14 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
               className="flex-1 items-center justify-center active:opacity-70"
             >
               <Camera size={26} color={COLORS.primary} />
-              <Text className="text-primary-600 text-xs font-semibold mt-1">{t('photos.take')}</Text>
+              <Text className="text-primary-600 dark:text-slate-200 text-xs font-semibold mt-1">{t('photos.take')}</Text>
             </Pressable>
             <Pressable
               onPress={openLibrary}
-              className="items-center justify-center py-3 border-t border-primary-200 active:opacity-70"
+              className="items-center justify-center py-3 border-t border-primary-200 dark:border-slate-600 active:opacity-70"
             >
               <ImagePlus size={18} color={COLORS.primary} />
-              <Text className="text-primary-600 text-xs mt-1">{t('photos.gallery')}</Text>
+              <Text className="text-primary-600 dark:text-slate-200 text-xs mt-1">{t('photos.gallery')}</Text>
             </Pressable>
           </View>
 

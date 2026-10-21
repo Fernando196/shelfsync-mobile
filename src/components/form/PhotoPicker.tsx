@@ -9,7 +9,7 @@ import { CameraCaptureModal } from '../camera/CameraCaptureModal';
 import { COLORS } from '../../const/theme.const';
 
 const TILE =
-  'w-24 h-24 rounded-xl bg-primary-50 border border-dashed border-primary-200 items-center justify-center mr-3 active:scale-95';
+  'w-24 h-24 rounded-xl bg-primary-50 dark:bg-slate-800 border border-dashed border-primary-200 dark:border-slate-600 items-center justify-center mr-3 active:scale-95';
 
 interface PhotoPickerProps {
   photos: string[];

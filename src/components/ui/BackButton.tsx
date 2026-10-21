@@ -11,7 +11,7 @@ export function BackButton() {
     <Pressable
       onPress={() => navigation.goBack()}
       hitSlop={8}
-      className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
+      className="w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 items-center justify-center active:opacity-70"
     >
       <ArrowLeft size={20} color={COLORS.primary} />
     </Pressable>

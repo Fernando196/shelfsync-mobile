@@ -20,9 +20,9 @@ export default function ProductCard({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row bg-white rounded-2xl p-3 mb-3 border border-slate-200 shadow-sm web:shadow-none active:scale-95"
+      className="flex-row bg-white dark:bg-slate-900 rounded-2xl p-3 mb-3 border border-slate-200 dark:border-slate-700 shadow-sm web:shadow-none active:scale-95"
     >
-      <View className="w-16 h-16 rounded-xl bg-slate-100 items-center justify-center overflow-hidden mr-3">
+      <View className="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-700 items-center justify-center overflow-hidden mr-3">
         {item.thumbnailUri ? (
           <Image source={{ uri: item.thumbnailUri }} className="w-16 h-16" resizeMode="cover" />
         ) : (
@@ -32,7 +32,7 @@ export default function ProductCard({
 
       <View className="flex-1">
         <View className="flex-row items-center justify-between">
-          <Text className="text-base font-semibold text-slate-800 flex-1" numberOfLines={1}>
+          <Text className="text-base font-semibold text-slate-800 dark:text-slate-100 flex-1" numberOfLines={1}>
             {item.name || item.code}
           </Text>
           {statusLabel ? <StatusPill label={statusLabel} tone={statusTone} /> : null}
@@ -42,12 +42,12 @@ export default function ProductCard({
         <View className="flex-row items-center justify-between mt-2">
           <View className="flex-row items-center flex-1">
             <MapPin size={12} color="#94a3b8" />
-            <Text className="text-xs text-slate-500 ml-1 flex-1" numberOfLines={1}>
+            <Text className="text-xs text-slate-500 dark:text-slate-400 ml-1 flex-1" numberOfLines={1}>
               {item.location || t('common.noLocation')}
             </Text>
           </View>
-          <View className="bg-primary-50 rounded-full px-2 py-0.5 ml-2">
-            <Text className="text-xs font-semibold text-primary-700">x{item.qty}</Text>
+          <View className="bg-primary-50 dark:bg-slate-800 rounded-full px-2 py-0.5 ml-2">
+            <Text className="text-xs font-semibold text-primary-700 dark:text-slate-200">x{item.qty}</Text>
           </View>
         </View>
       </View>

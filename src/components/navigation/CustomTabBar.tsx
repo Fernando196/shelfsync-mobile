@@ -68,7 +68,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
       >
         <Icon size={22} color={focused ? COLORS.primary : '#94a3b8'} />
         <Text
-          className={`text-[10px] mt-1 font-medium ${focused ? 'text-primary-600' : 'text-slate-400'}`}
+          className={`text-[10px] mt-1 font-medium ${focused ? 'text-primary-600 dark:text-slate-200' : 'text-slate-400'}`}
         >
           {route.name in LABEL_KEYS
             ? t(LABEL_KEYS[route.name as keyof typeof LABEL_KEYS])
@@ -79,7 +79,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   };
 
   return (
-    <View style={{ paddingBottom: insets.bottom }} className="bg-white border-t border-slate-200">
+    <View style={{ paddingBottom: insets.bottom }} className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
       <View className="flex-row items-center" style={{ height: 60 }}>
         {leftRoutes.map(renderTab)}
         <View style={{ width: 72 }} />

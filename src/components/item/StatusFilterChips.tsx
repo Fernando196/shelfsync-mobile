@@ -61,11 +61,11 @@ function Chip({
     <Pressable
       onPress={onPress}
       className={`flex-row items-center px-3 py-1.5 mr-2 rounded-full border active:opacity-70 ${
-        active ? `${tone.bg} border-primary-600` : 'bg-white border-slate-200'
+        active ? `${tone.bg} border-primary-600 dark:border-slate-300` : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
       }`}
     >
       {status && <View className={`w-2 h-2 rounded-full mr-2 ${tone.dot}`} />}
-      <Text className={`text-xs font-semibold ${active ? tone.text : 'text-slate-600'}`}>
+      <Text className={`text-xs font-semibold ${active ? tone.text : 'text-slate-600 dark:text-slate-300'}`}>
         {label}
       </Text>
       {count !== undefined && (

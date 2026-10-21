@@ -31,10 +31,10 @@ export default function AlertHost() {
       if (cancel) press(cancel);
     }}>
       <View className="flex-1 items-center justify-center bg-black/40 px-6">
-        <View className="w-full max-w-sm bg-white rounded-2xl p-5">
-          <Text className="text-lg font-bold text-slate-900">{alert.title}</Text>
+        <View className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl p-5">
+          <Text className="text-lg font-bold text-slate-900 dark:text-slate-50">{alert.title}</Text>
           {!!alert.message && (
-            <Text className="text-base text-slate-600 mt-2">{alert.message}</Text>
+            <Text className="text-base text-slate-600 dark:text-slate-300 mt-2">{alert.message}</Text>
           )}
           <View className={`mt-4 ${row ? 'flex-row gap-3' : ''}`}>
             {alert.buttons.map((b, i) => (

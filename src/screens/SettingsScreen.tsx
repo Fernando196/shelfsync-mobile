@@ -150,14 +150,14 @@ export default function SettingsScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 40 }}>
-        <Text className="text-2xl font-bold text-slate-800 mb-5">{t('tabs.settings')}</Text>
+        <Text className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-5">{t('tabs.settings')}</Text>
 
-        <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 flex-row items-center">
-          <View className="w-12 h-12 rounded-full bg-primary-50 items-center justify-center mr-3">
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 mb-4 flex-row items-center">
+          <View className="w-12 h-12 rounded-full bg-primary-50 dark:bg-slate-800 items-center justify-center mr-3">
             <User size={22} color={COLORS.primary} />
           </View>
           <View className="flex-1">
-            <Text className="font-semibold text-slate-800">
+            <Text className="font-semibold text-slate-800 dark:text-slate-100">
               {profile?.fullName ?? profile?.email ?? t('settings.operator')}
             </Text>
             <Text className="text-slate-400 text-xs">{profile?.email ?? t('settings.noEmail')}</Text>
@@ -167,22 +167,22 @@ export default function SettingsScreen() {
           </Pressable>
         </View>
 
-        <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4">
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 mb-4">
           <View className="flex-row items-center mb-3">
             <Languages size={16} color={COLORS.primary} />
-            <Text className="font-semibold text-slate-800 ml-2">{t('settings.language')}</Text>
+            <Text className="font-semibold text-slate-800 dark:text-slate-100 ml-2">{t('settings.language')}</Text>
           </View>
-          <View className="flex-row bg-slate-100 rounded-xl p-1">
+          <View className="flex-row bg-slate-100 dark:bg-slate-700 rounded-xl p-1">
             {LANGUAGES.map((lang) => {
               const active = i18n.language === lang.code;
               return (
                 <Pressable
                   key={lang.code}
                   onPress={() => setLanguage(lang.code)}
-                  className={`flex-1 items-center py-2.5 rounded-lg ${active ? 'bg-white' : ''}`}
+                  className={`flex-1 items-center py-2.5 rounded-lg ${active ? 'bg-white dark:bg-slate-900' : ''}`}
                 >
                   <Text
-                    className={`text-sm font-semibold ${active ? 'text-slate-900' : 'text-slate-500'}`}
+                    className={`text-sm font-semibold ${active ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-400'}`}
                   >
                     {lang.label}
                   </Text>
@@ -192,9 +192,9 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4">
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 mb-4">
           <View className="flex-row items-center justify-between mb-3">
-            <Text className="font-semibold text-slate-800">{t('settings.printer')}</Text>
+            <Text className="font-semibold text-slate-800 dark:text-slate-100">{t('settings.printer')}</Text>
             {connectedName ? (
               <StatusPill label={connectedName} tone="success" />
             ) : (
@@ -207,7 +207,7 @@ export default function SettingsScreen() {
               <Pressable
                 onPress={handleTestPrint}
                 disabled={testing}
-                className="flex-1 flex-row items-center justify-center bg-primary-600 rounded-xl py-3 mr-2 active:scale-95"
+                className="flex-1 flex-row items-center justify-center bg-primary-600 dark:bg-slate-600 rounded-xl py-3 mr-2 active:scale-95"
               >
                 {testing ? (
                   <ActivityIndicator color="#fff" />
@@ -220,7 +220,7 @@ export default function SettingsScreen() {
               </Pressable>
               <Pressable
                 onPress={handleDisconnect}
-                className="flex-row items-center justify-center bg-rose-50 rounded-xl px-4 active:scale-95"
+                className="flex-row items-center justify-center bg-rose-50 dark:bg-rose-950 rounded-xl px-4 active:scale-95"
               >
                 <BluetoothOff size={16} color="#f43f5e" />
               </Pressable>
@@ -237,14 +237,14 @@ export default function SettingsScreen() {
             <Pressable
               onPress={startScan}
               disabled={scanning || connecting}
-              className="flex-row items-center justify-center bg-primary-50 rounded-xl py-3 active:scale-95"
+              className="flex-row items-center justify-center bg-primary-50 dark:bg-slate-800 rounded-xl py-3 active:scale-95"
             >
               {scanning ? (
                 <Radar size={16} color={COLORS.primary} />
               ) : (
                 <Bluetooth size={16} color={COLORS.primary} />
               )}
-              <Text className="text-primary-700 font-semibold ml-2 text-sm">
+              <Text className="text-primary-700 dark:text-slate-200 font-semibold ml-2 text-sm">
                 {scanning ? t('settings.searching') : t('settings.searchPrinter')}
               </Text>
             </Pressable>
@@ -261,10 +261,10 @@ export default function SettingsScreen() {
                   <Pressable
                     key={item.id}
                     onPress={() => handleConnect(item)}
-                    className="flex-row items-center justify-between py-3 border-b border-slate-100 active:bg-slate-50"
+                    className="flex-row items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800 active:bg-slate-50"
                   >
                     <View>
-                      <Text className="text-slate-700 font-medium">
+                      <Text className="text-slate-700 dark:text-slate-200 font-medium">
                         {item.name || t('settings.unnamedDevice')}
                       </Text>
                       <Text className="text-slate-400 text-xs">{item.id}</Text>
@@ -277,10 +277,10 @@ export default function SettingsScreen() {
           )}
         </View>
 
-        <View className="bg-white rounded-2xl border border-slate-200 p-4">
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4">
           <View className="flex-row items-center mb-3">
             <Ruler size={16} color={COLORS.primary} />
-            <Text className="font-semibold text-slate-800 ml-2">{t('settings.labelFormat')}</Text>
+            <Text className="font-semibold text-slate-800 dark:text-slate-100 ml-2">{t('settings.labelFormat')}</Text>
           </View>
           <View className="flex-row flex-wrap">
             {LABEL_FORMATS.map((f) => (

@@ -7,7 +7,8 @@
     <title>ShelfSync</title>
     <!-- PWA: open full screen from the home screen, without Safari's UI -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#f8fafc" />
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="ShelfSync" />
@@ -51,6 +52,18 @@
         display: flex;
         height: 100%;
         flex: 1;
+      }
+      /* Dark mode follows the phone's theme (NativeWind dark: uses the same media query) */
+      @media (prefers-color-scheme: dark) {
+        html,
+        body {
+          background-color: #020617;
+          color-scheme: dark;
+        }
+        input:focus,
+        textarea:focus {
+          border-color: #cbd5e1 !important;
+        }
       }
     </style>
     <!-- iOS Safari ignores user-scalable=no, so pinch would zoom the whole app: block it here -->
