@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { View, Text, Image, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
-import { Camera, ImagePlus, RotateCw, Trash2 } from 'lucide-react-native';
+import { Camera, ImagePlus, RotateCw, Star, Trash2 } from 'lucide-react-native';
 import { IInventoryItem, IInventoryPhoto } from '../../interfaces/item.interface';
-import { deletePhoto, photoUrl, uploadPhoto } from '../../services/files.service';
+import { deletePhoto, photoUrl, setCoverPhoto, uploadPhoto } from '../../services/files.service';
 import { hapticTap, hapticSuccess, hapticError } from '../../lib/haptics';
 import { pickFromLibrary } from '../../lib/pickFromLibrary';
 import { CameraCaptureModal } from '../camera/CameraCaptureModal';
@@ -21,14 +21,28 @@ interface ItemPhotoStripProps {
 
 const PHOTO_HEIGHT = 200;
 
+// Botones redondos sobre cada foto (estrella y basura).
+const photoButtonStyle = {
+  position: 'absolute',
+  top: 8,
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  alignItems: 'center',
+  justifyContent: 'center',
+} as const;
+
 export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [pending, setPending] = useState<PendingPhoto[]>([]);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [coverSettingId, setCoverSettingId] = useState<string | null>(null);
   const files = item.files ?? [];
   // Mas reciente primero, igual que en la tira.
   const photos = [...files].reverse();
+  const coverIndex = photos.findIndex((p) => p.id === item.cover?.id);
   const isEmpty = files.length === 0 && pending.length === 0;
 
   // Sube en orden; si una falla se detiene y deja esa y las restantes marcadas para reintentar.
@@ -70,6 +84,20 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
   };
 
   const retry = () => upload(pending.filter((p) => p.failed).map((p) => p.uri));
+
+  const makeCover = async (photo: IInventoryPhoto) => {
+    hapticTap();
+    setCoverSettingId(photo.id);
+    try {
+      onChange(await setCoverPhoto(item.id, photo.id));
+      hapticSuccess();
+    } catch (e: any) {
+      hapticError();
+      Alert.alert('No se pudo cambiar la portada', e?.message ?? String(e));
+    } finally {
+      setCoverSettingId(null);
+    }
+  };
 
   const confirmDelete = (photo: IInventoryPhoto) => {
     hapticTap();
@@ -171,23 +199,49 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
               style={{ width: 260, height: PHOTO_HEIGHT }}
             >
               <Image source={{ uri: photoUrl(p.url) }} className="rounded-2xl w-full h-full" />
+              {i === coverIndex && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    left: 8,
+                    bottom: 8,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    borderRadius: 999,
+                    paddingHorizontal: 10,
+                    paddingVertical: 4,
+                  }}
+                >
+                  <Star size={12} color="#facc15" fill="#facc15" />
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
+                    Portada
+                  </Text>
+                </View>
+              )}
+              <Pressable
+                onPress={() => makeCover(p)}
+                // La portada actual no se vuelve a elegir; la estrella llena la marca.
+                disabled={i === coverIndex || coverSettingId !== null}
+                hitSlop={8}
+                style={({ pressed }) => ({ ...photoButtonStyle, left: 8, opacity: pressed ? 0.7 : 1 })}
+              >
+                {coverSettingId === p.id ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Star
+                    size={16}
+                    color={i === coverIndex ? '#facc15' : '#fff'}
+                    fill={i === coverIndex ? '#facc15' : 'none'}
+                  />
+                )}
+              </Pressable>
               {/* Layout en style: en web NativeWind no aplicaba estas clases a este Pressable */}
               <Pressable
                 onPress={() => confirmDelete(p)}
                 disabled={deletingId !== null}
                 hitSlop={8}
-                style={({ pressed }) => ({
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  backgroundColor: 'rgba(0,0,0,0.5)',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: pressed ? 0.7 : 1,
-                })}
+                style={({ pressed }) => ({ ...photoButtonStyle, right: 8, opacity: pressed ? 0.7 : 1 })}
               >
                 {deletingId === p.id ? (
                   <ActivityIndicator size="small" color="#fff" />
@@ -206,6 +260,9 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
         onClose={() => setViewerIndex(null)}
         onDelete={(i) => confirmDelete(photos[i])}
         deleting={deletingId !== null}
+        coverIndex={coverIndex}
+        onSetCover={(i) => makeCover(photos[i])}
+        settingCover={coverSettingId !== null}
       />
 
       <CameraCaptureModal

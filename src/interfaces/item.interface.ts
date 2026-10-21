@@ -29,6 +29,8 @@ export interface IInventoryItem extends IAuditable {
 
   status: EnumItemStatus;
   cover?: IInventoryPhoto | null;
+  // Portada elegida a mano; null = automatica (la foto mas reciente).
+  coverPhotoId?: string | null;
 }
 
 export interface IUpsertItemInput {

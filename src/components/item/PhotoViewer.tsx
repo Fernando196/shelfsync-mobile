@@ -13,7 +13,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Trash2, X } from 'lucide-react-native';
+import { Star, Trash2, X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface PhotoViewerProps {
@@ -24,6 +24,10 @@ interface PhotoViewerProps {
   // Recibe el indice de la foto actual; la confirmacion la maneja quien lo usa.
   onDelete?: (index: number) => void;
   deleting?: boolean;
+  // Indice de la foto que hoy es portada (-1 si ninguna).
+  coverIndex?: number;
+  onSetCover?: (index: number) => void;
+  settingCover?: boolean;
 }
 
 const MAX_ZOOM = 4;
@@ -44,10 +48,20 @@ function touchDistance(e: GestureResponderEvent) {
 // arrastrar para moverse con zoom. Todo con PanResponder y no con un ScrollView: en
 // iOS Safari, una vez que arranca el scroll nativo los toques ya no se pueden
 // cancelar y el pellizco hace zoom a toda la pagina.
-export function PhotoViewer({ urls, index, onClose, onDelete, deleting }: PhotoViewerProps) {
+export function PhotoViewer({
+  urls,
+  index,
+  onClose,
+  onDelete,
+  deleting,
+  coverIndex = -1,
+  onSetCover,
+  settingCover,
+}: PhotoViewerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [current, setCurrent] = useState(index ?? 0);
+  const isCover = coverIndex === current;
   const containerRef = useRef<View>(null);
 
   // swipeX mueve la tira de fotos; scale/tx/ty son el zoom de la foto actual.
@@ -232,6 +246,21 @@ export function PhotoViewer({ urls, index, onClose, onDelete, deleting }: PhotoV
             {urls.length > 1 ? `${current + 1} / ${urls.length}` : ''}
           </Text>
           <View className="flex-row">
+            {onSetCover && (
+              <Pressable
+                onPress={() => onSetCover(current)}
+                // La portada actual no se vuelve a elegir; la estrella llena la marca.
+                disabled={isCover || settingCover}
+                hitSlop={12}
+                className="w-10 h-10 mr-3 rounded-full bg-white/20 items-center justify-center active:opacity-70"
+              >
+                {settingCover ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Star size={20} color={isCover ? '#facc15' : '#fff'} fill={isCover ? '#facc15' : 'none'} />
+                )}
+              </Pressable>
+            )}
             {onDelete && (
               <Pressable
                 onPress={() => onDelete(current)}

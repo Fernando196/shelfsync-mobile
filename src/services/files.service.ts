@@ -26,6 +26,14 @@ export async function deletePhoto(id: string, photoId: string): Promise<IInvento
   );
 }
 
+/** photoId null regresa la portada a automatica (la foto mas reciente). */
+export async function setCoverPhoto(id: string, photoId: string | null): Promise<IInventoryItem> {
+  return <IInventoryItem>await request(`/items/${encodeURIComponent(id)}/cover`, {
+    method: 'PATCH',
+    body: JSON.stringify({ photoId }),
+  });
+}
+
 export function photoUrl(relativeUrl: string): string {
   return `${API_BASE_URL}${relativeUrl}`;
 }
