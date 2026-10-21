@@ -201,7 +201,7 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
               className="mx-1 active:opacity-80"
               style={{ width: 260, height: PHOTO_HEIGHT }}
             >
-              <Image source={{ uri: photoUrl(p.url) }} className="rounded-2xl w-full h-full" />
+              <Image source={{ uri: photoUrl(p.mediumUrl ?? p.url) }} className="rounded-2xl w-full h-full" />
               {i === coverIndex && (
                 <View
                   style={{
@@ -258,6 +258,7 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
       )}
 
       <PhotoViewer
+        // El visor si carga el original (2048px) para ver detalle con zoom.
         urls={photos.map((p) => photoUrl(p.url))}
         index={viewerIndex}
         onClose={() => setViewerIndex(null)}

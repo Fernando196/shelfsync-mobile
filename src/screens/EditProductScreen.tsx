@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { parseMoney } from '../lib/money';
 import { useTranslation } from 'react-i18next';
 import {
   View,
@@ -11,11 +12,11 @@ import {
   Image,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { Tag, Boxes, MapPin, Minus, Plus, Camera, Trash2 } from 'lucide-react-native';
+import { Tag, Boxes, MapPin, Minus, Plus, Camera, Trash2, Store } from 'lucide-react-native';
 import { useInventory } from '../state/InventoryContext';
 import AccordionSection from '../components/ui/AccordionSection';
 import { hapticSuccess, hapticError } from '../lib/haptics';
-import { IEditForm, IInventoryItem } from '../interfaces/item.interface';
+import { IEditForm, IInventoryItem, ITEM_CONDITIONS } from '../interfaces/item.interface';
 import { deleteItem, getItemById, updateItem } from '../services/items.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import CategoryAutocomplete from '../components/form/CategoryAutocomplete';
@@ -34,6 +35,9 @@ function emptyForm(): IEditForm {
     latitude: null,
     longitude: null,
     categoryId: null,
+    price: '',
+    cost: '',
+    condition: 'new',
   };
 }
 
@@ -88,6 +92,9 @@ export default function EditProductScreen() {
           name: itemResponse.name || '',
           qty: itemResponse.qty ?? 0,
           categoryId: itemResponse.categoryId ?? null,
+          price: itemResponse.price != null ? String(itemResponse.price) : '',
+          cost: itemResponse.cost != null ? String(itemResponse.cost) : '',
+          condition: itemResponse.condition ?? 'new',
         });
         setItem(itemResponse);
       })
@@ -105,6 +112,9 @@ export default function EditProductScreen() {
         latitude: form.latitude ?? undefined,
         longitude: form.longitude ?? undefined,
         categoryId: form.categoryId ?? undefined,
+        price: parseMoney(form.price),
+        cost: parseMoney(form.cost),
+        condition: form.condition,
       });
       // Se quitan una por una al subir, asi un reintento no duplica las que ya subieron.
       for (const uri of newPhotos) {
@@ -196,6 +206,61 @@ export default function EditProductScreen() {
             value={form.location}
             onChangeText={(location) => onChangeForm('location', location)}
           />
+        </AccordionSection>
+
+        <AccordionSection
+          title={t('pricing.section')}
+          icon={<Store size={18} color={COLORS.primary} />}
+        >
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+            {t('pricing.cost')}
+          </Text>
+          <TextInput
+            className="border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 mb-4 text-base text-slate-800 dark:text-slate-100"
+            value={form.cost}
+            onChangeText={(cost) => onChangeForm('cost', cost)}
+            keyboardType="decimal-pad"
+            placeholder="0.00"
+            placeholderTextColor="#94a3b8"
+          />
+
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
+            {t('pricing.salePrice')}
+          </Text>
+          <TextInput
+            className="border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 mb-4 text-base text-slate-800 dark:text-slate-100"
+            value={form.price}
+            onChangeText={(price) => onChangeForm('price', price)}
+            keyboardType="decimal-pad"
+            placeholder="0.00"
+            placeholderTextColor="#94a3b8"
+          />
+
+          <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">
+            {t('marketplace.condition')}
+          </Text>
+          <View className="flex-row flex-wrap">
+            {ITEM_CONDITIONS.map((c) => {
+              const active = form.condition === c;
+              return (
+                <Pressable
+                  key={c}
+                  onPress={() => onChangeForm('condition', c)}
+                  className={`px-4 py-2 rounded-full mr-2 mb-2 border active:opacity-70 ${
+                    active
+                      ? 'bg-primary-600 dark:bg-slate-600 border-primary-600 dark:border-slate-300'
+                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
+                  }`}
+                >
+                  <Text
+                    className={`text-sm font-medium ${active ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}
+                  >
+                    {t(`conditions.${c}`)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </AccordionSection>
 
         <AccordionSection title={t('edit.photos')} icon={<Camera size={18} color={COLORS.primary} />}>

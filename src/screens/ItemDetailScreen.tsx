@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Pressable, Alert, Platform } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
-import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil } from 'lucide-react-native';
+import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Store } from 'lucide-react-native';
+import { MarketplaceSheet } from '../components/item/MarketplaceSheet';
+import { formatMoney } from '../lib/money';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { IInventoryItem } from '../interfaces/item.interface';
 import { getItemById } from '../services/items.service';
@@ -32,6 +34,7 @@ export default function ItemDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [printing, setPrinting] = useState(false);
   const [toast, setToast] = useState<IToast | null>(null);
+  const [showMarketplace, setShowMarketplace] = useState(false);
   const [loading, setLoading] = useState(true);
   const { changing, pendingAction, handleAction, runAction, cancelComment } = useItemStatusAction(
     id,
@@ -152,6 +155,26 @@ export default function ItemDetailScreen() {
           {formatItemCode(item.code)}
           {item.productLookup?.sku ? `  ·  SKU ${item.productLookup.sku}` : ''}
         </Text>
+        {/* Precio de venta destacado; costo de bodega y ganancia mas chicos debajo. */}
+        {(item.price != null || item.cost != null) && (
+          <View className="mt-3">
+            {item.price != null ? (
+              <Text className="text-3xl font-bold text-accent-600 dark:text-emerald-400">
+                {formatMoney(item.price)}
+              </Text>
+            ) : (
+              <Text className="text-sm text-slate-400">{t('pricing.noSalePrice')}</Text>
+            )}
+            {item.cost != null && (
+              <Text className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                {t('pricing.costLine', { value: formatMoney(item.cost) })}
+                {item.price != null
+                  ? `  ·  ${t('pricing.margin', { value: formatMoney(item.price - item.cost) })}`
+                  : ''}
+              </Text>
+            )}
+          </View>
+        )}
         <View className="mt-3">
           <StatusPill label={status.label} tone={status.tone} />
         </View>
@@ -241,10 +264,22 @@ export default function ItemDetailScreen() {
           </Pressable>
         )}
 
+        <Pressable
+          onPress={() => setShowMarketplace(true)}
+          className="flex-row items-center justify-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl py-3.5 mt-3 active:opacity-80"
+        >
+          <Store size={18} color={COLORS.primary} />
+          <Text className="text-slate-800 dark:text-slate-100 font-semibold ml-2">{t('marketplace.open')}</Text>
+        </Pressable>
+
         <StatusHistory itemId={item.id} status={item.status} />
       </ScrollView>
 
       {toast && <Toast toast={toast} />}
+
+      {showMarketplace && (
+        <MarketplaceSheet item={item} onClose={() => setShowMarketplace(false)} />
+      )}
 
       {pendingAction && (
         <CommentSheet

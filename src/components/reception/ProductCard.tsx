@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatMoney } from '../../lib/money';
 import { useTranslation } from 'react-i18next';
 import { View, Text, Image, Pressable } from 'react-native';
 import { Package, MapPin } from 'lucide-react-native';
@@ -46,6 +47,11 @@ export default function ProductCard({
               {item.location || t('common.noLocation')}
             </Text>
           </View>
+          {item.price != null && (
+            <Text className="text-sm font-bold text-accent-600 dark:text-emerald-400 ml-2">
+              {formatMoney(item.price)}
+            </Text>
+          )}
           <View className="bg-primary-50 dark:bg-slate-800 rounded-full px-2 py-0.5 ml-2">
             <Text className="text-xs font-semibold text-primary-700 dark:text-slate-200">x{item.qty}</Text>
           </View>

@@ -182,6 +182,7 @@ export default function InventoryScreen() {
         category: item.category?.name,
         thumbnailUri: item.cover ? photoUrl(item.cover.thumbnailUrl ?? item.cover.url) : undefined,
         code: formatItemCode(item.code),
+        price: item.price,
       },
       onPress: () => navigation.navigate('ItemDetail', { id: item.id }),
       statusLabel: status.label,

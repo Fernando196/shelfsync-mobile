@@ -8,7 +8,9 @@ export interface IInventoryPhoto {
   filename: string;
   url: string;
   createdAt: string;
+  // Variantes WebP de la API (240px y 800px); null si no se generaron: usar `url`.
   thumbnailUrl: string | null;
+  mediumUrl: string | null;
 }
 
 export interface IInventoryItem extends IAuditable {
@@ -31,7 +33,15 @@ export interface IInventoryItem extends IAuditable {
   cover?: IInventoryPhoto | null;
   // Portada elegida a mano; null = automatica (la foto mas reciente).
   coverPhotoId?: string | null;
+  // price = precio de venta (Marketplace); cost = lo que costo de bodega (manifiesto).
+  price?: number | null;
+  cost?: number | null;
+  condition?: ItemCondition;
 }
+
+// Mismos estados que pide Facebook Marketplace.
+export type ItemCondition = 'new' | 'used_like_new' | 'used_good' | 'used_fair';
+export const ITEM_CONDITIONS: ItemCondition[] = ['new', 'used_like_new', 'used_good', 'used_fair'];
 
 export interface IItemStatusCounts {
   total: number;
@@ -49,6 +59,9 @@ export interface IUpsertItemInput {
   notes?: string;
   productLookupId?: string;
   productLookup?: ICreateProductLookupInput;
+  price?: number | null;
+  cost?: number | null;
+  condition?: ItemCondition;
 }
 
 export interface IEditForm {
@@ -58,6 +71,10 @@ export interface IEditForm {
   latitude: number | null;
   longitude: number | null;
   categoryId: string | null;
+  // Texto tal cual se escribe; se convierte a numero al guardar.
+  price: string;
+  cost: string;
+  condition: ItemCondition;
 }
 
 export interface IItemStatusHistory {

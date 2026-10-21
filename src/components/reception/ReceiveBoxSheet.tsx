@@ -1,4 +1,5 @@
 import { Boxes, Minus, Package, Plus } from 'lucide-react-native';
+import { parseMoney } from '../../lib/money';
 import { useTranslation } from 'react-i18next';
 import { View, Text, Pressable, Alert, Switch, Platform } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
@@ -27,6 +28,7 @@ function emptyForm() {
     description: '',
     needAssembly: false,
     categoryId: '',
+    cost: '',
   };
 }
 
@@ -78,6 +80,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         qty: form.qty,
         location: form.location,
         notes: form.notes?.trim(),
+        cost: parseMoney(form.cost),
         longitude: form.longitude || undefined,
         latitude: form.latitude || undefined,
         categoryId: form.categoryId || undefined,
@@ -178,6 +181,16 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
             <Plus size={18} color={COLORS.primary} />
           </Pressable>
         </View>
+
+        {/* Opcional: a veces no se sabe al recibir; se puede llenar despues en Editar. */}
+        <Input
+          label={t('pricing.costOptional')}
+          value={form.cost}
+          onChangeText={(v) => set('cost', v)}
+          keyboardType="decimal-pad"
+          placeholder="0.00"
+          className="mb-2"
+        />
 
         <Input
           label={t('reception.warehouseLocation')}
