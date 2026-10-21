@@ -198,9 +198,16 @@ const es = {
     cost: 'Costo de bodega',
     costOptional: 'Costo de bodega (opcional)',
     salePrice: 'Precio de venta',
-    noSalePrice: 'Sin precio de venta',
+    addSalePrice: 'Agregar precio de venta',
+    saveFailed: 'No se pudo guardar el precio',
     costLine: 'Costo {{value}}',
     margin: 'Ganancia {{value}}',
+  },
+  sold: {
+    title: 'Marcar como vendido',
+    question: '¿En cuanto se vendio?',
+    hint: 'Si no lo sabes, dejalo vacio.',
+    confirm: 'Marcar como vendido',
   },
   conditions: {
     new: 'Nuevo',

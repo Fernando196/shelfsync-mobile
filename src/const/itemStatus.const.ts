@@ -21,6 +21,7 @@ function action(
   to: EnumItemStatus,
   variant: ButtonVariant,
   needsComment?: boolean,
+  needsPrice?: boolean,
 ): ItemAction {
   return {
     get label() {
@@ -29,6 +30,7 @@ function action(
     to,
     variant,
     needsComment,
+    needsPrice,
   };
 }
 
@@ -46,15 +48,18 @@ export type ItemAction = {
   readonly label: string;
   to: EnumItemStatus;
   needsComment?: boolean;
+  // Vendido: pide en cuanto se vendio y lo guarda como precio de venta.
+  needsPrice?: boolean;
   variant: ButtonVariant;
 };
 
 const damaged = () => action('damaged', EnumItemStatus.DAMAGED, 'danger', true);
+const sold = () => action('sold', EnumItemStatus.SOLD, 'primary', false, true);
 
 export const ITEM_ACTIONS: Record<EnumItemStatus, ItemAction[]> = {
   [EnumItemStatus.RECEIVED]: [
     action('requiresAssembly', EnumItemStatus.PENDING_ASSEMBLY, 'secondary'),
-    action('sold', EnumItemStatus.SOLD, 'primary'),
+    sold(),
     damaged(),
   ],
   [EnumItemStatus.PENDING_ASSEMBLY]: [
@@ -72,7 +77,7 @@ export const ITEM_ACTIONS: Record<EnumItemStatus, ItemAction[]> = {
     action('cancelAssembly', EnumItemStatus.PENDING_ASSEMBLY, 'secondary'),
     damaged(),
   ],
-  [EnumItemStatus.READY]: [action('sold', EnumItemStatus.SOLD, 'primary'), damaged()],
+  [EnumItemStatus.READY]: [sold(), damaged()],
   [EnumItemStatus.SOLD]: [damaged()],
   [EnumItemStatus.DAMAGED]: [],
 };

@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { SoldPriceSheet } from './SoldPriceSheet';
 import { useTranslation } from 'react-i18next';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import ButtonPill from '../ui/ButtonPill';
@@ -26,14 +27,22 @@ export function ItemStatusSheet({
   const { t } = useTranslation();
   const sheetRef = useRef<BottomSheetHandle>(null);
   const actions = ITEM_ACTIONS[item.status] ?? [];
+  // El cambio de estatus puede responder sin fotos/producto: se combina con el item escaneado.
   const { changing, handleAction, pendingAction, runAction, cancelComment } = useItemStatusAction(
     item.id,
-    onUpdate,
+    (next) => onUpdate({ ...item, ...next }),
   );
 
   const status = getItemStatus(item);
 
-  return pendingAction ? (
+  return pendingAction?.needsPrice ? (
+    <SoldPriceSheet
+      currentPrice={item.price}
+      onClose={cancelComment}
+      onConfirm={(price) => runAction(pendingAction, undefined, price)}
+      loading={changing}
+    />
+  ) : pendingAction ? (
     <CommentSheet
       title={t('statusSheet.damageReason')}
       onClose={cancelComment}

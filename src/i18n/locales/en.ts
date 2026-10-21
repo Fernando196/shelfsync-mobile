@@ -199,9 +199,16 @@ const en: typeof es = {
     cost: 'Warehouse cost',
     costOptional: 'Warehouse cost (optional)',
     salePrice: 'Sale price',
-    noSalePrice: 'No sale price',
+    addSalePrice: 'Add sale price',
+    saveFailed: 'Could not save the price',
     costLine: 'Cost {{value}}',
     margin: 'Profit {{value}}',
+  },
+  sold: {
+    title: 'Mark as sold',
+    question: 'What did it sell for?',
+    hint: 'Leave it empty if you do not know.',
+    confirm: 'Mark as sold',
   },
   conditions: {
     new: 'New',
