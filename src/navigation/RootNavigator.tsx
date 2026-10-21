@@ -5,8 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SessionProvider, useSession } from '../state/SessionContext';
 import { useAutoReconnectPrinter } from '../hooks/useAutoReconnectPrinter';
 import LoginScreen from '../screens/auth/LoginScreen';
-import CreatePinScreen from '../screens/auth/CreatePinScreen';
-import PinUnlockScreen from '../screens/auth/PinUnlockScreen';
 import MainTabs from './MainTabs';
 import ItemDetailScreen from '../screens/ItemDetailScreen';
 import EditProductScreen from '../screens/EditProductScreen';
@@ -30,14 +28,12 @@ function Splash() {
 }
 
 function Gate() {
-  const { loading, hasToken, hasPin, unlocked } = useSession();
-  useAutoReconnectPrinter(unlocked);
-  useRefreshCategories(unlocked);
+  const { loading, hasToken } = useSession();
+  useAutoReconnectPrinter(hasToken);
+  useRefreshCategories(hasToken);
 
   if (loading) return <Splash />;
   if (!hasToken) return <LoginScreen />;
-  if (!hasPin) return <CreatePinScreen />;
-  if (!unlocked) return <PinUnlockScreen />;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

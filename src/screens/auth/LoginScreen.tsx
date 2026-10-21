@@ -49,7 +49,7 @@ export default function LoginScreen() {
           </View>
           <Text className="text-2xl font-bold text-slate-800">Iniciar sesion</Text>
           <Text className="text-slate-400 mt-1 text-center">
-            Solo se pide una vez por dispositivo. Despues desbloqueas con tu PIN.
+            Solo se pide una vez por dispositivo. La sesion queda abierta.
           </Text>
         </View>
 
