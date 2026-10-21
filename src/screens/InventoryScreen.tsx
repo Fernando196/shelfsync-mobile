@@ -7,9 +7,11 @@ import {
   RefreshControl,
   ActivityIndicator,
   Pressable,
+  Platform,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { Search, PackageSearch, WifiOff, X } from 'lucide-react-native';
+import { Search, PackageSearch, RefreshCw, WifiOff, X } from 'lucide-react-native';
+import { PULL_REFRESHING, useWebPullToRefresh } from '../hooks/useWebPullToRefresh';
 import ProductCard from '../components/reception/ProductCard';
 import { PillTone } from '../components/item/StatusPill';
 import { IProductCardData } from '../interfaces/product.interface';
@@ -22,6 +24,7 @@ import { formatItemCode } from '../lib/formatItemCode';
 import { Screen } from '../components/ui/Screen';
 import { getItemStatus } from '../lib/statusItem';
 import { useInventory } from '../state/InventoryContext';
+import { COLORS } from '../const/theme.const';
 
 type Row = {
   key: string;
@@ -93,13 +96,39 @@ export default function InventoryScreen() {
     loadFirst(debounceQuery, status);
   }, [loadFirst, debounceQuery, status]);
 
-  // Los conteos se recargan al volver a la pantalla: el estatus pudo cambiar en el detalle.
   const loadCounts = useCallback(() => {
     getStatusCounts(debounceQuery)
       .then(setCounts)
       .catch(() => {});
   }, [debounceQuery]);
-  useFocusEffect(loadCounts);
+
+  // Recarga suave: trae la primera pagina, agrega arriba lo nuevo y actualiza lo que ya
+  // estaba, sin tirar lo cargado mas abajo ni mover el scroll.
+  const softRefresh = useCallback(async () => {
+    const id = requestId.current;
+    try {
+      const { data, count } = await listItems(debounceQuery, 0, PAGE_SIZE, status);
+      if (id !== requestId.current) return;
+      setItems((prev) => {
+        const fresh = new Map(data.map((i) => [i.id, i]));
+        const known = new Set(prev.map((i) => i.id));
+        const added = data.filter((i) => !known.has(i.id));
+        return [...added, ...prev.map((i) => fresh.get(i.id) ?? i)];
+      });
+      setTotal(count);
+      setOffline(false);
+      loadCounts();
+    } catch {
+      setOffline(true);
+    }
+  }, [debounceQuery, status, loadCounts]);
+
+  // Al volver a la lista (detalle, escaner) se trae lo nuevo sin perder el scroll.
+  useFocusEffect(
+    useCallback(() => {
+      softRefresh();
+    }, [softRefresh]),
+  );
 
   // Cerrar el buscador tambien quita el filtro de texto.
   const closeSearch = () => {
@@ -117,6 +146,11 @@ export default function InventoryScreen() {
       setRefreshing(false);
     }
   };
+
+  const listRef = useRef<FlatList<Row>>(null);
+  const pullIndicatorRef = useRef<View>(null);
+  const pullIconRef = useRef<View>(null);
+  const webPull = useWebPullToRefresh(listRef, pullIndicatorRef, pullIconRef, onRefresh);
 
   const backendRows: Row[] = items.map((item) => {
     const status = getItemStatus(item);
@@ -144,15 +178,17 @@ export default function InventoryScreen() {
             <Text className="text-2xl font-bold text-slate-800">Inventario</Text>
             <Text className="text-slate-400 text-sm mt-0.5">{total} articulos</Text>
           </View>
-          {!searchOpen && (
-            <Pressable
-              onPress={() => setSearchOpen(true)}
-              hitSlop={8}
-              className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
-            >
-              <Search size={20} color="#4f46e5" />
-            </Pressable>
-          )}
+          <View className="flex-row">
+            {!searchOpen && (
+              <Pressable
+                onPress={() => setSearchOpen(true)}
+                hitSlop={8}
+                className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
+              >
+                <Search size={20} color={COLORS.primary} />
+              </Pressable>
+            )}
+          </View>
         </View>
 
         {searchOpen && (
@@ -178,35 +214,66 @@ export default function InventoryScreen() {
           <View className="flex-row items-center bg-amber-50 rounded-xl px-3 py-2 mt-3">
             <WifiOff size={14} color="#f59e0b" />
             <Text className="text-amber-700 text-xs ml-2">
-              Sin conexion con el servidor. Desliza hacia abajo para reintentar.
+              {Platform.OS === 'web'
+                ? 'Sin conexion con el servidor. Jala hacia abajo para reintentar.'
+                : 'Sin conexion con el servidor. Desliza hacia abajo para reintentar.'}
             </Text>
           </View>
         )}
       </View>
 
-      <FlatList
-        data={backendRows}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
-        keyExtractor={(r) => r.key}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        renderItem={({ item }) => (
-          <ProductCard
-            item={item.card}
-            statusLabel={item.statusLabel}
-            statusTone={item.statusTone}
-            onPress={item.onPress}
-          />
-        )}
-        ListEmptyComponent={
-          <View className="items-center mt-24">
-            <PackageSearch size={40} color="#cbd5e1" />
-            <Text className="text-slate-400 mt-3">No hay articulos que coincidan</Text>
+      <View style={{ flex: 1, overflow: 'hidden' }}>
+        {/* Indicador del "jalar para actualizar" de web, detras de la lista: se descubre
+            al jalar. En nativo no se usa (lo pinta RefreshControl). */}
+        {Platform.OS === 'web' && (
+          <View
+            ref={pullIndicatorRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: PULL_REFRESHING,
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: 0,
+            }}
+          >
+            {webPull.refreshing ? (
+              <ActivityIndicator color={COLORS.primary} />
+            ) : (
+              <View ref={pullIconRef}>
+                <RefreshCw size={22} color={COLORS.primary} />
+              </View>
+            )}
           </View>
-        }
-        ListFooterComponent={loadingMore ? <ActivityIndicator className="pt-4 pb-10" /> : null}
-      />
+        )}
+
+        <FlatList
+          ref={listRef}
+          data={backendRows}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          keyExtractor={(r) => r.key}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          renderItem={({ item }) => (
+            <ProductCard
+              item={item.card}
+              statusLabel={item.statusLabel}
+              statusTone={item.statusTone}
+              onPress={item.onPress}
+            />
+          )}
+          ListEmptyComponent={
+            <View className="items-center mt-24">
+              <PackageSearch size={40} color="#cbd5e1" />
+              <Text className="text-slate-400 mt-3">No hay articulos que coincidan</Text>
+            </View>
+          }
+          ListFooterComponent={loadingMore ? <ActivityIndicator className="pt-4 pb-10" /> : null}
+        />
+      </View>
     </Screen>
   );
 }
