@@ -4,6 +4,14 @@ services:
       context: .
       args:
         EXPO_PUBLIC_API_BASE_URL: ${EXPO_PUBLIC_API_BASE_URL:-https://shelfsync-api.fernandomorales.dev}
+    image: shelfsync-web:latest
+    container_name: shelfsync-web
     restart: unless-stopped
-    ports:
-      - '8090:80'
+    # Misma red que cloudflared (igual que shelfsync-api): el tunnel llega a
+    # http://shelfsync-web:80 sin publicar puertos en el host.
+    networks:
+      - tunnel
+
+networks:
+  tunnel:
+    external: true
