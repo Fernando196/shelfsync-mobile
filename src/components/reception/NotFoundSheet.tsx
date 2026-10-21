@@ -1,4 +1,4 @@
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, Text, View } from 'react-native';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { IProductLookup } from '../../interfaces/productLookup.interface';
 import { useState, useRef } from 'react';
@@ -56,7 +56,8 @@ export function NotFoundSheet({ code, onClose, onFound, onCreateNew }: NotFoundS
         onChangeText={(v) => setSku(v)}
         label="SKU del manifiesto"
         keyboardType="number-pad"
-        autoFocus
+        // En web (iOS) el foco con el sheet aun fuera de pantalla hace que Safari desplace la pagina
+        autoFocus={Platform.OS !== 'web'}
         className="mt-4"
       />
 

@@ -49,8 +49,8 @@ export default function PinKeypad({
   return (
     <View className="items-center w-full">
       <Animated.View
-        style={{ transform: [{ translateX }] }}
-        className="flex-row justify-center mb-10"
+        // Layout via style, not className: NativeWind drops className on Animated.View on web
+        style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 40, transform: [{ translateX }] }}
       >
         {Array.from({ length }).map((_, i) => {
           const filled = i < value.length;

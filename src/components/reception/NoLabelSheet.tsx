@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { IProductLookup } from '../../interfaces/productLookup.interface';
 import { useEffect, useState, useRef } from 'react';
@@ -50,7 +50,8 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
       value={term}
       onChangeText={(v) => setTerm(v)}
       label="Descripción del producto"
-      autoFocus
+      // En web (iOS) el foco con el sheet aun fuera de pantalla hace que Safari desplace la pagina
+      autoFocus={Platform.OS !== 'web'}
       className="mb-4"
     />
   );
@@ -92,7 +93,7 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
         results.map((product) => (
           <Pressable
             key={product.id}
-            className={`bg-white border shadow-sm rounded-xl p-3 mb-2 ${product.id === exactMatch?.id ? 'border-primary' : 'border-slate-200'}`}
+            className={`bg-white border shadow-sm web:shadow-none rounded-xl p-3 mb-2 ${product.id === exactMatch?.id ? 'border-primary' : 'border-slate-200'}`}
             onPress={() => onSelect(product)}
           >
             <Text className="text-sm font-semibold text-slate-800">

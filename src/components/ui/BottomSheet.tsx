@@ -71,15 +71,33 @@ export function BottomSheet({ title, header, children, footer, onClose, ref }: B
   ).current;
 
   return (
+    // Layout via style, not className: on web NativeWind drops className on these two,
+    // which left the sheet unpositioned (pushing the camera) and without background.
     <KeyboardAvoidingView
       pointerEvents="box-none"
-      className="absolute bottom-0 left-0 right-0 justify-end"
       behavior="padding"
-      style={{ top: insets.top + 20 }}
+      style={{
+        position: 'absolute',
+        top: insets.top + 20,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        justifyContent: 'flex-end',
+        // Clip the sheet while it is translated off screen; on web it would otherwise
+        // grow the page and make Safari scroll the camera behind it.
+        overflow: 'hidden',
+      }}
     >
       <Animated.View
-        className="bg-white rounded-t-3xl px-5 pb-10"
-        style={{ flexShrink: 1, transform: [{ translateY }] }}
+        style={{
+          backgroundColor: '#ffffff',
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          paddingHorizontal: 20,
+          paddingBottom: 40,
+          flexShrink: 1,
+          transform: [{ translateY }],
+        }}
       >
         <View className="pt-5" {...panResponder.panHandlers}>
           <View className="self-center w-10 h-1 rounded-full bg-slate-300 mb-4" />

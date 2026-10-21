@@ -20,10 +20,22 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const pulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    // isInteraction: false — on web this runs in JS, and an endless "interaction" blocks
+    // InteractionManager, so FlatList never renders past its first 10 rows.
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1.08, duration: 900, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 1, duration: 900, useNativeDriver: true }),
+        Animated.timing(pulse, {
+          toValue: 1.08,
+          duration: 900,
+          useNativeDriver: true,
+          isInteraction: false,
+        }),
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 900,
+          useNativeDriver: true,
+          isInteraction: false,
+        }),
       ]),
     );
     loop.start();
