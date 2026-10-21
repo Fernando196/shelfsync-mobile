@@ -1,11 +1,22 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, FlatList, RefreshControl, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Search, PackageSearch, WifiOff } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  RefreshControl,
+  ActivityIndicator,
+  Pressable,
+} from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Search, PackageSearch, WifiOff, X } from 'lucide-react-native';
 import ProductCard from '../components/reception/ProductCard';
 import { PillTone } from '../components/item/StatusPill';
 import { IProductCardData } from '../interfaces/product.interface';
-import { listItems } from '../services/items.service';
+import { getStatusCounts, listItems } from '../services/items.service';
+import { StatusFilterChips } from '../components/item/StatusFilterChips';
+import { EnumItemStatus } from '../interfaces/enum/itemStatus.type';
+import { IItemStatusCounts } from '../interfaces/item.interface';
 import { photoUrl } from '../services/files.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import { Screen } from '../components/ui/Screen';
@@ -25,6 +36,9 @@ const PAGE_SIZE = 20;
 export default function InventoryScreen() {
   const navigation = useNavigation<any>();
   const [query, setQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [status, setStatus] = useState<EnumItemStatus | null>(null);
+  const [counts, setCounts] = useState<IItemStatusCounts | null>(null);
   const { items, setItems, total, setTotal } = useInventory();
   const [offline, setOffline] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -42,10 +56,10 @@ export default function InventoryScreen() {
     };
   }, [query]);
 
-  const loadFirst = useCallback(async (q: string) => {
+  const loadFirst = useCallback(async (q: string, s: EnumItemStatus | null) => {
     try {
       const id = ++requestId.current;
-      const { data, count } = await listItems(q, 0, PAGE_SIZE);
+      const { data, count } = await listItems(q, 0, PAGE_SIZE, s);
       if (id !== requestId.current) return;
       setItems(data);
       setTotal(count);
@@ -60,7 +74,7 @@ export default function InventoryScreen() {
     if (loadingMore || items.length >= total) return;
     try {
       setLoadingMore(true);
-      const { data, count } = await listItems(debounceQuery, items.length, PAGE_SIZE);
+      const { data, count } = await listItems(debounceQuery, items.length, PAGE_SIZE, status);
       if (id !== requestId.current) return;
       setItems((prev) => {
         const seen = new Set(prev.map((i) => i.id));
@@ -76,13 +90,28 @@ export default function InventoryScreen() {
   };
 
   useEffect(() => {
-    loadFirst(debounceQuery);
-  }, [loadFirst, debounceQuery]);
+    loadFirst(debounceQuery, status);
+  }, [loadFirst, debounceQuery, status]);
+
+  // Los conteos se recargan al volver a la pantalla: el estatus pudo cambiar en el detalle.
+  const loadCounts = useCallback(() => {
+    getStatusCounts(debounceQuery)
+      .then(setCounts)
+      .catch(() => {});
+  }, [debounceQuery]);
+  useFocusEffect(loadCounts);
+
+  // Cerrar el buscador tambien quita el filtro de texto.
+  const closeSearch = () => {
+    setQuery('');
+    setSearchOpen(false);
+  };
 
   const onRefresh = async () => {
     try {
       setRefreshing(true);
-      await loadFirst(debounceQuery);
+      loadCounts();
+      await loadFirst(debounceQuery, status);
     } catch (err: any) {
     } finally {
       setRefreshing(false);
@@ -110,19 +139,40 @@ export default function InventoryScreen() {
   return (
     <Screen>
       <View className="px-5 pb-2">
-        <Text className="text-2xl font-bold text-slate-800">Inventario</Text>
-        <Text className="text-slate-400 text-sm mt-0.5">{total} articulos</Text>
-
-        <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-3 mt-4">
-          <Search size={16} color="#94a3b8" />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Buscar por nombre, SKU o ubicacion"
-            className="flex-1 py-3 px-2 text-sm"
-            placeholderTextColor="#94a3b8"
-          />
+        <View className="flex-row items-center justify-between">
+          <View>
+            <Text className="text-2xl font-bold text-slate-800">Inventario</Text>
+            <Text className="text-slate-400 text-sm mt-0.5">{total} articulos</Text>
+          </View>
+          {!searchOpen && (
+            <Pressable
+              onPress={() => setSearchOpen(true)}
+              hitSlop={8}
+              className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
+            >
+              <Search size={20} color="#4f46e5" />
+            </Pressable>
+          )}
         </View>
+
+        {searchOpen && (
+          <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-3 mt-4">
+            <Search size={16} color="#94a3b8" />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Buscar por nombre, SKU o ubicacion"
+              className="flex-1 py-3 px-2 text-sm"
+              placeholderTextColor="#94a3b8"
+              autoFocus
+            />
+            <Pressable onPress={closeSearch} hitSlop={8} className="p-1 active:opacity-70">
+              <X size={18} color="#94a3b8" />
+            </Pressable>
+          </View>
+        )}
+
+        <StatusFilterChips selected={status} counts={counts} onChange={setStatus} />
 
         {offline && (
           <View className="flex-row items-center bg-amber-50 rounded-xl px-3 py-2 mt-3">

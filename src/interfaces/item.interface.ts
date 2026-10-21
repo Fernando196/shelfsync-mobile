@@ -33,6 +33,11 @@ export interface IInventoryItem extends IAuditable {
   coverPhotoId?: string | null;
 }
 
+export interface IItemStatusCounts {
+  total: number;
+  counts: Record<EnumItemStatus, number>;
+}
+
 export interface IUpsertItemInput {
   id?: string;
   categoryId?: string;
