@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 // Servicio de impresion BLE para la MP210, usando react-native-ble-plx
 // (funciona igual en Android e iOS, sin necesitar certificacion MFi porque
 // la impresora habla BLE nativo, no Bluetooth clasico/SPP).
@@ -163,7 +164,7 @@ export async function tryAutoReconnect(): Promise<Device | null> {
  */
 async function writeRawBytes(bytes: number[]): Promise<void> {
   if (!connectedDevice) {
-    throw new Error('No hay una impresora conectada. Conecta la MP210 primero.');
+    throw new Error(i18n.t('errors.noPrinter'));
   }
 
   const chunks = chunkBytes(bytes, CHUNK_SIZE);

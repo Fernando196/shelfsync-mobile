@@ -1,4 +1,5 @@
 import { Boxes, Minus, Package, Plus } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { View, Text, Pressable, Alert, Switch, Platform } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Input } from '../ui/Input';
@@ -30,6 +31,7 @@ function emptyForm() {
 }
 
 export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IReceiveBoxSheetProps) {
+  const { t } = useTranslation();
   const sheetRef = useRef<BottomSheetHandle>(null);
   const [form, setForm] = useState(() => ({
     ...emptyForm(),
@@ -44,8 +46,8 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         const perm = await Location.requestForegroundPermissionsAsync();
         if (!perm.granted) {
           Alert.alert(
-            'Permiso requerido',
-            'Se necesita acceso a la ubicacion para registrar donde esta el mueble.',
+            t('reception.locationPermissionTitle'),
+            t('reception.locationPermissionMessage'),
           );
           return;
         }
@@ -57,7 +59,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         }));
       } catch (e: any) {
         hapticError();
-        Alert.alert('No se pudo obtener la ubicacion', e?.message ?? String(e));
+        Alert.alert(t('reception.locationFailed'), e?.message ?? String(e));
       }
     })();
   }, []);
@@ -103,7 +105,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
       onSaved(newItem, print);
     } catch (e: any) {
       hapticError();
-      Alert.alert('No se pudo guardar', e?.message ?? String(e));
+      Alert.alert(t('reception.saveFailed'), e?.message ?? String(e));
     } finally {
       setSaving(false);
     }
@@ -112,7 +114,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
   return (
     <BottomSheet
       ref={sheetRef}
-      title={newProduct ? 'Producto nuevo' : 'Recibir caja'}
+      title={newProduct ? t('reception.newProduct') : t('reception.receiveBox')}
       onClose={onClose}
     >
       <View className="bg-slate-50 rounded-2xl p-3">
@@ -122,30 +124,32 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           </View>
           <View className="flex-1">
             <Text className="text-base font-semibold text-slate-800" numberOfLines={2}>
-              {product?.description || form.description.trim() || 'Sin descripción'}
+              {product?.description || form.description.trim() || t('reception.noDescription')}
             </Text>
             <Text className="text-slate-500 text-sm mt-0.5">
-              Barcode: {product?.barcode || newProduct?.barcode || 'Sin codigo de barras'}
+              {t('reception.barcode', {
+                value: product?.barcode || newProduct?.barcode || t('reception.noBarcode'),
+              })}
             </Text>
             <Text className="text-slate-500 text-sm mt-0.5">
-              SKU: {product?.sku || newProduct?.sku || 'Sin sku'}
+              {t('reception.sku', { value: product?.sku || newProduct?.sku || t('reception.noSku') })}
             </Text>
           </View>
         </View>
         {newProduct && (
           <View className="mt-2">
             <Input
-              label="Descripción del manifiesto"
+              label={t('reception.manifestDescription')}
               value={form.description}
               onChangeText={(v) => set('description', v)}
               multiline
               textAlignVertical="top"
             />
             <View className="flex flex-row items-center gap-4 mt-3">
-              <Text>Requiere ensamble</Text>
+              <Text>{t('actions.requiresAssembly')}</Text>
               <Switch
-                trackColor={{ false: '#cbd5e1', true: '#a5b4fc' }}
-                thumbColor={COLORS.primary}
+                trackColor={{ false: '#cbd5e1', true: '#6ee7b7' }}
+                thumbColor={COLORS.accent}
                 value={form.needAssembly}
                 onValueChange={(v) => set('needAssembly', v)}
               />
@@ -157,7 +161,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
       <View className="flex flex-col bg-slate-50 rounded-2xl p-3 mt-3">
         <View className="flex flex-row gap-4">
           <Boxes size={18} color={COLORS.primary} />
-          <Text className="text-base font-bold">Inventario y stock</Text>
+          <Text className="text-base font-bold">{t('reception.stockSection')}</Text>
         </View>
         <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
           <Pressable
@@ -176,32 +180,32 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         </View>
 
         <Input
-          label="Ubicacion en bodega"
+          label={t('reception.warehouseLocation')}
           value={form.location}
           onChangeText={(v) => set('location', v)}
-          placeholder="Pasillo B - Estante 4 - Tarima 12"
+          placeholder={t('reception.locationPlaceholder')}
         />
 
         <Input
-          label="Observaciones"
+          label={t('reception.notes')}
           multiline
           textAlignVertical="top"
           value={form.notes}
           onChangeText={(v) => set('notes', v)}
-          placeholder="Caja abierta, le faltan piezas, etc."
+          placeholder={t('reception.notesPlaceholder')}
           placeholderTextColor="#94a3b8"
           className="mt-2"
         />
 
-        <Text className="text-sm font-semibold text-slate-500 my-2">Categoria (Opcional)</Text>
+        <Text className="text-sm font-semibold text-slate-500 my-2">{t('reception.categoryOptional')}</Text>
         <CategoryAutocomplete
-          label="Buscar categoria"
+          label={t('reception.searchCategory')}
           onChange={(id) => set('categoryId', id)}
           selected={form.categoryId || ''}
         />
 
         <View className="mt-4">
-          <Text className="text-base font-bold mb-4">Fotos de caja o producto</Text>
+          <Text className="text-base font-bold mb-4">{t('reception.photosSection')}</Text>
           <PhotoPicker photos={form.photos} onChange={(p) => set('photos', p)} />
         </View>
       </View>
@@ -213,7 +217,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           disabled={saving || (!!newProduct && !form.description.trim())}
           onPress={() => handleSave(true)}
         >
-          <Text className="text-sm font-semibold text-white">Guardar e imprimir</Text>
+          <Text className="text-sm font-semibold text-white">{t('reception.saveAndPrint')}</Text>
         </Pressable>
       )}
 
@@ -222,14 +226,14 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
           onPress={() => sheetRef.current?.close()}
           className="flex-1 bg-slate-100 rounded-xl py-3 mr-2 items-center"
         >
-          <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
+          <Text className="text-slate-700 font-semibold text-sm">{t('common.cancel')}</Text>
         </Pressable>
         <Pressable
           className={`flex-1 bg-slate-100 rounded-xl py-3 items-center ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
           disabled={saving || (!!newProduct && !form.description.trim())}
           onPress={() => handleSave(false)}
         >
-          <Text className="text-sm font-semibold text-slate-700">Solo guardar</Text>
+          <Text className="text-sm font-semibold text-slate-700">{t('reception.saveOnly')}</Text>
         </Pressable>
       </View>
     </BottomSheet>

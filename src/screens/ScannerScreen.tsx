@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
@@ -22,6 +23,7 @@ import { getItemStatus } from '../lib/statusItem';
 import { NoLabelSheet } from '../components/reception/NoLabelSheet';
 
 export default function ScannerScreen() {
+  const { t } = useTranslation();
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
@@ -54,7 +56,7 @@ export default function ScannerScreen() {
           const id = data.slice(prefixQRItem.length);
           if (!id) {
             hapticError();
-            Alert.alert('QR incorrecto', 'El id del qr es incorrecto');
+            Alert.alert(t('scanner.invalidQrTitle'), t('scanner.invalidQrMessage'));
             return;
           }
 
@@ -75,7 +77,7 @@ export default function ScannerScreen() {
         }
       } catch (e: any) {
         hapticError();
-        Alert.alert('No encontrado', e?.message ?? 'No se pudo buscar el articulo');
+        Alert.alert(t('scanner.notFoundTitle'), e?.message ?? t('scanner.searchFailed'));
       } finally {
         setLoading(false);
       }
@@ -85,7 +87,7 @@ export default function ScannerScreen() {
 
   const toastSaved = (item: IInventoryItem) =>
     setToast({
-      title: `${formatItemCode(item.code)} guardada`,
+      title: t('scanner.saved', { code: formatItemCode(item.code) }),
       subtitle: item.name || '',
     });
 
@@ -98,9 +100,9 @@ export default function ScannerScreen() {
     }
     if (!getConnectedPrinter()) {
       hapticError();
-      Alert.alert('Guardada sin imprimir', 'No hay impresora conectada.', [
-        { text: 'OK', style: 'cancel', onPress: () => toastSaved(item) },
-        { text: 'Ir a Ajustes', onPress: () => navigation.navigate('Settings') },
+      Alert.alert(t('scanner.savedNotPrinted'), t('scanner.noPrinter'), [
+        { text: t('common.ok'), style: 'cancel', onPress: () => toastSaved(item) },
+        { text: t('common.goToSettings'), onPress: () => navigation.navigate('Settings') },
       ]);
       return;
     }
@@ -111,8 +113,8 @@ export default function ScannerScreen() {
       setPrinted(true);
     } catch (e: any) {
       hapticError();
-      Alert.alert('Guardada sin imprimir', e?.message ?? String(e), [
-        { text: 'OK', onPress: () => toastSaved(item) },
+      Alert.alert(t('scanner.savedNotPrinted'), e?.message ?? String(e), [
+        { text: t('common.ok'), onPress: () => toastSaved(item) },
       ]);
     } finally {
       setLoading(false);
@@ -131,13 +133,13 @@ export default function ScannerScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-white px-8">
         <Text className="text-slate-600 text-center mb-4">
-          Se necesita acceso a la camara para escanear codigos QR.
+          {t('scanner.cameraPermission')}
         </Text>
         <Pressable
           onPress={requestPermission}
           className="bg-primary-600 rounded-xl px-5 py-3 active:scale-95"
         >
-          <Text className="text-white font-semibold">Dar permiso</Text>
+          <Text className="text-white font-semibold">{t('scanner.grantPermission')}</Text>
         </Pressable>
       </View>
     );
@@ -147,7 +149,7 @@ export default function ScannerScreen() {
     <View className="flex-1 bg-black">
       {toast && (
         <Toast toast={toast}>
-          {printed && <Text className="text-white/80 text-base">Etiqueta impresa</Text>}
+          {printed && <Text className="text-white/80 text-base">{t('detail.labelPrinted')}</Text>}
         </Toast>
       )}
 
@@ -179,7 +181,7 @@ export default function ScannerScreen() {
             height: 240,
             borderRadius: 24,
             borderWidth: 3,
-            borderColor: 'rgba(79,70,229,0.9)',
+            borderColor: 'rgba(5,150,105,0.9)',
           }}
         />
       </View>
@@ -187,7 +189,7 @@ export default function ScannerScreen() {
       <Pressable
         onPress={() => {
           hapticSelect();
-          setTorch((t) => !t);
+          setTorch((on) => !on);
         }}
         className="absolute right-6 bg-black/50 rounded-full w-11 h-11 items-center justify-center active:scale-95"
         style={{
@@ -264,7 +266,7 @@ export default function ScannerScreen() {
             className="flex-row items-center bg-black/50 rounded-full px-5 py-3 active:scale-95"
           >
             <Search size={18} color="#fff" />
-            <Text className="text-white font-semibold text-sm ml-2">Sin etiqueta</Text>
+            <Text className="text-white font-semibold text-sm ml-2">{t('scanner.noLabel')}</Text>
           </Pressable>
         </View>
       )}

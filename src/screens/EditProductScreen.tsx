@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -38,6 +39,7 @@ function emptyForm(): IEditForm {
 
 export default function EditProductScreen() {
   const route = useRoute<any>();
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const { id } = route.params;
   const [loading, setLoading] = useState(true);
@@ -47,12 +49,12 @@ export default function EditProductScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      'Eliminar producto',
-      'Esta accion quita el articulo del inventario. No se puede deshacer desde la app.',
+      t('edit.delete'),
+      t('edit.deleteMessage'),
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Eliminar',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             setDeleting(true);
@@ -62,7 +64,7 @@ export default function EditProductScreen() {
               // Editar y Detalle ya no tienen item: volver a la lista.
               navigation.popToTop();
             } catch (e: any) {
-              Alert.alert('No se pudo eliminar', e?.message ?? String(e));
+              Alert.alert(t('edit.deleteFailed'), e?.message ?? String(e));
             } finally {
               setDeleting(false);
             }
@@ -89,7 +91,7 @@ export default function EditProductScreen() {
         });
         setItem(itemResponse);
       })
-      .catch((e) => Alert.alert('No se pudo cargar', e?.message ?? String(e)))
+      .catch((e) => Alert.alert(t('edit.loadFailed'), e?.message ?? String(e)))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -113,7 +115,7 @@ export default function EditProductScreen() {
       navigation.goBack();
     } catch (e: any) {
       hapticError();
-      Alert.alert('No se pudo guardar', e?.message ?? String(e));
+      Alert.alert(t('edit.saveFailed'), e?.message ?? String(e));
     } finally {
       setSaving(false);
     }
@@ -135,43 +137,43 @@ export default function EditProductScreen() {
       {/* Encabezado propio (sin header nativo), mismo estilo que Inventario */}
       <View className="flex-row items-center px-5 pb-2">
         <BackButton />
-        <Text className="text-2xl font-bold text-slate-800 ml-3">Editar mueble</Text>
+        <Text className="text-2xl font-bold text-slate-800 ml-3">{t('edit.title')}</Text>
       </View>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 20, paddingTop: 8, paddingBottom: 48 }}
       >
         <Text className="text-slate-400 text-sm mb-5">
-          Los cambios se guardan directo en el servidor
+          {t('edit.subtitle')}
         </Text>
 
-        <AccordionSection title="Identificacion del mueble" icon={<Tag size={18} color={COLORS.primary} />}>
+        <AccordionSection title={t('edit.identification')} icon={<Tag size={18} color={COLORS.primary} />}>
           <Text className="text-xs font-semibold text-slate-500 mb-1">
-            Codigo: {item && formatItemCode(item.code)}
+            {t('edit.code', { code: item ? formatItemCode(item.code) : '' })}
           </Text>
           <Text className="text-xs font-semibold text-slate-500 mb-1">
-            SKU / codigo {item?.productLookup.sku}
+            {t('edit.sku', { sku: item?.productLookup.sku ?? '' })}
           </Text>
           <Text className="text-xs font-semibold text-slate-500 mb-1">
-            Producto {item?.productLookup.description}
+            {t('edit.product', { description: item?.productLookup.description ?? '' })}
           </Text>
-          <Text className="text-xs font-semibold text-slate-500 mb-1">Nombre del mueble</Text>
+          <Text className="text-xs font-semibold text-slate-500 mb-1">{t('edit.name')}</Text>
           <TextInput
             className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base text-slate-800"
             value={form.name}
             onChangeText={(name) => onChangeForm('name', name)}
           />
 
-          <Text className="text-xs font-semibold text-slate-500 mb-2">Categoria</Text>
+          <Text className="text-xs font-semibold text-slate-500 mb-2">{t('edit.category')}</Text>
           <CategoryAutocomplete
-            label="Buscar categoria"
+            label={t('reception.searchCategory')}
             onChange={(id) => onChangeForm('categoryId', id)}
             selected={form.categoryId || ''}
           />
         </AccordionSection>
 
-        <AccordionSection title="Inventario y stock" icon={<Boxes size={18} color={COLORS.primary} />}>
-          <Text className="text-xs font-semibold text-slate-500 mb-2">Cantidad disponible</Text>
+        <AccordionSection title={t('edit.stock')} icon={<Boxes size={18} color={COLORS.primary} />}>
+          <Text className="text-xs font-semibold text-slate-500 mb-2">{t('edit.available')}</Text>
           <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
             <Pressable
               onPress={() => onChangeForm('qty', Math.max(0, form.qty - 1))}
@@ -188,7 +190,7 @@ export default function EditProductScreen() {
             </Pressable>
           </View>
 
-          <Text className="text-xs font-semibold text-slate-500 mb-1">Ubicacion en bodega</Text>
+          <Text className="text-xs font-semibold text-slate-500 mb-1">{t('edit.location')}</Text>
           <TextInput
             className="border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-800"
             value={form.location}
@@ -196,7 +198,7 @@ export default function EditProductScreen() {
           />
         </AccordionSection>
 
-        <AccordionSection title="Fotos" icon={<Camera size={18} color={COLORS.primary} />}>
+        <AccordionSection title={t('edit.photos')} icon={<Camera size={18} color={COLORS.primary} />}>
           {(item?.files?.length ?? 0) > 0 && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
               {item?.files?.map((p) => (
@@ -208,12 +210,12 @@ export default function EditProductScreen() {
               ))}
             </ScrollView>
           )}
-          <Text className="text-xs font-semibold text-slate-500 mb-2">Agregar fotos</Text>
+          <Text className="text-xs font-semibold text-slate-500 mb-2">{t('edit.addPhotos')}</Text>
           <PhotoPicker photos={newPhotos} onChange={setNewPhotos} />
         </AccordionSection>
 
         <AccordionSection
-          title="Geolocalizacion en bodega"
+          title={t('edit.geolocation')}
           icon={<MapPin size={18} color={COLORS.primary} />}
           defaultOpen={false}
         >
@@ -235,7 +237,7 @@ export default function EditProductScreen() {
           {saving ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-white font-semibold text-base">Guardar cambios</Text>
+            <Text className="text-white font-semibold text-base">{t('edit.save')}</Text>
           )}
         </Pressable>
 
@@ -250,7 +252,7 @@ export default function EditProductScreen() {
           ) : (
             <>
               <Trash2 size={16} color="#e11d48" />
-              <Text className="text-rose-600 font-semibold ml-2">Eliminar producto</Text>
+              <Text className="text-rose-600 font-semibold ml-2">{t('edit.delete')}</Text>
             </>
           )}
         </Pressable>

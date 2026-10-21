@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import i18n from '../i18n';
 import { ItemAction } from '../const/itemStatus.const';
 import { IInventoryItem } from '../interfaces/item.interface';
 import { updateItemStatus } from '../services/items.service';
@@ -21,7 +22,7 @@ export function useItemStatusAction(itemId: string, onUpdated: (item: IInventory
       setPendingAction(null);
     } catch (err: any) {
       hapticError();
-      Alert.alert('No se pudo cambiar', err.message);
+      Alert.alert(i18n.t('actions.changeFailed'), err.message);
     } finally {
       setChanging(false);
     }

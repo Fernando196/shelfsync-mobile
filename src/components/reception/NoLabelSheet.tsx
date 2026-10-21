@@ -1,4 +1,5 @@
 import { Platform, Pressable, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { IProductLookup } from '../../interfaces/productLookup.interface';
 import { useEffect, useState, useRef } from 'react';
@@ -7,6 +8,7 @@ import { searchProducts } from '../../services/productLookup.service';
 import { normalize } from '../../lib/normalize';
 
 export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps) {
+  const { t } = useTranslation();
   const sheetRef = useRef<BottomSheetHandle>(null);
   const [term, setTerm] = useState<string>('');
   const [results, setResults] = useState<IProductLookup[]>([]);
@@ -49,7 +51,7 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
     <Input
       value={term}
       onChangeText={(v) => setTerm(v)}
-      label="Descripción del producto"
+      label={t('reception.productDescription')}
       // En web (iOS) el foco con el sheet aun fuera de pantalla hace que Safari desplace la pagina
       autoFocus={Platform.OS !== 'web'}
       className="mb-4"
@@ -63,13 +65,13 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
         className={`flex-1 bg-primary-600  rounded-xl py-3 mr-2 items-center ${!canCreate ? 'opacity-50' : ''}`}
         disabled={!canCreate}
       >
-        <Text className="text-white font-semibold text-sm">Crear producto nuevo</Text>
+        <Text className="text-white font-semibold text-sm">{t('reception.createNewProduct')}</Text>
       </Pressable>
       <Pressable
         onPress={() => sheetRef.current?.close()}
         className="flex-1 bg-slate-100 rounded-xl py-3 items-center"
       >
-        <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
+        <Text className="text-slate-700 font-semibold text-sm">{t('common.cancel')}</Text>
       </Pressable>
     </View>
   );
@@ -77,18 +79,18 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
   return (
     <BottomSheet
       ref={sheetRef}
-      title="Caja sin etiqueta"
+      title={t('reception.noLabelTitle')}
       header={header}
       footer={actions}
       onClose={onClose}
     >
       {exactMatch && (
         <Text className="text-xs text-slate-500 mb-2">
-          Ya existe «{exactMatch.description}», selecciónalo de la lista
+          {t('reception.alreadyExists', { description: exactMatch.description })}
         </Text>
       )}
       {term.trim().length >= 2 && !loading && results.length === 0 ? (
-        <Text className="text-base text-slate-600">No encontre nada parecido</Text>
+        <Text className="text-base text-slate-600">{t('reception.noMatches')}</Text>
       ) : (
         results.map((product) => (
           <Pressable
@@ -97,10 +99,12 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
             onPress={() => onSelect(product)}
           >
             <Text className="text-sm font-semibold text-slate-800">
-              {product.description || 'Sin descripción'}
+              {product.description || t('reception.noDescription')}
             </Text>
             <Text className="text-xs font-semibold text-slate-500">
-              Requiere ensamble: {product.needAssembly ? 'Si' : 'No'}
+              {t('reception.needsAssembly', {
+                value: product.needAssembly ? t('common.yes') : t('common.no'),
+              })}
             </Text>
           </Pressable>
         ))

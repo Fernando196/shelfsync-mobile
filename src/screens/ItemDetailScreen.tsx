@@ -8,7 +8,8 @@ import { getItemById } from '../services/items.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import StatusPill from '../components/item/StatusPill';
 import { getItemStatus } from '../lib/statusItem';
-import { ITEM_ACTIONS } from '../const/itemStatus.const';
+import { ITEM_ACTIONS, ITEM_STATUS } from '../const/itemStatus.const';
+import { useTranslation } from 'react-i18next';
 import { CommentSheet } from '../components/item/CommentSheet';
 import { useItemStatusAction } from '../hooks/useItemStatusAction';
 import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
@@ -23,6 +24,7 @@ import { Screen } from '../components/ui/Screen';
 import { BackButton } from '../components/ui/BackButton';
 
 export default function ItemDetailScreen() {
+  const { t } = useTranslation();
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
   const navigation = useNavigation<any>();
   const { id } = route.params;
@@ -54,9 +56,9 @@ export default function ItemDetailScreen() {
     if (!item) return;
     if (!getConnectedPrinter()) {
       hapticError();
-      Alert.alert('Sin impresora conectada', 'Vincula la impresora en Ajustes para imprimir.', [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Ir a Ajustes', onPress: () => navigation.navigate('Settings') },
+      Alert.alert(t('detail.noPrinterTitle'), t('detail.noPrinterMessage'), [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.goToSettings'), onPress: () => navigation.navigate('Settings') },
       ]);
       return;
     }
@@ -64,10 +66,10 @@ export default function ItemDetailScreen() {
     try {
       await printInventoryTicket(toTicket(item));
       hapticSuccess();
-      setToast({ title: 'Etiqueta impresa', subtitle: item.name || '' });
+      setToast({ title: t('detail.labelPrinted'), subtitle: item.name || '' });
     } catch (e: any) {
       hapticError();
-      Alert.alert('Error al imprimir', e?.message ?? String(e));
+      Alert.alert(t('detail.printError'), e?.message ?? String(e));
     } finally {
       setPrinting(false);
     }
@@ -129,7 +131,7 @@ export default function ItemDetailScreen() {
       <View className="flex-row items-center justify-between px-5 pb-2">
         <View className="flex-row items-center">
           <BackButton />
-          <Text className="text-2xl font-bold text-slate-800 ml-3">Detalle</Text>
+          <Text className="text-2xl font-bold text-slate-800 ml-3">{t('detail.title')}</Text>
         </View>
         <Pressable
           onPress={() => navigation.navigate('EditProduct', { id: item.id })}
@@ -157,19 +159,19 @@ export default function ItemDetailScreen() {
         <View className="bg-white rounded-2xl border border-slate-200 px-4 py-2 mt-5">
           <View className="flex-row items-center py-2">
             <Boxes size={16} color="#64748b" />
-            <Text className="text-slate-500 ml-2 flex-1">Cantidad</Text>
+            <Text className="text-slate-500 ml-2 flex-1">{t('detail.quantity')}</Text>
             <Text className="font-semibold text-slate-800">{item.qty}</Text>
           </View>
           <View className="h-px bg-slate-100" />
           <View className="flex-row items-center py-2">
             <MapPin size={16} color="#64748b" />
-            <Text className="text-slate-500 ml-2 flex-1">Ubicacion</Text>
+            <Text className="text-slate-500 ml-2 flex-1">{t('detail.location')}</Text>
             <Text className="font-semibold text-slate-800">{item.location || '-'}</Text>
           </View>
           <View className="h-px bg-slate-100" />
           <View className="flex-row items-center py-2">
             <Tag size={16} color="#64748b" />
-            <Text className="text-slate-500 ml-2 flex-1">Categoria</Text>
+            <Text className="text-slate-500 ml-2 flex-1">{t('detail.category')}</Text>
             <Text className="font-semibold text-slate-800">{item.category?.name || '-'}</Text>
           </View>
         </View>
@@ -179,7 +181,7 @@ export default function ItemDetailScreen() {
         {actions.length > 0 && (
           <View className="mt-6">
             <Text className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-              Siguiente paso
+              {t('detail.nextStep')}
             </Text>
             {actions
               .filter((a) => a.variant !== 'danger')
@@ -214,7 +216,7 @@ export default function ItemDetailScreen() {
                 >
                   <TriangleAlert size={16} color="#e11d48" />
                   <Text className="text-rose-600 font-semibold ml-2">
-                    Marcar como {action.label.toLowerCase()}
+                    {t('detail.markAs', { status: ITEM_STATUS[action.to].label.toLowerCase() })}
                   </Text>
                 </Pressable>
               ))}
@@ -233,7 +235,7 @@ export default function ItemDetailScreen() {
             ) : (
               <>
                 <Printer size={18} color={COLORS.primary} />
-                <Text className="text-slate-800 font-semibold ml-2">Reimprimir etiqueta</Text>
+                <Text className="text-slate-800 font-semibold ml-2">{t('detail.reprint')}</Text>
               </>
             )}
           </Pressable>
@@ -249,7 +251,7 @@ export default function ItemDetailScreen() {
           onClose={cancelComment}
           onConfirm={(comment) => runAction(pendingAction, comment)}
           loading={changing}
-          title="Artículo dañado"
+          title={t('detail.damagedTitle')}
         />
       )}
     </Screen>

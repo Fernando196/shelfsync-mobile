@@ -25,6 +25,7 @@ import { Screen } from '../components/ui/Screen';
 import { getItemStatus } from '../lib/statusItem';
 import { useInventory } from '../state/InventoryContext';
 import { COLORS } from '../const/theme.const';
+import { useTranslation } from 'react-i18next';
 
 type Row = {
   key: string;
@@ -37,9 +38,11 @@ type Row = {
 const PAGE_SIZE = 20;
 
 export default function InventoryScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
   const [status, setStatus] = useState<EnumItemStatus | null>(null);
   const [counts, setCounts] = useState<IItemStatusCounts | null>(null);
   const { items, setItems, total, setTotal } = useInventory();
@@ -180,8 +183,10 @@ export default function InventoryScreen() {
       <View className="px-5 pb-2">
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-2xl font-bold text-slate-800">Inventario</Text>
-            <Text className="text-slate-400 text-sm mt-0.5">{total} articulos</Text>
+            <Text className="text-2xl font-bold text-slate-800">{t('inventory.title')}</Text>
+            <Text className="text-slate-400 text-sm mt-0.5">
+              {t('inventory.count', { count: total })}
+            </Text>
           </View>
           <View className="flex-row">
             {!searchOpen && (
@@ -197,15 +202,22 @@ export default function InventoryScreen() {
         </View>
 
         {searchOpen && (
-          <View className="flex-row items-center bg-white border border-slate-200 rounded-xl px-3 mt-4">
-            <Search size={16} color="#94a3b8" />
+          // El foco se marca en el contenedor (que es el que tiene el borde), no en el input.
+          <View
+            className={`flex-row items-center bg-white border rounded-xl px-3 mt-4 ${
+              searchFocused ? 'border-primary-600' : 'border-slate-200'
+            }`}
+          >
+            <Search size={16} color={searchFocused ? COLORS.primary : '#94a3b8'} />
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Buscar por nombre, SKU o ubicacion"
+              placeholder={t('inventory.searchPlaceholder')}
               className="flex-1 py-3 px-2 text-sm"
               placeholderTextColor="#94a3b8"
               autoFocus
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
             />
             <Pressable onPress={closeSearch} hitSlop={8} className="p-1 active:opacity-70">
               <X size={18} color="#94a3b8" />
@@ -220,8 +232,8 @@ export default function InventoryScreen() {
             <WifiOff size={14} color="#f59e0b" />
             <Text className="text-amber-700 text-xs ml-2">
               {Platform.OS === 'web'
-                ? 'Sin conexion con el servidor. Jala hacia abajo para reintentar.'
-                : 'Sin conexion con el servidor. Desliza hacia abajo para reintentar.'}
+                ? t('inventory.offlinePull')
+                : t('inventory.offlineSwipe')}
             </Text>
           </View>
         )}
@@ -273,7 +285,7 @@ export default function InventoryScreen() {
           ListEmptyComponent={
             <View className="items-center mt-24">
               <PackageSearch size={40} color="#cbd5e1" />
-              <Text className="text-slate-400 mt-3">No hay articulos que coincidan</Text>
+              <Text className="text-slate-400 mt-3">{t('inventory.empty')}</Text>
             </View>
           }
           ListFooterComponent={loadingMore ? <ActivityIndicator className="pt-4 pb-10" /> : null}

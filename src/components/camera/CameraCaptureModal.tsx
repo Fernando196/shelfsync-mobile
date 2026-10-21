@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
 
 export function CameraCaptureModal({ visible, onClose, onDone }: CameraCaptureModalProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<CameraView>(null);
   const [shots, setShots] = useState<string[]>([]);
@@ -31,13 +33,13 @@ export function CameraCaptureModal({ visible, onClose, onDone }: CameraCaptureMo
         ) : (
           <View className="flex-1 items-center justify-center bg-white px-8">
             <Text className="text-slate-600 text-center mb-4">
-              Se necesita acceso a la camara para tomar fotos
+              {t('camera.permission')}
             </Text>
             <Pressable
               onPress={requestPermission}
               className="bg-primary-600 rounded-xl px-5 py-3 active:scale-95"
             >
-              <Text className="text-white font-semibold">Dar permiso</Text>
+              <Text className="text-white font-semibold">{t('scanner.grantPermission')}</Text>
             </Pressable>
           </View>
         )}
@@ -70,7 +72,7 @@ export function CameraCaptureModal({ visible, onClose, onDone }: CameraCaptureMo
               onPress={handleClose}
               className="flex-1 bg-slate-100 rounded-xl py-3 items-center"
             >
-              <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
+              <Text className="text-slate-700 font-semibold text-sm">{t('common.cancel')}</Text>
             </Pressable>
             <Pressable
               className="w-20 h-20 rounded-full bg-white border-4 border-slate-300 justify-center items-center"
@@ -86,7 +88,7 @@ export function CameraCaptureModal({ visible, onClose, onDone }: CameraCaptureMo
               }}
               disabled={shots.length === 0}
             >
-              <Text className="font-semibold text-sm text-white">Listo ({shots.length})</Text>
+              <Text className="font-semibold text-sm text-white">{t('camera.done', { count: shots.length })}</Text>
             </Pressable>
           </View>
         </View>

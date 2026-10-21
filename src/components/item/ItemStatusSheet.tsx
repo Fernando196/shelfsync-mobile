@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import ButtonPill from '../ui/ButtonPill';
 import { Text, View } from 'react-native';
@@ -22,6 +23,7 @@ export function ItemStatusSheet({
   onUpdate: (item: IInventoryItem) => void;
   onViewDetail: () => void;
 }) {
+  const { t } = useTranslation();
   const sheetRef = useRef<BottomSheetHandle>(null);
   const actions = ITEM_ACTIONS[item.status] ?? [];
   const { changing, handleAction, pendingAction, runAction, cancelComment } = useItemStatusAction(
@@ -33,7 +35,7 @@ export function ItemStatusSheet({
 
   return pendingAction ? (
     <CommentSheet
-      title="Motivo del daño"
+      title={t('statusSheet.damageReason')}
       onClose={cancelComment}
       onConfirm={(comment) => runAction(pendingAction, comment)}
       loading={changing}
@@ -41,7 +43,7 @@ export function ItemStatusSheet({
   ) : (
     <BottomSheet
       ref={sheetRef}
-      title={`Cambiar estatus de la caja ${formatItemCode(item.code)}`}
+      title={t('statusSheet.title', { code: formatItemCode(item.code) })}
       onClose={onClose}
     >
       <View className="flex flex-row items-center bg-slate-200 p-3 rounded-md">
@@ -51,15 +53,17 @@ export function ItemStatusSheet({
         <View className="flex-1">
           <View className="flex flex-row justify-between">
             <Text className="text-base font-semibold text-slate-800 flex-1 mr-2" numberOfLines={2}>
-              {item.name || item.productLookup.description || 'Sin descripción'}
+              {item.name || item.productLookup.description || t('reception.noDescription')}
             </Text>
             {status ? <StatusPill label={status.label} tone={status.tone} /> : null}
           </View>
           <Text className="text-slate-500 text-sm mt-0.5">
-            Barcode: {item.productLookup.barcode || 'Sin codigo de barras'}
+            {t('reception.barcode', {
+              value: item.productLookup.barcode || t('reception.noBarcode'),
+            })}
           </Text>
           <Text className="text-slate-500 text-sm mt-0.5">
-            SKU: {item.productLookup.sku || 'Sin sku'}
+            {t('reception.sku', { value: item.productLookup.sku || t('reception.noSku') })}
           </Text>
         </View>
       </View>
@@ -76,11 +80,11 @@ export function ItemStatusSheet({
         <ButtonPill
           disabled={changing}
           onPress={onViewDetail}
-          label={'Ver detalle'}
+          label={t('statusSheet.viewDetail')}
           variant={'secondary'}
         />
         <ButtonPill
-          label="Cancelar"
+          label={t('common.cancel')}
           variant="secondary"
           onPress={() => sheetRef.current?.close()}
         />

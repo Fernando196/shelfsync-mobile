@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { Device } from 'react-native-ble-plx';
-import { User, Bluetooth, BluetoothOff, Radar, LogOut, Printer, Ruler } from 'lucide-react-native';
+import { User, Bluetooth, BluetoothOff, Radar, LogOut, Printer, Ruler, Languages } from 'lucide-react-native';
 import {
   requestBlePermissions,
   scanForPrinters,
@@ -21,10 +21,13 @@ import { Screen } from '../components/ui/Screen';
 import { toTicket } from '../lib/toTicket';
 import Chip from '../components/ui/Chip';
 import { COLORS } from '../const/theme.const';
+import { useTranslation } from 'react-i18next';
+import { LANGUAGES, setLanguage } from '../i18n';
 
 const LABEL_FORMATS = ['58mm', '80mm'];
 
 export default function SettingsScreen() {
+  const { t, i18n } = useTranslation();
   const { profile, resetSession } = useSession();
   const [scanning, setScanning] = useState(false);
   const [connecting, setConnecting] = useState(false);
@@ -52,8 +55,8 @@ export default function SettingsScreen() {
     const ok = await requestBlePermissions();
     if (!ok) {
       Alert.alert(
-        'Permisos requeridos',
-        'Se necesita permiso de Bluetooth para buscar la impresora.',
+        t('settings.permissionsTitle'),
+        t('settings.blePermission'),
       );
       return;
     }
@@ -67,7 +70,7 @@ export default function SettingsScreen() {
       );
     } catch (e: any) {
       setScanning(false);
-      Alert.alert('Bluetooth no disponible', e.message ?? String(e));
+      Alert.alert(t('settings.bleUnavailable'), e.message ?? String(e));
       return;
     }
     setTimeout(() => {
@@ -86,7 +89,7 @@ export default function SettingsScreen() {
       hapticSuccess();
     } catch (e: any) {
       hapticError();
-      Alert.alert('No se pudo conectar', e.message ?? String(e));
+      Alert.alert(t('settings.connectFailed'), e.message ?? String(e));
     } finally {
       setConnecting(false);
     }
@@ -98,10 +101,10 @@ export default function SettingsScreen() {
   };
 
   const handleForget = () => {
-    Alert.alert('Olvidar impresora', 'La proxima vez que abras la app no se reconectara sola.', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('settings.forgetTitle'), t('settings.forgetMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Olvidar',
+        text: t('settings.forget'),
         style: 'destructive',
         onPress: async () => {
           await disconnectPrinter();
@@ -119,15 +122,15 @@ export default function SettingsScreen() {
       const item = {
         id: 'pruebas',
         code: 1,
-        name: 'Ticket de prueba',
+        name: t('settings.testTicket'),
         qty: 1,
-        location: 'Bodega',
+        location: t('settings.testLocation'),
       };
       await printInventoryTicket(toTicket(item));
       hapticSuccess();
     } catch (e: any) {
       hapticError();
-      Alert.alert('Error al imprimir', e.message ?? String(e));
+      Alert.alert(t('detail.printError'), e.message ?? String(e));
     } finally {
       setTesting(false);
     }
@@ -135,11 +138,11 @@ export default function SettingsScreen() {
 
   const handleLogout = () => {
     Alert.alert(
-      'Cerrar turno',
-      'Se cerrara tu sesion en este dispositivo. Tendras que iniciar sesion otra vez.',
+      t('settings.logoutTitle'),
+      t('settings.logoutMessage'),
       [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Cerrar turno', style: 'destructive', onPress: () => resetSession() },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('settings.logoutTitle'), style: 'destructive', onPress: () => resetSession() },
       ],
     );
   };
@@ -147,7 +150,7 @@ export default function SettingsScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 40 }}>
-        <Text className="text-2xl font-bold text-slate-800 mb-5">Ajustes</Text>
+        <Text className="text-2xl font-bold text-slate-800 mb-5">{t('tabs.settings')}</Text>
 
         <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 flex-row items-center">
           <View className="w-12 h-12 rounded-full bg-primary-50 items-center justify-center mr-3">
@@ -155,9 +158,9 @@ export default function SettingsScreen() {
           </View>
           <View className="flex-1">
             <Text className="font-semibold text-slate-800">
-              {profile?.fullName ?? profile?.email ?? 'Operario'}
+              {profile?.fullName ?? profile?.email ?? t('settings.operator')}
             </Text>
-            <Text className="text-slate-400 text-xs">{profile?.email ?? 'Sin correo'}</Text>
+            <Text className="text-slate-400 text-xs">{profile?.email ?? t('settings.noEmail')}</Text>
           </View>
           <Pressable onPress={handleLogout} className="p-2 active:scale-95">
             <LogOut size={20} color="#f43f5e" />
@@ -165,12 +168,37 @@ export default function SettingsScreen() {
         </View>
 
         <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4">
+          <View className="flex-row items-center mb-3">
+            <Languages size={16} color={COLORS.primary} />
+            <Text className="font-semibold text-slate-800 ml-2">{t('settings.language')}</Text>
+          </View>
+          <View className="flex-row bg-slate-100 rounded-xl p-1">
+            {LANGUAGES.map((lang) => {
+              const active = i18n.language === lang.code;
+              return (
+                <Pressable
+                  key={lang.code}
+                  onPress={() => setLanguage(lang.code)}
+                  className={`flex-1 items-center py-2.5 rounded-lg ${active ? 'bg-white' : ''}`}
+                >
+                  <Text
+                    className={`text-sm font-semibold ${active ? 'text-slate-900' : 'text-slate-500'}`}
+                  >
+                    {lang.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4">
           <View className="flex-row items-center justify-between mb-3">
-            <Text className="font-semibold text-slate-800">Impresora termica</Text>
+            <Text className="font-semibold text-slate-800">{t('settings.printer')}</Text>
             {connectedName ? (
               <StatusPill label={connectedName} tone="success" />
             ) : (
-              <StatusPill label="Desconectada" tone="neutral" />
+              <StatusPill label={t('settings.disconnected')} tone="neutral" />
             )}
           </View>
 
@@ -186,7 +214,7 @@ export default function SettingsScreen() {
                 ) : (
                   <>
                     <Printer size={16} color="#fff" />
-                    <Text className="text-white font-semibold ml-2 text-sm">Ticket de prueba</Text>
+                    <Text className="text-white font-semibold ml-2 text-sm">{t('settings.testTicket')}</Text>
                   </>
                 )}
               </Pressable>
@@ -201,7 +229,7 @@ export default function SettingsScreen() {
 
           {connectedName && (
             <Pressable onPress={handleForget} className="items-center mt-3 active:scale-95">
-              <Text className="text-slate-400 text-xs">Olvidar esta impresora</Text>
+              <Text className="text-slate-400 text-xs">{t('settings.forgetPrinter')}</Text>
             </Pressable>
           )}
 
@@ -217,7 +245,7 @@ export default function SettingsScreen() {
                 <Bluetooth size={16} color={COLORS.primary} />
               )}
               <Text className="text-primary-700 font-semibold ml-2 text-sm">
-                {scanning ? 'Buscando dispositivos...' : 'Buscar impresora'}
+                {scanning ? t('settings.searching') : t('settings.searchPrinter')}
               </Text>
             </Pressable>
           )}
@@ -226,7 +254,7 @@ export default function SettingsScreen() {
             <View className="mt-3">
               {devices.length === 0 ? (
                 <Text className="text-slate-400 text-sm py-3">
-                  Buscando dispositivos cercanos...
+                  {t('settings.searchingNearby')}
                 </Text>
               ) : (
                 devices.map((item) => (
@@ -237,7 +265,7 @@ export default function SettingsScreen() {
                   >
                     <View>
                       <Text className="text-slate-700 font-medium">
-                        {item.name || 'Dispositivo sin nombre'}
+                        {item.name || t('settings.unnamedDevice')}
                       </Text>
                       <Text className="text-slate-400 text-xs">{item.id}</Text>
                     </View>
@@ -252,7 +280,7 @@ export default function SettingsScreen() {
         <View className="bg-white rounded-2xl border border-slate-200 p-4">
           <View className="flex-row items-center mb-3">
             <Ruler size={16} color={COLORS.primary} />
-            <Text className="font-semibold text-slate-800 ml-2">Formato de etiqueta</Text>
+            <Text className="font-semibold text-slate-800 ml-2">{t('settings.labelFormat')}</Text>
           </View>
           <View className="flex-row flex-wrap">
             {LABEL_FORMATS.map((f) => (

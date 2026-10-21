@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import * as Location from 'expo-location';
@@ -18,6 +19,7 @@ export default function LocationPickerMap({
   longitude,
   onLocationChange,
 }: LocationPickerMapProps) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [failedTiles, setFailedTiles] = useState<Set<string>>(new Set());
 
@@ -28,8 +30,8 @@ export default function LocationPickerMap({
       const perm = await Location.requestForegroundPermissionsAsync();
       if (!perm.granted) {
         Alert.alert(
-          'Permiso requerido',
-          'Se necesita acceso a la ubicacion para registrar donde esta el mueble.',
+          t('reception.locationPermissionTitle'),
+          t('reception.locationPermissionMessage'),
         );
         return;
       }
@@ -38,7 +40,7 @@ export default function LocationPickerMap({
       hapticSuccess();
     } catch (e: any) {
       hapticError();
-      Alert.alert('No se pudo obtener la ubicacion', e?.message ?? String(e));
+      Alert.alert(t('reception.locationFailed'), e?.message ?? String(e));
     } finally {
       setLoading(false);
     }
@@ -68,7 +70,7 @@ export default function LocationPickerMap({
           <>
             <LocateFixed size={18} color={COLORS.primary} />
             <Text className="text-primary-700 font-semibold ml-2">
-              {hasCoords ? 'Actualizar coordenadas' : 'Obtener coordenadas actuales'}
+              {hasCoords ? t('location.update') : t('location.get')}
             </Text>
           </>
         )}

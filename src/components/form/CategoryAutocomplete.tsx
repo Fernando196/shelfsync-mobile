@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, Text, TextInput, View } from 'react-native';
 import { CirclePlus } from 'lucide-react-native';
 import { ICategory } from '../../interfaces/category.interface';
@@ -15,6 +16,7 @@ export default function CategoryAutocomplete({
   selected: string;
   onChange: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoadingAddCat, setIsLoadingAddCat] = useState<boolean>(false);
@@ -48,7 +50,7 @@ export default function CategoryAutocomplete({
       const updated = await refreshCategories();
       setCategories(updated);
     } catch (e: any) {
-      Alert.alert('No se pudo crear la categoria', e.message);
+      Alert.alert(t('category.createFailed'), e.message);
     } finally {
       setIsLoadingAddCat(false);
     }

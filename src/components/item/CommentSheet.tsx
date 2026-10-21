@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { Input } from '../ui/Input';
 import ButtonPill from '../ui/ButtonPill';
@@ -15,12 +16,13 @@ export function CommentSheet({
   loading: boolean;
   title: string;
 }) {
+  const { t } = useTranslation();
   const sheetRef = useRef<BottomSheetHandle>(null);
   const [comment, setComment] = useState<string>('');
   return (
     <BottomSheet ref={sheetRef} title={title} onClose={onClose}>
       <Input
-        label="Motivo"
+        label={t('comment.reason')}
         multiline
         textAlignVertical="top"
         value={comment}
@@ -28,12 +30,12 @@ export function CommentSheet({
       />
       <View className="flex flex-col mt-5 gap-3">
         <ButtonPill
-          label="Cancelar"
+          label={t('common.cancel')}
           variant="secondary"
           onPress={() => sheetRef.current?.close()}
         />
         <ButtonPill
-          label="Confirmar"
+          label={t('common.confirm')}
           variant="danger"
           onPress={() => onConfirm(comment.trim())}
           disabled={loading || !comment.trim()}

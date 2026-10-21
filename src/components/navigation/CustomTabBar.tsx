@@ -5,18 +5,20 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Boxes, Settings, ScanLine } from 'lucide-react-native';
 import { hapticTap } from '../../lib/haptics';
 import { COLORS } from '../../const/theme.const';
+import { useTranslation } from 'react-i18next';
 
 const ICONS: Record<string, any> = {
   Inventory: Boxes,
   Settings: Settings,
 };
 
-const LABELS: Record<string, string> = {
-  Inventory: 'Inventario',
-  Settings: 'Ajustes',
-};
+const LABEL_KEYS = {
+  Inventory: 'tabs.inventory',
+  Settings: 'tabs.settings',
+} as const;
 
 export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const pulse = useRef(new Animated.Value(1)).current;
 
@@ -68,7 +70,9 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         <Text
           className={`text-[10px] mt-1 font-medium ${focused ? 'text-primary-600' : 'text-slate-400'}`}
         >
-          {LABELS[route.name] ?? route.name}
+          {route.name in LABEL_KEYS
+            ? t(LABEL_KEYS[route.name as keyof typeof LABEL_KEYS])
+            : route.name}
         </Text>
       </Pressable>
     );

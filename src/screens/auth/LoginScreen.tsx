@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -15,6 +16,7 @@ import { hapticError, hapticSuccess } from '../../lib/haptics';
 import { login } from '../../services/auth.service';
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const { refreshToken, refreshProfile } = useSession();
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -22,7 +24,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!userName.trim() || !password) {
-      Alert.alert('Faltan datos', 'Ingresa tu usuario y contrasena.');
+      Alert.alert(t('login.missingTitle'), t('login.missingMessage'));
       return;
     }
     setLoading(true);
@@ -34,7 +36,7 @@ export default function LoginScreen() {
       await Promise.all([refreshToken(), refreshProfile()]);
     } catch (e: any) {
       hapticError();
-      Alert.alert('No se pudo iniciar sesion', e?.message ?? String(e));
+      Alert.alert(t('login.failed'), e?.message ?? String(e));
     } finally {
       setLoading(false);
     }
@@ -47,13 +49,13 @@ export default function LoginScreen() {
           <View className="w-16 h-16 rounded-2xl bg-primary-600 items-center justify-center mb-4">
             <Warehouse size={28} color="#fff" />
           </View>
-          <Text className="text-2xl font-bold text-slate-800">Iniciar sesion</Text>
+          <Text className="text-2xl font-bold text-slate-800">{t('login.title')}</Text>
           <Text className="text-slate-400 mt-1 text-center">
-            Solo se pide una vez por dispositivo. La sesion queda abierta.
+            {t('login.subtitle')}
           </Text>
         </View>
 
-        <Text className="text-xs font-semibold text-slate-500 mb-1">Usuario</Text>
+        <Text className="text-xs font-semibold text-slate-500 mb-1">{t('login.user')}</Text>
         <TextInput
           className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base text-slate-800"
           value={userName}
@@ -64,7 +66,7 @@ export default function LoginScreen() {
           placeholderTextColor="#94a3b8"
         />
 
-        <Text className="text-xs font-semibold text-slate-500 mb-1">Contrasena</Text>
+        <Text className="text-xs font-semibold text-slate-500 mb-1">{t('login.password')}</Text>
         <TextInput
           className="border border-slate-200 rounded-xl px-4 py-3 mb-6 text-base text-slate-800"
           value={password}
@@ -83,7 +85,7 @@ export default function LoginScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-white font-semibold text-base">Entrar</Text>
+            <Text className="text-white font-semibold text-base">{t('login.submit')}</Text>
           )}
         </Pressable>
       </View>

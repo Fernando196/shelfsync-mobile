@@ -3,6 +3,7 @@ import { ITEM_STATUS } from '../../const/itemStatus.const';
 import { EnumItemStatus } from '../../interfaces/enum/itemStatus.type';
 import { IItemStatusCounts } from '../../interfaces/item.interface';
 import { TONE_STYLES } from './StatusPill';
+import { useTranslation } from 'react-i18next';
 
 interface StatusFilterChipsProps {
   // null = Todos.
@@ -14,6 +15,7 @@ interface StatusFilterChipsProps {
 const STATUSES = Object.keys(ITEM_STATUS) as EnumItemStatus[];
 
 export function StatusFilterChips({ selected, counts, onChange }: StatusFilterChipsProps) {
+  const { t } = useTranslation();
   return (
     <ScrollView
       horizontal
@@ -22,7 +24,7 @@ export function StatusFilterChips({ selected, counts, onChange }: StatusFilterCh
       contentContainerStyle={{ paddingHorizontal: 20 }}
     >
       <Chip
-        label="Todos"
+        label={t('inventory.all')}
         count={counts?.total}
         active={selected === null}
         onPress={() => onChange(null)}

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, Image, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { Camera, ImagePlus, RotateCw, Star, Trash2 } from 'lucide-react-native';
 import { IInventoryItem, IInventoryPhoto } from '../../interfaces/item.interface';
@@ -35,6 +36,7 @@ const photoButtonStyle = {
 } as const;
 
 export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
+  const { t } = useTranslation();
   const [cameraOpen, setCameraOpen] = useState(false);
   const [pending, setPending] = useState<PendingPhoto[]>([]);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
@@ -65,8 +67,8 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
         );
         hapticError();
         Alert.alert(
-          'No se pudieron subir fotos',
-          `${failed.length} foto(s) sin subir. Toca la foto para reintentar.\n${e?.message ?? ''}`,
+          t('photos.uploadFailedTitle'),
+          `${t('photos.uploadFailedMessage', { count: failed.length })}\n${e?.message ?? ''}`,
         );
         return;
       }
@@ -94,7 +96,7 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
       hapticSuccess();
     } catch (e: any) {
       hapticError();
-      Alert.alert('No se pudo cambiar la portada', e?.message ?? String(e));
+      Alert.alert(t('photos.coverFailed'), e?.message ?? String(e));
     } finally {
       setCoverSettingId(null);
     }
@@ -102,10 +104,10 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
 
   const confirmDelete = (photo: IInventoryPhoto) => {
     hapticTap();
-    Alert.alert('Eliminar foto', 'Esta foto se borrara del producto. No se puede deshacer.', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('photos.deleteTitle'), t('photos.deleteMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Eliminar',
+        text: t('common.delete'),
         style: 'destructive',
         onPress: async () => {
           setDeletingId(photo.id);
@@ -117,7 +119,7 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
             hapticSuccess();
           } catch (e: any) {
             hapticError();
-            Alert.alert('No se pudo eliminar la foto', e?.message ?? String(e));
+            Alert.alert(t('photos.deleteFailed'), e?.message ?? String(e));
           } finally {
             setDeletingId(null);
           }
@@ -138,14 +140,14 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
             className="flex-1 items-center justify-center active:opacity-70"
           >
             <Camera size={32} color={COLORS.primary} />
-            <Text className="text-primary-600 font-semibold mt-2">Tomar fotos</Text>
+            <Text className="text-primary-600 font-semibold mt-2">{t('photos.takePhotos')}</Text>
           </Pressable>
           <Pressable
             onPress={openLibrary}
             className="flex-row items-center justify-center py-3 border-t border-primary-200 active:opacity-70"
           >
             <ImagePlus size={16} color={COLORS.primary} />
-            <Text className="text-primary-600 ml-2">Elegir de galeria</Text>
+            <Text className="text-primary-600 ml-2">{t('photos.chooseFromGallery')}</Text>
           </Pressable>
         </View>
       ) : (
@@ -159,14 +161,14 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
               className="flex-1 items-center justify-center active:opacity-70"
             >
               <Camera size={26} color={COLORS.primary} />
-              <Text className="text-primary-600 text-xs font-semibold mt-1">Tomar</Text>
+              <Text className="text-primary-600 text-xs font-semibold mt-1">{t('photos.take')}</Text>
             </Pressable>
             <Pressable
               onPress={openLibrary}
               className="items-center justify-center py-3 border-t border-primary-200 active:opacity-70"
             >
               <ImagePlus size={18} color={COLORS.primary} />
-              <Text className="text-primary-600 text-xs mt-1">Galeria</Text>
+              <Text className="text-primary-600 text-xs mt-1">{t('photos.gallery')}</Text>
             </Pressable>
           </View>
 
@@ -183,7 +185,7 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
                 {p.failed ? (
                   <>
                     <RotateCw size={24} color="#fff" />
-                    <Text className="text-white text-xs font-semibold mt-1">Reintentar</Text>
+                    <Text className="text-white text-xs font-semibold mt-1">{t('common.retry')}</Text>
                   </>
                 ) : (
                   <ActivityIndicator color="#fff" />
@@ -216,7 +218,7 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
                 >
                   <Star size={12} color="#facc15" fill="#facc15" />
                   <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginLeft: 4 }}>
-                    Portada
+                    {t('photos.cover')}
                   </Text>
                 </View>
               )}

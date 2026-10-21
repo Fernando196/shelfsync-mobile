@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, Image, Pressable } from 'react-native';
 import { Package, MapPin } from 'lucide-react-native';
 import StatusPill, { PillTone } from '../item/StatusPill';
@@ -15,6 +16,7 @@ export default function ProductCard({
   statusTone?: PillTone;
   onPress?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Pressable
       onPress={onPress}
@@ -35,13 +37,13 @@ export default function ProductCard({
           </Text>
           {statusLabel ? <StatusPill label={statusLabel} tone={statusTone} /> : null}
         </View>
-        <Text className="text-xs text-slate-400 mt-0.5">Codigo: {item.code}</Text>
+        <Text className="text-xs text-slate-400 mt-0.5">{t('inventory.code', { code: item.code })}</Text>
 
         <View className="flex-row items-center justify-between mt-2">
           <View className="flex-row items-center flex-1">
             <MapPin size={12} color="#94a3b8" />
             <Text className="text-xs text-slate-500 ml-1 flex-1" numberOfLines={1}>
-              {item.location || 'Sin ubicacion'}
+              {item.location || t('common.noLocation')}
             </Text>
           </View>
           <View className="bg-primary-50 rounded-full px-2 py-0.5 ml-2">

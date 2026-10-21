@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import { getAccessToken, notifyUnauthorized } from '../lib/auth';
 
 if (!process.env.EXPO_PUBLIC_API_BASE_URL) {
@@ -15,9 +16,7 @@ export async function fetchWithTimeout(input: string, init: RequestInit): Promis
     return await fetch(input, { ...init, signal: controller.signal });
   } catch (e: any) {
     if (e?.name === 'AbortError') {
-      throw new Error(
-        'Tiempo de espera agotado contactando al servidor. Revisa la conexion o la IP configurada.',
-      );
+      throw new Error(i18n.t('errors.timeout'));
     }
     throw e;
   } finally {

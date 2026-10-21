@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Image, Pressable, ScrollView, Alert, Platform } from 'react-native';
 import { Camera, ImagePlus, X } from 'lucide-react-native';
 import { hapticTap, hapticSelect } from '../../lib/haptics';
@@ -16,6 +17,7 @@ interface PhotoPickerProps {
 }
 
 export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
+  const { t } = useTranslation();
   const [cameraOpen, setCameraOpen] = useState(false);
 
   const addFromLibrary = async () => {
@@ -25,10 +27,10 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
 
   const openPicker = () => {
     hapticTap();
-    Alert.alert('Agregar foto', 'Elige una opcion', [
-      { text: 'Tomar foto', onPress: () => setCameraOpen(true) },
-      { text: 'Elegir de galeria', onPress: addFromLibrary },
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('photoPicker.addTitle'), t('photoPicker.addMessage'), [
+      { text: t('photoPicker.takePhoto'), onPress: () => setCameraOpen(true) },
+      { text: t('photos.chooseFromGallery'), onPress: addFromLibrary },
+      { text: t('common.cancel'), style: 'cancel' },
     ]);
   };
 

@@ -7,8 +7,11 @@ import { hapticError } from '../../lib/haptics';
 import { TONE_STYLES } from './StatusPill';
 import { ITEM_STATUS } from '../../const/itemStatus.const';
 import { COLORS } from '../../const/theme.const';
+import { useTranslation } from 'react-i18next';
+import { dateLocale } from '../../i18n';
 
 export function StatusHistory({ itemId, status }: StatusHistoryProps) {
+  const { t } = useTranslation();
   const [history, setHistory] = useState<IItemStatusHistory[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -20,7 +23,7 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
       })
       .catch((err: any) => {
         hapticError();
-        Alert.alert('Error al traer el historial', err?.message);
+        Alert.alert(t('history.loadError'), err?.message);
       })
       .finally(() => {
         setLoading(false);
@@ -30,9 +33,9 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
   if (loading && history.length === 0) return <ActivityIndicator color={COLORS.primary} />;
   return (
     <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 mt-4">
-      <Text className="text-sm font-semibold text-slate-500 mb-3">Historial</Text>
+      <Text className="text-sm font-semibold text-slate-500 mb-3">{t('history.title')}</Text>
       {history.length === 0 ? (
-        <Text className="text-slate-400 text-sm">Sin movimientos</Text>
+        <Text className="text-slate-400 text-sm">{t('history.empty')}</Text>
       ) : (
         history.map((item, index) => {
           const st = ITEM_STATUS[item.toStatus];
@@ -49,7 +52,7 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
                 <View className="flex-row justify-between">
                   <Text className="font-semibold text-slate-800">{st.label}</Text>
                   <Text className="text-xs text-slate-400">
-                    {new Date(item.changedAt).toLocaleString('es-MX', {
+                    {new Date(item.changedAt).toLocaleString(dateLocale(), {
                       day: '2-digit',
                       month: '2-digit',
                       hour: '2-digit',
@@ -59,7 +62,7 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
                 </View>
                 <View className="mt-2">
                   <Text className="text-sm text-slate-500">
-                    {item.changedBy?.fullName ?? 'Sin usuario'}
+                    {item.changedBy?.fullName ?? t('history.noUser')}
                   </Text>
                   {!!item.comment && (
                     <View className="bg-rose-50 rounded-lg px-3 py-2 mt-2">

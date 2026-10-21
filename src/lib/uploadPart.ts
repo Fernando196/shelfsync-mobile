@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import { File } from 'expo-file-system';
 
 // El fetch global de Expo (expo/fetch) no acepta el objeto { uri, name, type }
@@ -5,6 +6,6 @@ import { File } from 'expo-file-system';
 // File de expo-file-system, que lee los bytes del archivo local.
 export async function toUploadPart(uri: string): Promise<Blob> {
   const file = new File(uri);
-  if (!file.exists) throw new Error('La foto ya no existe en el telefono');
+  if (!file.exists) throw new Error(i18n.t('errors.photoMissing'));
   return file as unknown as Blob;
 }
