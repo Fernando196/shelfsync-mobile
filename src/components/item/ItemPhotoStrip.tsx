@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { View, Text, Image, ScrollView, Pressable, ActivityIndicator, Alert } from 'react-native';
-import { Camera, ImagePlus, RotateCw } from 'lucide-react-native';
-import { IInventoryItem } from '../../interfaces/item.interface';
-import { photoUrl, uploadPhoto } from '../../services/files.service';
+import { Camera, ImagePlus, RotateCw, Trash2 } from 'lucide-react-native';
+import { IInventoryItem, IInventoryPhoto } from '../../interfaces/item.interface';
+import { deletePhoto, photoUrl, uploadPhoto } from '../../services/files.service';
 import { hapticTap, hapticSuccess, hapticError } from '../../lib/haptics';
 import { pickFromLibrary } from '../../lib/pickFromLibrary';
 import { CameraCaptureModal } from '../camera/CameraCaptureModal';
@@ -15,15 +15,17 @@ interface PendingPhoto {
 
 interface ItemPhotoStripProps {
   item: IInventoryItem;
-  onUploaded: (item: IInventoryItem) => void;
+  // Item actualizado por la API tras subir o borrar una foto.
+  onChange: (item: IInventoryItem) => void;
 }
 
 const PHOTO_HEIGHT = 200;
 
-export function ItemPhotoStrip({ item, onUploaded }: ItemPhotoStripProps) {
+export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [pending, setPending] = useState<PendingPhoto[]>([]);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const files = item.files ?? [];
   // Mas reciente primero, igual que en la tira.
   const photos = [...files].reverse();
@@ -40,7 +42,7 @@ export function ItemPhotoStrip({ item, onUploaded }: ItemPhotoStripProps) {
       try {
         const updated = await uploadPhoto(item.id, uris[i]);
         setPending((prev) => prev.filter((p) => p.uri !== uris[i]));
-        onUploaded(updated);
+        onChange(updated);
       } catch (e: any) {
         const failed = uris.slice(i);
         setPending((prev) =>
@@ -68,6 +70,32 @@ export function ItemPhotoStrip({ item, onUploaded }: ItemPhotoStripProps) {
   };
 
   const retry = () => upload(pending.filter((p) => p.failed).map((p) => p.uri));
+
+  const confirmDelete = (photo: IInventoryPhoto) => {
+    hapticTap();
+    Alert.alert('Eliminar foto', 'Esta foto se borrara del producto. No se puede deshacer.', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Eliminar',
+        style: 'destructive',
+        onPress: async () => {
+          setDeletingId(photo.id);
+          try {
+            const updated = await deletePhoto(item.id, photo.id);
+            // Si era la ultima foto, el visor no tiene nada que mostrar.
+            if (!updated.files?.length) setViewerIndex(null);
+            onChange(updated);
+            hapticSuccess();
+          } catch (e: any) {
+            hapticError();
+            Alert.alert('No se pudo eliminar la foto', e?.message ?? String(e));
+          } finally {
+            setDeletingId(null);
+          }
+        },
+      },
+    ]);
+  };
 
   return (
     <>
@@ -136,12 +164,37 @@ export function ItemPhotoStrip({ item, onUploaded }: ItemPhotoStripProps) {
           ))}
 
           {photos.map((p, i) => (
-            <Pressable key={p.id} onPress={() => setViewerIndex(i)} className="active:opacity-80">
-              <Image
-                source={{ uri: photoUrl(p.url) }}
-                className="rounded-2xl mx-1"
-                style={{ width: 260, height: PHOTO_HEIGHT }}
-              />
+            <Pressable
+              key={p.id}
+              onPress={() => setViewerIndex(i)}
+              className="mx-1 active:opacity-80"
+              style={{ width: 260, height: PHOTO_HEIGHT }}
+            >
+              <Image source={{ uri: photoUrl(p.url) }} className="rounded-2xl w-full h-full" />
+              {/* Layout en style: en web NativeWind no aplicaba estas clases a este Pressable */}
+              <Pressable
+                onPress={() => confirmDelete(p)}
+                disabled={deletingId !== null}
+                hitSlop={8}
+                style={({ pressed }) => ({
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: 'rgba(0,0,0,0.5)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: pressed ? 0.7 : 1,
+                })}
+              >
+                {deletingId === p.id ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Trash2 size={16} color="#fff" />
+                )}
+              </Pressable>
             </Pressable>
           ))}
         </ScrollView>
@@ -151,6 +204,8 @@ export function ItemPhotoStrip({ item, onUploaded }: ItemPhotoStripProps) {
         urls={photos.map((p) => photoUrl(p.url))}
         index={viewerIndex}
         onClose={() => setViewerIndex(null)}
+        onDelete={(i) => confirmDelete(photos[i])}
+        deleting={deletingId !== null}
       />
 
       <CameraCaptureModal

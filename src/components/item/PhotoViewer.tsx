@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   GestureResponderEvent,
   Image,
@@ -12,7 +13,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { X } from 'lucide-react-native';
+import { Trash2, X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface PhotoViewerProps {
@@ -20,6 +21,9 @@ interface PhotoViewerProps {
   // Foto con la que abre; null = cerrado.
   index: number | null;
   onClose: () => void;
+  // Recibe el indice de la foto actual; la confirmacion la maneja quien lo usa.
+  onDelete?: (index: number) => void;
+  deleting?: boolean;
 }
 
 const MAX_ZOOM = 4;
@@ -40,7 +44,7 @@ function touchDistance(e: GestureResponderEvent) {
 // arrastrar para moverse con zoom. Todo con PanResponder y no con un ScrollView: en
 // iOS Safari, una vez que arranca el scroll nativo los toques ya no se pueden
 // cancelar y el pellizco hace zoom a toda la pagina.
-export function PhotoViewer({ urls, index, onClose }: PhotoViewerProps) {
+export function PhotoViewer({ urls, index, onClose, onDelete, deleting }: PhotoViewerProps) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [current, setCurrent] = useState(index ?? 0);
@@ -94,6 +98,10 @@ export function PhotoViewer({ urls, index, onClose }: PhotoViewerProps) {
   useEffect(() => {
     applyZoom(1, 0, 0);
   }, [current, index]);
+  // Si se borro la ultima foto de la lista, quedarse en la nueva ultima.
+  useEffect(() => {
+    if (urls.length && current > urls.length - 1) setCurrent(urls.length - 1);
+  }, [urls.length, current]);
 
   const pan = useMemo(() => {
     const startMode = (mode: Mode, g: PanResponderGestureState) => {
@@ -223,13 +231,29 @@ export function PhotoViewer({ urls, index, onClose }: PhotoViewerProps) {
           <Text className="text-white text-base font-semibold">
             {urls.length > 1 ? `${current + 1} / ${urls.length}` : ''}
           </Text>
-          <Pressable
-            onPress={onClose}
-            hitSlop={12}
-            className="w-10 h-10 rounded-full bg-white/20 items-center justify-center active:opacity-70"
-          >
-            <X size={22} color="#fff" />
-          </Pressable>
+          <View className="flex-row">
+            {onDelete && (
+              <Pressable
+                onPress={() => onDelete(current)}
+                disabled={deleting}
+                hitSlop={12}
+                className="w-10 h-10 mr-3 rounded-full bg-white/20 items-center justify-center active:opacity-70"
+              >
+                {deleting ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Trash2 size={20} color="#fff" />
+                )}
+              </Pressable>
+            )}
+            <Pressable
+              onPress={onClose}
+              hitSlop={12}
+              className="w-10 h-10 rounded-full bg-white/20 items-center justify-center active:opacity-70"
+            >
+              <X size={22} color="#fff" />
+            </Pressable>
+          </View>
         </View>
       </View>
     </Modal>

@@ -146,7 +146,7 @@ export default function ItemDetailScreen() {
   return (
     <View className="flex-1 bg-surface">
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
-        <ItemPhotoStrip item={item} onUploaded={setItem} />
+        <ItemPhotoStrip item={item} onChange={setItem} />
         <View className="flex-row items-start justify-between">
           <View className="flex-1 mr-3">
             <Text className="text-2xl font-bold text-slate-800">

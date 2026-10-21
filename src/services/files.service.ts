@@ -19,6 +19,13 @@ export async function uploadPhoto(id: string, fileUri: string): Promise<IInvento
   return response;
 }
 
+export async function deletePhoto(id: string, photoId: string): Promise<IInventoryItem> {
+  return <IInventoryItem>await request(
+    `/items/${encodeURIComponent(id)}/photos/${encodeURIComponent(photoId)}`,
+    { method: 'DELETE' },
+  );
+}
+
 export function photoUrl(relativeUrl: string): string {
   return `${API_BASE_URL}${relativeUrl}`;
 }
