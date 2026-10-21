@@ -1,5 +1,5 @@
 import { Boxes, Minus, Package, Plus } from 'lucide-react-native';
-import { View, Text, Pressable, Alert, Switch } from 'react-native';
+import { View, Text, Pressable, Alert, Switch, Platform } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Input } from '../ui/Input';
 import { IInventoryItem, IUpsertItemInput } from '../../interfaces/item.interface';
@@ -205,13 +205,16 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         </View>
       </View>
 
-      <Pressable
-        className={` bg-primary-600 rounded-xl py-3 items-center mt-3 ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
-        disabled={saving || (!!newProduct && !form.description.trim())}
-        onPress={() => handleSave(true)}
-      >
-        <Text className="text-sm font-semibold text-white">Guardar e imprimir</Text>
-      </Pressable>
+      {/* En web no hay Bluetooth; la impresion web llegara con la API de impresion */}
+      {Platform.OS !== 'web' && (
+        <Pressable
+          className={` bg-primary-600 rounded-xl py-3 items-center mt-3 ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
+          disabled={saving || (!!newProduct && !form.description.trim())}
+          onPress={() => handleSave(true)}
+        >
+          <Text className="text-sm font-semibold text-white">Guardar e imprimir</Text>
+        </Pressable>
+      )}
 
       <View className="flex-row mt-5">
         <Pressable

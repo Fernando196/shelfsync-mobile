@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, Pressable, Alert } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Pressable, Alert, Platform } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
 import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Trash2 } from 'lucide-react-native';
 import type { RootStackParamList } from '../navigation/RootNavigator';
@@ -12,7 +12,10 @@ import { ITEM_ACTIONS } from '../const/itemStatus.const';
 import ButtonPill from '../components/ui/ButtonPill';
 import { CommentSheet } from '../components/item/CommentSheet';
 import { useItemStatusAction } from '../hooks/useItemStatusAction';
-import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
+import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
+import { toTicket } from '../lib/toTicket';
+import { hapticError, hapticSuccess } from '../lib/haptics';
+import { IToast, Toast } from '../components/ui/Toast';
 import { StatusHistory } from '../components/item/StatusHistory';
 import { useInventory } from '../state/InventoryContext';
 import { ItemPhotoStrip } from '../components/item/ItemPhotoStrip';
@@ -23,7 +26,8 @@ export default function ItemDetailScreen() {
   const { id } = route.params;
   const [item, setItem] = useState<IInventoryItem | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [showPrint, setShowPrint] = useState(false);
+  const [printing, setPrinting] = useState(false);
+  const [toast, setToast] = useState<IToast | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
   const { changing, pendingAction, handleAction, runAction, cancelComment } = useItemStatusAction(
@@ -37,6 +41,36 @@ export default function ItemDetailScreen() {
       updateItem(item);
     }
   }, [item, updateItem]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  // Un solo toque: imprime directo. Solo se interrumpe si no hay impresora o falla.
+  const handlePrint = async () => {
+    if (!item) return;
+    if (!getConnectedPrinter()) {
+      hapticError();
+      Alert.alert('Sin impresora conectada', 'Vincula la impresora en Ajustes para imprimir.', [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Ir a Ajustes', onPress: () => navigation.navigate('Settings') },
+      ]);
+      return;
+    }
+    setPrinting(true);
+    try {
+      await printInventoryTicket(toTicket(item));
+      hapticSuccess();
+      setToast({ title: 'Etiqueta impresa', subtitle: item.name || '' });
+    } catch (e: any) {
+      hapticError();
+      Alert.alert('Error al imprimir', e?.message ?? String(e));
+    } finally {
+      setPrinting(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -162,13 +196,23 @@ export default function ItemDetailScreen() {
             />
           ))}
         </View>
-        <Pressable
-          onPress={() => setShowPrint(true)}
-          className="flex-row items-center justify-center bg-primary-600 rounded-xl py-4 active:scale-95 mb-3"
-        >
-          <Printer size={18} color="#fff" />
-          <Text className="text-white font-semibold ml-2">Reimprimir etiqueta</Text>
-        </Pressable>
+        {/* En web no hay Bluetooth; la impresion web llegara con la API de impresion */}
+        {Platform.OS !== 'web' && (
+          <Pressable
+            onPress={handlePrint}
+            disabled={printing}
+            className="flex-row items-center justify-center bg-primary-600 rounded-xl py-4 active:scale-95 mb-3"
+          >
+            {printing ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <Printer size={18} color="#fff" />
+                <Text className="text-white font-semibold ml-2">Reimprimir etiqueta</Text>
+              </>
+            )}
+          </Pressable>
+        )}
         <Pressable
           onPress={handleDelete}
           disabled={deleting}
@@ -186,21 +230,7 @@ export default function ItemDetailScreen() {
         <StatusHistory itemId={item.id} status={item.status} />
       </ScrollView>
 
-      <ThermalPreviewModal
-        visible={showPrint}
-        onClose={() => setShowPrint(false)}
-        product={{
-          id: item.id,
-          name: item.name || '',
-          qty: item.qty,
-          location: item.location || '',
-          code: item.code,
-        }}
-        onGoToPrinterSetup={() => {
-          setShowPrint(false);
-          navigation.navigate('Settings');
-        }}
-      />
+      {toast && <Toast toast={toast} />}
 
       {pendingAction && (
         <CommentSheet

@@ -19,7 +19,6 @@ import { DETAIL_ON_SCAN } from '../const/itemStatus.const';
 import { ItemStatusSheet } from '../components/item/ItemStatusSheet';
 import { IToast, Toast } from '../components/ui/Toast';
 import { getItemStatus } from '../lib/statusItem';
-import ThermalPreviewModal from '../components/printing/ThermalPreviewModal';
 import { NoLabelSheet } from '../components/reception/NoLabelSheet';
 
 export default function ScannerScreen() {
@@ -84,33 +83,39 @@ export default function ScannerScreen() {
     [loading, sheet],
   );
 
+  const toastSaved = (item: IInventoryItem) =>
+    setToast({
+      title: `${formatItemCode(item.code)} guardada`,
+      subtitle: item.name || '',
+    });
+
+  // El item ya quedo guardado; si no se pudo imprimir solo se avisa, sin pasos extra.
   const handleSaveItem = async (item: IInventoryItem, print: boolean) => {
     cleanSheet();
-    if (print) {
-      const printer = getConnectedPrinter();
-      if (!printer) {
-        setSheet({ kind: 'print', item });
-      } else {
-        try {
-          setLoading(true);
-          await printInventoryTicket(toTicket(item));
-          setToast({
-            title: `${formatItemCode(item.code)} guardada`,
-            subtitle: item.name || '',
-          });
-          setPrinted(true);
-        } catch (err) {
-          hapticError();
-          setSheet({ kind: 'print', item });
-        } finally {
-          setLoading(false);
-        }
-      }
-    } else {
-      setToast({
-        title: `${formatItemCode(item.code)} guardada`,
-        subtitle: item.name || '',
-      });
+    if (!print) {
+      toastSaved(item);
+      return;
+    }
+    if (!getConnectedPrinter()) {
+      hapticError();
+      Alert.alert('Guardada sin imprimir', 'No hay impresora conectada.', [
+        { text: 'OK', style: 'cancel', onPress: () => toastSaved(item) },
+        { text: 'Ir a Ajustes', onPress: () => navigation.navigate('Settings') },
+      ]);
+      return;
+    }
+    try {
+      setLoading(true);
+      await printInventoryTicket(toTicket(item));
+      toastSaved(item);
+      setPrinted(true);
+    } catch (e: any) {
+      hapticError();
+      Alert.alert('Guardada sin imprimir', e?.message ?? String(e), [
+        { text: 'OK', onPress: () => toastSaved(item) },
+      ]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -223,30 +228,6 @@ export default function ScannerScreen() {
         />
       )}
 
-      {sheet?.kind === 'print' && (
-        <ThermalPreviewModal
-          visible
-          onClose={() => {
-            setToast({
-              title: `${formatItemCode(sheet.item.code)} guardada`,
-              subtitle: sheet.item.name || '',
-            });
-            cleanSheet();
-          }}
-          product={{
-            id: sheet.item.id,
-            name: sheet.item.name || '',
-            qty: sheet.item.qty,
-            location: sheet.item.location || '',
-            code: sheet.item.code,
-          }}
-          onGoToPrinterSetup={() => {
-            cleanSheet();
-            navigation.navigate('Settings');
-          }}
-        />
-      )}
-
       {sheet?.kind === 'status' && (
         <ItemStatusSheet
           item={sheet.item}
@@ -295,6 +276,5 @@ type Sheet =
   | { kind: 'receive'; product: IProductLookup }
   | { kind: 'new'; barcode?: string; sku?: string; description?: string }
   | { kind: 'notFound'; code: string }
-  | { kind: 'print'; item: IInventoryItem }
   | { kind: 'status'; item: IInventoryItem }
   | { kind: 'search' };
