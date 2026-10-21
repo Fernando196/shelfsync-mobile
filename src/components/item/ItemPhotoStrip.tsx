@@ -6,6 +6,7 @@ import { photoUrl, uploadPhoto } from '../../services/files.service';
 import { hapticTap, hapticSuccess, hapticError } from '../../lib/haptics';
 import { pickFromLibrary } from '../../lib/pickFromLibrary';
 import { CameraCaptureModal } from '../camera/CameraCaptureModal';
+import { PhotoViewer } from './PhotoViewer';
 
 interface PendingPhoto {
   uri: string;
@@ -22,7 +23,10 @@ const PHOTO_HEIGHT = 200;
 export function ItemPhotoStrip({ item, onUploaded }: ItemPhotoStripProps) {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [pending, setPending] = useState<PendingPhoto[]>([]);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const files = item.files ?? [];
+  // Mas reciente primero, igual que en la tira.
+  const photos = [...files].reverse();
   const isEmpty = files.length === 0 && pending.length === 0;
 
   // Sube en orden; si una falla se detiene y deja esa y las restantes marcadas para reintentar.
@@ -131,16 +135,23 @@ export function ItemPhotoStrip({ item, onUploaded }: ItemPhotoStripProps) {
             </Pressable>
           ))}
 
-          {[...files].reverse().map((p) => (
-            <Image
-              key={p.id}
-              source={{ uri: photoUrl(p.url) }}
-              className="rounded-2xl mx-1"
-              style={{ width: 260, height: PHOTO_HEIGHT }}
-            />
+          {photos.map((p, i) => (
+            <Pressable key={p.id} onPress={() => setViewerIndex(i)} className="active:opacity-80">
+              <Image
+                source={{ uri: photoUrl(p.url) }}
+                className="rounded-2xl mx-1"
+                style={{ width: 260, height: PHOTO_HEIGHT }}
+              />
+            </Pressable>
           ))}
         </ScrollView>
       )}
+
+      <PhotoViewer
+        urls={photos.map((p) => photoUrl(p.url))}
+        index={viewerIndex}
+        onClose={() => setViewerIndex(null)}
+      />
 
       <CameraCaptureModal
         visible={cameraOpen}
