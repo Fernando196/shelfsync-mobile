@@ -39,16 +39,9 @@ function Gate() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={MainTabs} />
-      <Stack.Screen
-        name="ItemDetail"
-        component={ItemDetailScreen}
-        options={{ headerShown: true, title: 'Detalle', headerTintColor: COLORS.primary }}
-      />
-      <Stack.Screen
-        name="EditProduct"
-        component={EditProductScreen}
-        options={{ headerShown: true, title: 'Editar', headerTintColor: COLORS.primary }}
-      />
+      {/* Sin header nativo: cada pantalla pinta su encabezado con BackButton */}
+      <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
+      <Stack.Screen name="EditProduct" component={EditProductScreen} />
     </Stack.Navigator>
   );
 }

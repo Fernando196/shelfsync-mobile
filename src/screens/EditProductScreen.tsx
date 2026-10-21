@@ -22,6 +22,8 @@ import LocationPickerMap from '../components/form/LocationPickerMap';
 import PhotoPicker from '../components/form/PhotoPicker';
 import { photoUrl, uploadPhoto } from '../services/files.service';
 import { COLORS } from '../const/theme.const';
+import { Screen } from '../components/ui/Screen';
+import { BackButton } from '../components/ui/BackButton';
 
 function emptyForm(): IEditForm {
   return {
@@ -129,124 +131,130 @@ export default function EditProductScreen() {
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-surface"
-      contentContainerStyle={{ padding: 20, paddingBottom: 48 }}
-    >
-      <Text className="text-2xl font-bold text-slate-800 mb-1">Editar mueble</Text>
-      <Text className="text-slate-400 text-sm mb-5">
-        Los cambios se guardan directo en el servidor
-      </Text>
-
-      <AccordionSection title="Identificacion del mueble" icon={<Tag size={18} color={COLORS.primary} />}>
-        <Text className="text-xs font-semibold text-slate-500 mb-1">
-          Codigo: {item && formatItemCode(item.code)}
-        </Text>
-        <Text className="text-xs font-semibold text-slate-500 mb-1">
-          SKU / codigo {item?.productLookup.sku}
-        </Text>
-        <Text className="text-xs font-semibold text-slate-500 mb-1">
-          Producto {item?.productLookup.description}
-        </Text>
-        <Text className="text-xs font-semibold text-slate-500 mb-1">Nombre del mueble</Text>
-        <TextInput
-          className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base text-slate-800"
-          value={form.name}
-          onChangeText={(name) => onChangeForm('name', name)}
-        />
-
-        <Text className="text-xs font-semibold text-slate-500 mb-2">Categoria</Text>
-        <CategoryAutocomplete
-          label="Buscar categoria"
-          onChange={(id) => onChangeForm('categoryId', id)}
-          selected={form.categoryId || ''}
-        />
-      </AccordionSection>
-
-      <AccordionSection title="Inventario y stock" icon={<Boxes size={18} color={COLORS.primary} />}>
-        <Text className="text-xs font-semibold text-slate-500 mb-2">Cantidad disponible</Text>
-        <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
-          <Pressable
-            onPress={() => onChangeForm('qty', Math.max(0, form.qty - 1))}
-            className="w-11 h-11 items-center justify-center active:scale-95"
-          >
-            <Minus size={18} color="#334155" />
-          </Pressable>
-          <Text className="w-10 text-center text-lg font-bold text-slate-800">{form.qty}</Text>
-          <Pressable
-            onPress={() => onChangeForm('qty', form.qty + 1)}
-            className="w-11 h-11 items-center justify-center active:scale-95"
-          >
-            <Plus size={18} color="#334155" />
-          </Pressable>
-        </View>
-
-        <Text className="text-xs font-semibold text-slate-500 mb-1">Ubicacion en bodega</Text>
-        <TextInput
-          className="border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-800"
-          value={form.location}
-          onChangeText={(location) => onChangeForm('location', location)}
-        />
-      </AccordionSection>
-
-      <AccordionSection title="Fotos" icon={<Camera size={18} color={COLORS.primary} />}>
-        {(item?.files?.length ?? 0) > 0 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
-            {item?.files?.map((p) => (
-              <Image
-                key={p.id}
-                source={{ uri: photoUrl(p.thumbnailUrl ?? p.url) }}
-                className="w-24 h-24 rounded-xl mr-3"
-              />
-            ))}
-          </ScrollView>
-        )}
-        <Text className="text-xs font-semibold text-slate-500 mb-2">Agregar fotos</Text>
-        <PhotoPicker photos={newPhotos} onChange={setNewPhotos} />
-      </AccordionSection>
-
-      <AccordionSection
-        title="Geolocalizacion en bodega"
-        icon={<MapPin size={18} color={COLORS.primary} />}
-        defaultOpen={false}
+    <Screen>
+      {/* Encabezado propio (sin header nativo), mismo estilo que Inventario */}
+      <View className="flex-row items-center px-5 pb-2">
+        <BackButton />
+        <Text className="text-2xl font-bold text-slate-800 ml-3">Editar mueble</Text>
+      </View>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ padding: 20, paddingTop: 8, paddingBottom: 48 }}
       >
-        <LocationPickerMap
-          latitude={form.latitude}
-          longitude={form.longitude}
-          onLocationChange={(c) => {
-            onChangeForm('latitude', c.latitude);
-            onChangeForm('longitude', c.longitude);
-          }}
-        />
-      </AccordionSection>
+        <Text className="text-slate-400 text-sm mb-5">
+          Los cambios se guardan directo en el servidor
+        </Text>
 
-      <Pressable
-        onPress={handleSave}
-        disabled={saving}
-        className={`rounded-xl py-4 items-center mt-2 active:scale-95 ${saving ? 'bg-slate-200' : 'bg-primary-600'}`}
-      >
-        {saving ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text className="text-white font-semibold text-base">Guardar cambios</Text>
-        )}
-      </Pressable>
+        <AccordionSection title="Identificacion del mueble" icon={<Tag size={18} color={COLORS.primary} />}>
+          <Text className="text-xs font-semibold text-slate-500 mb-1">
+            Codigo: {item && formatItemCode(item.code)}
+          </Text>
+          <Text className="text-xs font-semibold text-slate-500 mb-1">
+            SKU / codigo {item?.productLookup.sku}
+          </Text>
+          <Text className="text-xs font-semibold text-slate-500 mb-1">
+            Producto {item?.productLookup.description}
+          </Text>
+          <Text className="text-xs font-semibold text-slate-500 mb-1">Nombre del mueble</Text>
+          <TextInput
+            className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base text-slate-800"
+            value={form.name}
+            onChangeText={(name) => onChangeForm('name', name)}
+          />
 
-      {/* Eliminar vive aqui y no en el detalle, para que no se toque por error */}
-      <Pressable
-        onPress={handleDelete}
-        disabled={deleting || saving}
-        className="flex-row items-center justify-center py-4 mt-4 active:opacity-70"
-      >
-        {deleting ? (
-          <ActivityIndicator color="#e11d48" />
-        ) : (
-          <>
-            <Trash2 size={16} color="#e11d48" />
-            <Text className="text-rose-600 font-semibold ml-2">Eliminar producto</Text>
-          </>
-        )}
-      </Pressable>
-    </ScrollView>
+          <Text className="text-xs font-semibold text-slate-500 mb-2">Categoria</Text>
+          <CategoryAutocomplete
+            label="Buscar categoria"
+            onChange={(id) => onChangeForm('categoryId', id)}
+            selected={form.categoryId || ''}
+          />
+        </AccordionSection>
+
+        <AccordionSection title="Inventario y stock" icon={<Boxes size={18} color={COLORS.primary} />}>
+          <Text className="text-xs font-semibold text-slate-500 mb-2">Cantidad disponible</Text>
+          <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
+            <Pressable
+              onPress={() => onChangeForm('qty', Math.max(0, form.qty - 1))}
+              className="w-11 h-11 items-center justify-center active:scale-95"
+            >
+              <Minus size={18} color="#334155" />
+            </Pressable>
+            <Text className="w-10 text-center text-lg font-bold text-slate-800">{form.qty}</Text>
+            <Pressable
+              onPress={() => onChangeForm('qty', form.qty + 1)}
+              className="w-11 h-11 items-center justify-center active:scale-95"
+            >
+              <Plus size={18} color="#334155" />
+            </Pressable>
+          </View>
+
+          <Text className="text-xs font-semibold text-slate-500 mb-1">Ubicacion en bodega</Text>
+          <TextInput
+            className="border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-800"
+            value={form.location}
+            onChangeText={(location) => onChangeForm('location', location)}
+          />
+        </AccordionSection>
+
+        <AccordionSection title="Fotos" icon={<Camera size={18} color={COLORS.primary} />}>
+          {(item?.files?.length ?? 0) > 0 && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
+              {item?.files?.map((p) => (
+                <Image
+                  key={p.id}
+                  source={{ uri: photoUrl(p.thumbnailUrl ?? p.url) }}
+                  className="w-24 h-24 rounded-xl mr-3"
+                />
+              ))}
+            </ScrollView>
+          )}
+          <Text className="text-xs font-semibold text-slate-500 mb-2">Agregar fotos</Text>
+          <PhotoPicker photos={newPhotos} onChange={setNewPhotos} />
+        </AccordionSection>
+
+        <AccordionSection
+          title="Geolocalizacion en bodega"
+          icon={<MapPin size={18} color={COLORS.primary} />}
+          defaultOpen={false}
+        >
+          <LocationPickerMap
+            latitude={form.latitude}
+            longitude={form.longitude}
+            onLocationChange={(c) => {
+              onChangeForm('latitude', c.latitude);
+              onChangeForm('longitude', c.longitude);
+            }}
+          />
+        </AccordionSection>
+
+        <Pressable
+          onPress={handleSave}
+          disabled={saving}
+          className={`rounded-xl py-4 items-center mt-2 active:scale-95 ${saving ? 'bg-slate-200' : 'bg-primary-600'}`}
+        >
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className="text-white font-semibold text-base">Guardar cambios</Text>
+          )}
+        </Pressable>
+
+        {/* Eliminar vive aqui y no en el detalle, para que no se toque por error */}
+        <Pressable
+          onPress={handleDelete}
+          disabled={deleting || saving}
+          className="flex-row items-center justify-center py-4 mt-4 active:opacity-70"
+        >
+          {deleting ? (
+            <ActivityIndicator color="#e11d48" />
+          ) : (
+            <>
+              <Trash2 size={16} color="#e11d48" />
+              <Text className="text-rose-600 font-semibold ml-2">Eliminar producto</Text>
+            </>
+          )}
+        </Pressable>
+      </ScrollView>
+    </Screen>
   );
 }

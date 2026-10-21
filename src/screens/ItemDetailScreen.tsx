@@ -19,6 +19,8 @@ import { StatusHistory } from '../components/item/StatusHistory';
 import { useInventory } from '../state/InventoryContext';
 import { ItemPhotoStrip } from '../components/item/ItemPhotoStrip';
 import { COLORS } from '../const/theme.const';
+import { Screen } from '../components/ui/Screen';
+import { BackButton } from '../components/ui/BackButton';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -96,10 +98,15 @@ export default function ItemDetailScreen() {
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface px-8">
-        <TriangleAlert size={32} color="#f43f5e" />
-        <Text className="text-slate-600 text-center mt-3">{error}</Text>
-      </View>
+      <Screen>
+        <View className="px-5 pb-2">
+          <BackButton />
+        </View>
+        <View className="flex-1 items-center justify-center px-8">
+          <TriangleAlert size={32} color="#f43f5e" />
+          <Text className="text-slate-600 text-center mt-3">{error}</Text>
+        </View>
+      </Screen>
     );
   }
 
@@ -117,29 +124,34 @@ export default function ItemDetailScreen() {
   const actions = ITEM_ACTIONS[item.status] ?? [];
 
   return (
-    <View className="flex-1 bg-surface">
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
+    <Screen>
+      {/* Encabezado propio (sin header nativo), mismo estilo que Inventario */}
+      <View className="flex-row items-center justify-between px-5 pb-2">
+        <View className="flex-row items-center">
+          <BackButton />
+          <Text className="text-2xl font-bold text-slate-800 ml-3">Detalle</Text>
+        </View>
+        <Pressable
+          onPress={() => navigation.navigate('EditProduct', { id: item.id })}
+          hitSlop={8}
+          className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
+        >
+          <Pencil size={18} color={COLORS.primary} />
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 8, paddingBottom: 40 }}>
         <ItemPhotoStrip item={item} onChange={setItem} />
-        {/* Encabezado: nombre, codigo/SKU y estatus con aire entre cada uno */}
-        <View className="flex-row items-start justify-between">
-          <View className="flex-1 mr-3">
-            <Text className="text-2xl font-bold text-slate-900 leading-tight">
-              {item.name || item.productLookup.description}
-            </Text>
-            <Text className="text-sm text-slate-500 mt-1">
-              {formatItemCode(item.code)}
-              {item.productLookup?.sku ? `  ·  SKU ${item.productLookup.sku}` : ''}
-            </Text>
-            <View className="mt-3">
-              <StatusPill label={status.label} tone={status.tone} />
-            </View>
-          </View>
-          <Pressable
-            onPress={() => navigation.navigate('EditProduct', { id: item.id })}
-            className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
-          >
-            <Pencil size={18} color={COLORS.primary} />
-          </Pressable>
+        {/* Nombre, codigo/SKU y estatus con aire entre cada uno */}
+        <Text className="text-2xl font-bold text-slate-900 leading-tight">
+          {item.name || item.productLookup.description}
+        </Text>
+        <Text className="text-sm text-slate-500 mt-1">
+          {formatItemCode(item.code)}
+          {item.productLookup?.sku ? `  ·  SKU ${item.productLookup.sku}` : ''}
+        </Text>
+        <View className="mt-3">
+          <StatusPill label={status.label} tone={status.tone} />
         </View>
 
         <View className="bg-white rounded-2xl border border-slate-200 px-4 py-2 mt-5">
@@ -240,6 +252,6 @@ export default function ItemDetailScreen() {
           title="Artículo dañado"
         />
       )}
-    </View>
+    </Screen>
   );
 }
