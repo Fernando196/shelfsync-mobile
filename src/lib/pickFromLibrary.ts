@@ -9,7 +9,8 @@ export async function pickFromLibrary(): Promise<string[]> {
     return [];
   }
   const result = await ImagePicker.launchImageLibraryAsync({
-    quality: 0.6,
+    // Sin comprimir: uploadPhoto comprime una sola vez (ver files.service).
+    quality: 1,
     allowsMultipleSelection: true,
   });
   if (result.canceled || !result.assets?.length) return [];

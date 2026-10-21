@@ -14,7 +14,7 @@ export function CameraCaptureModal({ visible, onClose, onDone }: CameraCaptureMo
   const [permission, requestPermission] = useCameraPermissions();
 
   const takeShot = async () => {
-    const photo = await cameraRef.current?.takePictureAsync({ quality: 0.6 });
+    const photo = await cameraRef.current?.takePictureAsync({ quality: 1 });
     if (photo) setShots((prev) => [...prev, photo.uri]);
   };
 

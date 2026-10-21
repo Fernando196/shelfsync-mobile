@@ -36,7 +36,7 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
 
   // En web, launchCameraAsync abre la camara del telefono desde el navegador.
   const addFromBrowserCamera = async () => {
-    const result = await ImagePicker.launchCameraAsync({ quality: 0.6 });
+    const result = await ImagePicker.launchCameraAsync({ quality: 1 });
     if (!result.canceled && result.assets?.length) {
       onChange([...photos, ...result.assets.map((a) => a.uri)]);
     }
