@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { View, Text, Pressable, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Flashlight, FlashlightOff, Search } from 'lucide-react-native';
+import { Flashlight, FlashlightOff, Keyboard, Search } from 'lucide-react-native';
 import { hapticSelect, hapticError } from '../lib/haptics';
 import { prefixQRItem } from '../const/prefix.const';
 import { findProductByCode } from '../services/productLookup.service';
@@ -248,6 +248,14 @@ export default function ScannerScreen() {
         />
       )}
 
+      {sheet?.kind === 'manual' && (
+        <NotFoundSheet
+          onClose={cleanSheet}
+          onFound={(product) => setSheet({ kind: 'receive', product })}
+          onCreateNew={(sku) => setSheet({ kind: 'new', sku })}
+        />
+      )}
+
       {sheet?.kind === 'search' && (
         <NoLabelSheet
           onSelect={(product) => setSheet({ kind: 'receive', product })}
@@ -257,7 +265,11 @@ export default function ScannerScreen() {
       )}
 
       {!sheet && (
-        <View className="absolute left-0 right-0 items-center" style={{ bottom: 56 }}>
+        // Si la etiqueta no escanea: buscar sin etiqueta (por descripcion) o escribir el SKU.
+        <View
+          className="absolute left-0 right-0 flex-row justify-center gap-3"
+          style={{ bottom: 56 }}
+        >
           <Pressable
             onPress={() => {
               hapticSelect();
@@ -267,6 +279,16 @@ export default function ScannerScreen() {
           >
             <Search size={18} color="#fff" />
             <Text className="text-white font-semibold text-sm ml-2">{t('scanner.noLabel')}</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              hapticSelect();
+              setSheet({ kind: 'manual' });
+            }}
+            className="flex-row items-center bg-black/50 rounded-full px-5 py-3 active:scale-95"
+          >
+            <Keyboard size={18} color="#fff" />
+            <Text className="text-white font-semibold text-sm ml-2">{t('scanner.typeSku')}</Text>
           </Pressable>
         </View>
       )}
@@ -279,4 +301,5 @@ type Sheet =
   | { kind: 'new'; barcode?: string; sku?: string; description?: string }
   | { kind: 'notFound'; code: string }
   | { kind: 'status'; item: IInventoryItem }
-  | { kind: 'search' };
+  | { kind: 'search' }
+  | { kind: 'manual' };
