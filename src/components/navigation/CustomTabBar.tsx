@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Boxes, Settings, ScanLine } from 'lucide-react-native';
 import { hapticTap } from '../../lib/haptics';
+import { COLORS } from '../../const/theme.const';
 
 const ICONS: Record<string, any> = {
   Inventory: Boxes,
@@ -63,7 +64,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         }}
         className="flex-1 items-center justify-center py-2 active:scale-95"
       >
-        <Icon size={22} color={focused ? '#4f46e5' : '#94a3b8'} />
+        <Icon size={22} color={focused ? COLORS.primary : '#94a3b8'} />
         <Text
           className={`text-[10px] mt-1 font-medium ${focused ? 'text-primary-600' : 'text-slate-400'}`}
         >
@@ -89,7 +90,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
               navigation.navigate('Scanner');
             }}
             className={`w-16 h-16 rounded-full items-center justify-center shadow-lg active:scale-95 ${
-              scannerFocused ? 'bg-primary-700' : 'bg-primary-600'
+              scannerFocused ? 'bg-accent-700' : 'bg-accent-600'
             }`}
             style={{ elevation: 6 }}
           >

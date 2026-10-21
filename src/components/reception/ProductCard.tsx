@@ -44,7 +44,7 @@ export default function ProductCard({
               {item.location || 'Sin ubicacion'}
             </Text>
           </View>
-          <View className="bg-indigo-50 rounded-full px-2 py-0.5 ml-2">
+          <View className="bg-primary-50 rounded-full px-2 py-0.5 ml-2">
             <Text className="text-xs font-semibold text-primary-700">x{item.qty}</Text>
           </View>
         </View>

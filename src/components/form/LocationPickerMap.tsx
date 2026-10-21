@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import { MapPin, LocateFixed } from 'lucide-react-native';
 import { hapticError, hapticSuccess } from '../../lib/haptics';
 import { centeredTileGrid, TileRef, tileSource } from '../../lib/staticMap';
+import { COLORS } from '../../const/theme.const';
 
 interface LocationPickerMapProps {
   latitude: number | null;
@@ -59,13 +60,13 @@ export default function LocationPickerMap({
       <Pressable
         onPress={captureLocation}
         disabled={loading}
-        className="flex-row items-center justify-center bg-indigo-50 border border-primary-100 rounded-xl py-3 active:scale-95"
+        className="flex-row items-center justify-center bg-primary-50 border border-primary-100 rounded-xl py-3 active:scale-95"
       >
         {loading ? (
-          <ActivityIndicator color="#4f46e5" />
+          <ActivityIndicator color={COLORS.primary} />
         ) : (
           <>
-            <LocateFixed size={18} color="#4f46e5" />
+            <LocateFixed size={18} color={COLORS.primary} />
             <Text className="text-primary-700 font-semibold ml-2">
               {hasCoords ? 'Actualizar coordenadas' : 'Obtener coordenadas actuales'}
             </Text>

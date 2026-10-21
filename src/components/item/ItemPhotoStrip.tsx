@@ -7,6 +7,7 @@ import { hapticTap, hapticSuccess, hapticError } from '../../lib/haptics';
 import { pickFromLibrary } from '../../lib/pickFromLibrary';
 import { CameraCaptureModal } from '../camera/CameraCaptureModal';
 import { PhotoViewer } from './PhotoViewer';
+import { COLORS } from '../../const/theme.const';
 
 interface PendingPhoto {
   uri: string;
@@ -129,42 +130,42 @@ export function ItemPhotoStrip({ item, onChange }: ItemPhotoStripProps) {
     <>
       {isEmpty ? (
         <View
-          className="w-full bg-indigo-50 border border-dashed border-primary-200 rounded-2xl mb-4 overflow-hidden"
+          className="w-full bg-primary-50 border border-dashed border-primary-200 rounded-2xl mb-4 overflow-hidden"
           style={{ height: PHOTO_HEIGHT }}
         >
           <Pressable
             onPress={openCamera}
             className="flex-1 items-center justify-center active:opacity-70"
           >
-            <Camera size={32} color="#4f46e5" />
+            <Camera size={32} color={COLORS.primary} />
             <Text className="text-primary-600 font-semibold mt-2">Tomar fotos</Text>
           </Pressable>
           <Pressable
             onPress={openLibrary}
             className="flex-row items-center justify-center py-3 border-t border-primary-200 active:opacity-70"
           >
-            <ImagePlus size={16} color="#4f46e5" />
+            <ImagePlus size={16} color={COLORS.primary} />
             <Text className="text-primary-600 ml-2">Elegir de galeria</Text>
           </Pressable>
         </View>
       ) : (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-1 mb-4">
           <View
-            className="mx-1 w-28 bg-indigo-50 border border-dashed border-primary-200 rounded-2xl overflow-hidden"
+            className="mx-1 w-28 bg-primary-50 border border-dashed border-primary-200 rounded-2xl overflow-hidden"
             style={{ height: PHOTO_HEIGHT }}
           >
             <Pressable
               onPress={openCamera}
               className="flex-1 items-center justify-center active:opacity-70"
             >
-              <Camera size={26} color="#4f46e5" />
+              <Camera size={26} color={COLORS.primary} />
               <Text className="text-primary-600 text-xs font-semibold mt-1">Tomar</Text>
             </Pressable>
             <Pressable
               onPress={openLibrary}
               className="items-center justify-center py-3 border-t border-primary-200 active:opacity-70"
             >
-              <ImagePlus size={18} color="#4f46e5" />
+              <ImagePlus size={18} color={COLORS.primary} />
               <Text className="text-primary-600 text-xs mt-1">Galeria</Text>
             </Pressable>
           </View>

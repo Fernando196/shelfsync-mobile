@@ -4,6 +4,7 @@ import { CirclePlus } from 'lucide-react-native';
 import { ICategory } from '../../interfaces/category.interface';
 import { getCategories, refreshCategories } from '../../lib/categoryCatalog';
 import { createCategory } from '../../services/categories.service';
+import { COLORS } from '../../const/theme.const';
 
 export default function CategoryAutocomplete({
   label,
@@ -71,7 +72,7 @@ export default function CategoryAutocomplete({
             className="pt-3 ml-2"
             disabled={isLoadingAddCat}
           >
-            <CirclePlus color="#4f46e5" />
+            <CirclePlus color={COLORS.primary} />
           </Pressable>
         )}
       </View>

@@ -5,9 +5,10 @@ import { hapticTap, hapticSelect } from '../../lib/haptics';
 import { pickFromLibrary } from '../../lib/pickFromLibrary';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraCaptureModal } from '../camera/CameraCaptureModal';
+import { COLORS } from '../../const/theme.const';
 
 const TILE =
-  'w-24 h-24 rounded-xl bg-indigo-50 border border-dashed border-primary-200 items-center justify-center mr-3 active:scale-95';
+  'w-24 h-24 rounded-xl bg-primary-50 border border-dashed border-primary-200 items-center justify-center mr-3 active:scale-95';
 
 interface PhotoPickerProps {
   photos: string[];
@@ -51,17 +52,17 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
           // En web no hay menu nativo y iOS abre directo la fototeca: dos botones separados.
           <>
             <Pressable onPress={addFromBrowserCamera} className={TILE}>
-              <Camera size={22} color="#4f46e5" />
+              <Camera size={22} color={COLORS.primary} />
             </Pressable>
             <Pressable onPress={addFromLibrary} className={TILE}>
-              <ImagePlus size={22} color="#4f46e5" />
+              <ImagePlus size={22} color={COLORS.primary} />
             </Pressable>
           </>
         ) : (
           <Pressable onPress={openPicker} className={TILE}>
             <View className="items-center">
-              <Camera size={22} color="#4f46e5" />
-              <ImagePlus size={14} color="#4f46e5" style={{ marginTop: 2 }} />
+              <Camera size={22} color={COLORS.primary} />
+              <ImagePlus size={14} color={COLORS.primary} style={{ marginTop: 2 }} />
             </View>
           </Pressable>
         )}

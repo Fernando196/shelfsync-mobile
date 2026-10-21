@@ -6,6 +6,7 @@ import { getStatusHistory } from '../../services/items.service';
 import { hapticError } from '../../lib/haptics';
 import { TONE_STYLES } from './StatusPill';
 import { ITEM_STATUS } from '../../const/itemStatus.const';
+import { COLORS } from '../../const/theme.const';
 
 export function StatusHistory({ itemId, status }: StatusHistoryProps) {
   const [history, setHistory] = useState<IItemStatusHistory[]>([]);
@@ -26,7 +27,7 @@ export function StatusHistory({ itemId, status }: StatusHistoryProps) {
       });
   }, [itemId, status]);
 
-  if (loading && history.length === 0) return <ActivityIndicator color="#4f46e5" />;
+  if (loading && history.length === 0) return <ActivityIndicator color={COLORS.primary} />;
   return (
     <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 mt-4">
       <Text className="text-sm font-semibold text-slate-500 mb-3">Historial</Text>

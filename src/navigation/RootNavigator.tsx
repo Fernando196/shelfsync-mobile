@@ -10,6 +10,7 @@ import ItemDetailScreen from '../screens/ItemDetailScreen';
 import EditProductScreen from '../screens/EditProductScreen';
 import { useRefreshCategories } from '../hooks/useRefreshCategories';
 import { InventoryProvider } from '../state/InventoryContext';
+import { COLORS } from '../const/theme.const';
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -22,7 +23,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function Splash() {
   return (
     <View className="flex-1 items-center justify-center bg-white">
-      <ActivityIndicator color="#4f46e5" />
+      <ActivityIndicator color={COLORS.primary} />
     </View>
   );
 }
@@ -41,12 +42,12 @@ function Gate() {
       <Stack.Screen
         name="ItemDetail"
         component={ItemDetailScreen}
-        options={{ headerShown: true, title: 'Detalle', headerTintColor: '#4f46e5' }}
+        options={{ headerShown: true, title: 'Detalle', headerTintColor: COLORS.primary }}
       />
       <Stack.Screen
         name="EditProduct"
         component={EditProductScreen}
-        options={{ headerShown: true, title: 'Editar', headerTintColor: '#4f46e5' }}
+        options={{ headerShown: true, title: 'Editar', headerTintColor: COLORS.primary }}
       />
     </Stack.Navigator>
   );

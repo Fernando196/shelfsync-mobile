@@ -13,6 +13,7 @@ import { IProductLookup } from '../../interfaces/productLookup.interface';
 import PhotoPicker from '../form/PhotoPicker';
 import { useInventory } from '../../state/InventoryContext';
 import CategoryAutocomplete from '../form/CategoryAutocomplete';
+import { COLORS } from '../../const/theme.const';
 
 function emptyForm() {
   return {
@@ -144,7 +145,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
               <Text>Requiere ensamble</Text>
               <Switch
                 trackColor={{ false: '#cbd5e1', true: '#a5b4fc' }}
-                thumbColor="#4f46e5"
+                thumbColor={COLORS.primary}
                 value={form.needAssembly}
                 onValueChange={(v) => set('needAssembly', v)}
               />
@@ -155,7 +156,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
 
       <View className="flex flex-col bg-slate-50 rounded-2xl p-3 mt-3">
         <View className="flex flex-row gap-4">
-          <Boxes size={18} color="#4f46e5" />
+          <Boxes size={18} color={COLORS.primary} />
           <Text className="text-base font-bold">Inventario y stock</Text>
         </View>
         <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
