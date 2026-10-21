@@ -60,7 +60,8 @@ export default function RootNavigator() {
   return (
     <SessionProvider>
       <InventoryProvider>
-        <NavigationContainer>
+        {/* On web, keep the tab title fixed so "Add to Home Screen" suggests the app name */}
+        <NavigationContainer documentTitle={{ formatter: () => 'ShelfSync' }}>
           <Gate />
         </NavigationContainer>
       </InventoryProvider>
