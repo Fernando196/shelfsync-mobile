@@ -20,6 +20,7 @@ import { readJSON, writeJSON, STORAGE_KEYS } from '../lib/storage';
 import { Screen } from '../components/ui/Screen';
 import { toTicket } from '../lib/toTicket';
 import Chip from '../components/ui/Chip';
+import { COLORS } from '../const/theme.const';
 
 const LABEL_FORMATS = ['58mm', '80mm'];
 
@@ -149,8 +150,8 @@ export default function SettingsScreen() {
         <Text className="text-2xl font-bold text-slate-800 mb-5">Ajustes</Text>
 
         <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 flex-row items-center">
-          <View className="w-12 h-12 rounded-full bg-indigo-50 items-center justify-center mr-3">
-            <User size={22} color="#4f46e5" />
+          <View className="w-12 h-12 rounded-full bg-primary-50 items-center justify-center mr-3">
+            <User size={22} color={COLORS.primary} />
           </View>
           <View className="flex-1">
             <Text className="font-semibold text-slate-800">
@@ -208,12 +209,12 @@ export default function SettingsScreen() {
             <Pressable
               onPress={startScan}
               disabled={scanning || connecting}
-              className="flex-row items-center justify-center bg-indigo-50 rounded-xl py-3 active:scale-95"
+              className="flex-row items-center justify-center bg-primary-50 rounded-xl py-3 active:scale-95"
             >
               {scanning ? (
-                <Radar size={16} color="#4f46e5" />
+                <Radar size={16} color={COLORS.primary} />
               ) : (
-                <Bluetooth size={16} color="#4f46e5" />
+                <Bluetooth size={16} color={COLORS.primary} />
               )}
               <Text className="text-primary-700 font-semibold ml-2 text-sm">
                 {scanning ? 'Buscando dispositivos...' : 'Buscar impresora'}
@@ -250,7 +251,7 @@ export default function SettingsScreen() {
 
         <View className="bg-white rounded-2xl border border-slate-200 p-4">
           <View className="flex-row items-center mb-3">
-            <Ruler size={16} color="#4f46e5" />
+            <Ruler size={16} color={COLORS.primary} />
             <Text className="font-semibold text-slate-800 ml-2">Formato de etiqueta</Text>
           </View>
           <View className="flex-row flex-wrap">

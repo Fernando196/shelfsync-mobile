@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, Pressable, Alert, Platform } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
-import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Trash2 } from 'lucide-react-native';
+import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil } from 'lucide-react-native';
 import type { RootStackParamList } from '../navigation/RootNavigator';
 import { IInventoryItem } from '../interfaces/item.interface';
-import { deleteItem, getItemById } from '../services/items.service';
+import { getItemById } from '../services/items.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import StatusPill from '../components/item/StatusPill';
 import { getItemStatus } from '../lib/statusItem';
 import { ITEM_ACTIONS } from '../const/itemStatus.const';
-import ButtonPill from '../components/ui/ButtonPill';
 import { CommentSheet } from '../components/item/CommentSheet';
 import { useItemStatusAction } from '../hooks/useItemStatusAction';
 import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
@@ -19,6 +18,7 @@ import { IToast, Toast } from '../components/ui/Toast';
 import { StatusHistory } from '../components/item/StatusHistory';
 import { useInventory } from '../state/InventoryContext';
 import { ItemPhotoStrip } from '../components/item/ItemPhotoStrip';
+import { COLORS } from '../const/theme.const';
 
 export default function ItemDetailScreen() {
   const route = useRoute<RouteProp<RootStackParamList, 'ItemDetail'>>();
@@ -28,13 +28,12 @@ export default function ItemDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [printing, setPrinting] = useState(false);
   const [toast, setToast] = useState<IToast | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
   const { changing, pendingAction, handleAction, runAction, cancelComment } = useItemStatusAction(
     id,
     setItem,
   );
-  const { updateItem, removeItem } = useInventory();
+  const { updateItem } = useInventory();
 
   useEffect(() => {
     if (item != null) {
@@ -95,32 +94,6 @@ export default function ItemDetailScreen() {
     }, [id]),
   );
 
-  const handleDelete = () => {
-    Alert.alert(
-      'Eliminar producto',
-      'Esta accion quita el articulo del inventario. No se puede deshacer desde la app.',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: async () => {
-            setDeleting(true);
-            try {
-              await deleteItem(id);
-              removeItem(id);
-              navigation.goBack();
-            } catch (e: any) {
-              Alert.alert('No se pudo eliminar', e?.message ?? String(e));
-            } finally {
-              setDeleting(false);
-            }
-          },
-        },
-      ],
-    );
-  };
-
   if (error) {
     return (
       <View className="flex-1 items-center justify-center bg-surface px-8">
@@ -133,7 +106,7 @@ export default function ItemDetailScreen() {
   if (loading && !item) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#4f46e5" />
+        <ActivityIndicator color={COLORS.primary} />
       </View>
     );
   }
@@ -147,27 +120,29 @@ export default function ItemDetailScreen() {
     <View className="flex-1 bg-surface">
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
         <ItemPhotoStrip item={item} onChange={setItem} />
+        {/* Encabezado: nombre, codigo/SKU y estatus con aire entre cada uno */}
         <View className="flex-row items-start justify-between">
           <View className="flex-1 mr-3">
-            <Text className="text-2xl font-bold text-slate-800">
+            <Text className="text-2xl font-bold text-slate-900 leading-tight">
               {item.name || item.productLookup.description}
             </Text>
-            <Text className="text-base font-semibold text-slate-500">
+            <Text className="text-sm text-slate-500 mt-1">
               {formatItemCode(item.code)}
+              {item.productLookup?.sku ? `  ·  SKU ${item.productLookup.sku}` : ''}
             </Text>
-            <StatusPill label={status.label} tone={status.tone} />
-            {item.productLookup?.sku && (
-              <Text className="text-slate-400 text-sm mb-4">SKU {item.productLookup.sku}</Text>
-            )}
+            <View className="mt-3">
+              <StatusPill label={status.label} tone={status.tone} />
+            </View>
           </View>
           <Pressable
             onPress={() => navigation.navigate('EditProduct', { id: item.id })}
-            className="w-10 h-10 rounded-full bg-indigo-50 items-center justify-center active:scale-95"
+            className="w-11 h-11 rounded-full bg-white border border-slate-200 items-center justify-center active:opacity-70"
           >
-            <Pencil size={17} color="#4f46e5" />
+            <Pencil size={18} color={COLORS.primary} />
           </Pressable>
         </View>
-        <View className="bg-white rounded-2xl border border-slate-200 p-4 mb-4">
+
+        <View className="bg-white rounded-2xl border border-slate-200 px-4 py-2 mt-5">
           <View className="flex-row items-center py-2">
             <Boxes size={16} color="#64748b" />
             <Text className="text-slate-500 ml-2 flex-1">Cantidad</Text>
@@ -185,48 +160,73 @@ export default function ItemDetailScreen() {
             <Text className="text-slate-500 ml-2 flex-1">Categoria</Text>
             <Text className="font-semibold text-slate-800">{item.category?.name || '-'}</Text>
           </View>
-
-          {actions.map((action) => (
-            <ButtonPill
-              disabled={changing}
-              key={action.to}
-              onPress={() => handleAction(action)}
-              label={action.label}
-              variant={action.variant}
-            />
-          ))}
         </View>
+
+        {/* Cambios de estatus en su propia seccion: principal relleno, otros con contorno,
+            danado como enlace para que no compita con el siguiente paso. */}
+        {actions.length > 0 && (
+          <View className="mt-6">
+            <Text className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              Siguiente paso
+            </Text>
+            {actions
+              .filter((a) => a.variant !== 'danger')
+              .map((action) => (
+                <Pressable
+                  key={action.to}
+                  disabled={changing}
+                  onPress={() => handleAction(action)}
+                  className={`items-center rounded-xl py-3.5 mb-2 active:opacity-80 ${
+                    action.variant === 'primary'
+                      ? 'bg-accent-600'
+                      : 'bg-white border border-slate-300'
+                  } ${changing ? 'opacity-50' : ''}`}
+                >
+                  <Text
+                    className={`text-base font-semibold ${
+                      action.variant === 'primary' ? 'text-white' : 'text-slate-800'
+                    }`}
+                  >
+                    {action.label}
+                  </Text>
+                </Pressable>
+              ))}
+            {actions
+              .filter((a) => a.variant === 'danger')
+              .map((action) => (
+                <Pressable
+                  key={action.to}
+                  disabled={changing}
+                  onPress={() => handleAction(action)}
+                  className="flex-row items-center justify-center py-3 active:opacity-70"
+                >
+                  <TriangleAlert size={16} color="#e11d48" />
+                  <Text className="text-rose-600 font-semibold ml-2">
+                    Marcar como {action.label.toLowerCase()}
+                  </Text>
+                </Pressable>
+              ))}
+          </View>
+        )}
+
         {/* En web no hay Bluetooth; la impresion web llegara con la API de impresion */}
         {Platform.OS !== 'web' && (
           <Pressable
             onPress={handlePrint}
             disabled={printing}
-            className="flex-row items-center justify-center bg-primary-600 rounded-xl py-4 active:scale-95 mb-3"
+            className="flex-row items-center justify-center bg-white border border-slate-300 rounded-xl py-3.5 mt-4 active:opacity-80"
           >
             {printing ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={COLORS.primary} />
             ) : (
               <>
-                <Printer size={18} color="#fff" />
-                <Text className="text-white font-semibold ml-2">Reimprimir etiqueta</Text>
+                <Printer size={18} color={COLORS.primary} />
+                <Text className="text-slate-800 font-semibold ml-2">Reimprimir etiqueta</Text>
               </>
             )}
           </Pressable>
         )}
-        <Pressable
-          onPress={handleDelete}
-          disabled={deleting}
-          className="flex-row items-center justify-center bg-rose-50 rounded-xl py-4 active:scale-95"
-        >
-          {deleting ? (
-            <ActivityIndicator color="#f43f5e" />
-          ) : (
-            <>
-              <Trash2 size={18} color="#f43f5e" />
-              <Text className="text-rose-600 font-semibold ml-2">Eliminar producto</Text>
-            </>
-          )}
-        </Pressable>
+
         <StatusHistory itemId={item.id} status={item.status} />
       </ScrollView>
 

@@ -10,16 +10,18 @@ import {
   Image,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { Tag, Boxes, MapPin, Minus, Plus, Camera } from 'lucide-react-native';
+import { Tag, Boxes, MapPin, Minus, Plus, Camera, Trash2 } from 'lucide-react-native';
+import { useInventory } from '../state/InventoryContext';
 import AccordionSection from '../components/ui/AccordionSection';
 import { hapticSuccess, hapticError } from '../lib/haptics';
 import { IEditForm, IInventoryItem } from '../interfaces/item.interface';
-import { getItemById, updateItem } from '../services/items.service';
+import { deleteItem, getItemById, updateItem } from '../services/items.service';
 import { formatItemCode } from '../lib/formatItemCode';
 import CategoryAutocomplete from '../components/form/CategoryAutocomplete';
 import LocationPickerMap from '../components/form/LocationPickerMap';
 import PhotoPicker from '../components/form/PhotoPicker';
 import { photoUrl, uploadPhoto } from '../services/files.service';
+import { COLORS } from '../const/theme.const';
 
 function emptyForm(): IEditForm {
   return {
@@ -38,6 +40,35 @@ export default function EditProductScreen() {
   const { id } = route.params;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const { removeItem } = useInventory();
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Eliminar producto',
+      'Esta accion quita el articulo del inventario. No se puede deshacer desde la app.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleting(true);
+            try {
+              await deleteItem(id);
+              removeItem(id);
+              // Editar y Detalle ya no tienen item: volver a la lista.
+              navigation.popToTop();
+            } catch (e: any) {
+              Alert.alert('No se pudo eliminar', e?.message ?? String(e));
+            } finally {
+              setDeleting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
   const [item, setItem] = useState<IInventoryItem | null>(null);
 
   const [form, setForm] = useState<IEditForm>(emptyForm());
@@ -92,7 +123,7 @@ export default function EditProductScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#4f46e5" />
+        <ActivityIndicator color={COLORS.primary} />
       </View>
     );
   }
@@ -107,7 +138,7 @@ export default function EditProductScreen() {
         Los cambios se guardan directo en el servidor
       </Text>
 
-      <AccordionSection title="Identificacion del mueble" icon={<Tag size={18} color="#4f46e5" />}>
+      <AccordionSection title="Identificacion del mueble" icon={<Tag size={18} color={COLORS.primary} />}>
         <Text className="text-xs font-semibold text-slate-500 mb-1">
           Codigo: {item && formatItemCode(item.code)}
         </Text>
@@ -132,7 +163,7 @@ export default function EditProductScreen() {
         />
       </AccordionSection>
 
-      <AccordionSection title="Inventario y stock" icon={<Boxes size={18} color="#4f46e5" />}>
+      <AccordionSection title="Inventario y stock" icon={<Boxes size={18} color={COLORS.primary} />}>
         <Text className="text-xs font-semibold text-slate-500 mb-2">Cantidad disponible</Text>
         <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
           <Pressable
@@ -158,7 +189,7 @@ export default function EditProductScreen() {
         />
       </AccordionSection>
 
-      <AccordionSection title="Fotos" icon={<Camera size={18} color="#4f46e5" />}>
+      <AccordionSection title="Fotos" icon={<Camera size={18} color={COLORS.primary} />}>
         {(item?.files?.length ?? 0) > 0 && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-3">
             {item?.files?.map((p) => (
@@ -176,7 +207,7 @@ export default function EditProductScreen() {
 
       <AccordionSection
         title="Geolocalizacion en bodega"
-        icon={<MapPin size={18} color="#4f46e5" />}
+        icon={<MapPin size={18} color={COLORS.primary} />}
         defaultOpen={false}
       >
         <LocationPickerMap
@@ -198,6 +229,22 @@ export default function EditProductScreen() {
           <ActivityIndicator color="#fff" />
         ) : (
           <Text className="text-white font-semibold text-base">Guardar cambios</Text>
+        )}
+      </Pressable>
+
+      {/* Eliminar vive aqui y no en el detalle, para que no se toque por error */}
+      <Pressable
+        onPress={handleDelete}
+        disabled={deleting || saving}
+        className="flex-row items-center justify-center py-4 mt-4 active:opacity-70"
+      >
+        {deleting ? (
+          <ActivityIndicator color="#e11d48" />
+        ) : (
+          <>
+            <Trash2 size={16} color="#e11d48" />
+            <Text className="text-rose-600 font-semibold ml-2">Eliminar producto</Text>
+          </>
         )}
       </Pressable>
     </ScrollView>
