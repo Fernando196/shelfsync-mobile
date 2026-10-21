@@ -19,6 +19,8 @@
       html,
       body {
         height: 100%;
+        /* No double-tap zoom */
+        touch-action: manipulation;
       }
       /* These styles disable body scrolling if you are using <ScrollView> */
       body {
@@ -42,6 +44,21 @@
         flex: 1;
       }
     </style>
+    <!-- iOS Safari ignores user-scalable=no, so pinch would zoom the whole app: block it here -->
+    <script>
+      // Capture phase on window: runs before any app handler can stop the event.
+      var opts = { passive: false, capture: true };
+      ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
+        window.addEventListener(type, function (e) { e.preventDefault(); }, opts);
+      });
+      ['touchstart', 'touchmove'].forEach(function (type) {
+        window.addEventListener(
+          type,
+          function (e) { if (e.touches.length > 1) e.preventDefault(); },
+          opts
+        );
+      });
+    </script>
   </head>
 
   <body>
