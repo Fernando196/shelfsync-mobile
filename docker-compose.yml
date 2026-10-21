@@ -1,0 +1,9 @@
+services:
+  shelfsync-web:
+    build:
+      context: .
+      args:
+        EXPO_PUBLIC_API_BASE_URL: ${EXPO_PUBLIC_API_BASE_URL:-https://shelfsync-api.fernandomorales.dev}
+    restart: unless-stopped
+    ports:
+      - '8090:80'
