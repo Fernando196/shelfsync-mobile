@@ -13,8 +13,7 @@ import { NotFoundSheet } from '../components/reception/NotFoundSheet';
 import { IInventoryItem } from '../interfaces/item.interface';
 import { formatItemCode } from '../lib/formatItemCode';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
-import { toTicket } from '../lib/toTicket';
+import { isPrinterReady, printLabel } from '../printing/printLabel';
 import { getItemById } from '../services/items.service';
 import { DETAIL_ON_SCAN } from '../const/itemStatus.const';
 import { ItemStatusSheet } from '../components/item/ItemStatusSheet';
@@ -98,7 +97,7 @@ export default function ScannerScreen() {
       toastSaved(item);
       return;
     }
-    if (!getConnectedPrinter()) {
+    if (!isPrinterReady()) {
       hapticError();
       Alert.alert(t('scanner.savedNotPrinted'), t('scanner.noPrinter'), [
         { text: t('common.ok'), style: 'cancel', onPress: () => toastSaved(item) },
@@ -108,7 +107,7 @@ export default function ScannerScreen() {
     }
     try {
       setLoading(true);
-      await printInventoryTicket(toTicket(item));
+      await printLabel(item);
       toastSaved(item);
       setPrinted(true);
     } catch (e: any) {

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, Pressable, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Pressable, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect, RouteProp } from '@react-navigation/native';
 import { MapPin, Boxes, Tag, Printer, TriangleAlert, Pencil, Store } from 'lucide-react-native';
 import { MarketplaceSheet } from '../components/item/MarketplaceSheet';
@@ -15,8 +15,7 @@ import { ITEM_ACTIONS, ITEM_STATUS } from '../const/itemStatus.const';
 import { useTranslation } from 'react-i18next';
 import { CommentSheet } from '../components/item/CommentSheet';
 import { useItemStatusAction } from '../hooks/useItemStatusAction';
-import { getConnectedPrinter, printInventoryTicket } from '../printing/PrinterService';
-import { toTicket } from '../lib/toTicket';
+import { isPrinterReady, printLabel } from '../printing/printLabel';
 import { hapticError, hapticSuccess } from '../lib/haptics';
 import { IToast, Toast } from '../components/ui/Toast';
 import { StatusHistory } from '../components/item/StatusHistory';
@@ -59,7 +58,7 @@ export default function ItemDetailScreen() {
   // Un solo toque: imprime directo. Solo se interrumpe si no hay impresora o falla.
   const handlePrint = async () => {
     if (!item) return;
-    if (!getConnectedPrinter()) {
+    if (!isPrinterReady()) {
       hapticError();
       Alert.alert(t('detail.noPrinterTitle'), t('detail.noPrinterMessage'), [
         { text: t('common.cancel'), style: 'cancel' },
@@ -69,7 +68,7 @@ export default function ItemDetailScreen() {
     }
     setPrinting(true);
     try {
-      await printInventoryTicket(toTicket(item));
+      await printLabel(item);
       hapticSuccess();
       setToast({ title: t('detail.labelPrinted'), subtitle: item.name || '' });
     } catch (e: any) {
@@ -231,23 +230,20 @@ export default function ItemDetailScreen() {
           </View>
         )}
 
-        {/* En web no hay Bluetooth; la impresion web llegara con la API de impresion */}
-        {Platform.OS !== 'web' && (
-          <Pressable
-            onPress={handlePrint}
-            disabled={printing}
-            className="flex-row items-center justify-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl py-3.5 mt-4 active:opacity-80"
-          >
-            {printing ? (
-              <ActivityIndicator color={COLORS.primary} />
-            ) : (
-              <>
-                <Printer size={18} color={COLORS.primary} />
-                <Text className="text-slate-800 dark:text-slate-100 font-semibold ml-2">{t('detail.reprint')}</Text>
-              </>
-            )}
-          </Pressable>
-        )}
+        <Pressable
+          onPress={handlePrint}
+          disabled={printing}
+          className="flex-row items-center justify-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl py-3.5 mt-4 active:opacity-80"
+        >
+          {printing ? (
+            <ActivityIndicator color={COLORS.primary} />
+          ) : (
+            <>
+              <Printer size={18} color={COLORS.primary} />
+              <Text className="text-slate-800 dark:text-slate-100 font-semibold ml-2">{t('detail.reprint')}</Text>
+            </>
+          )}
+        </Pressable>
 
         <Pressable
           onPress={() => setShowMarketplace(true)}

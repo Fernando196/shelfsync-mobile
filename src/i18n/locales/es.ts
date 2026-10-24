@@ -137,6 +137,9 @@ const es = {
       'Tiempo de espera agotado contactando al servidor. Revisa la conexion o la IP configurada.',
     photoMissing: 'La foto ya no existe en el telefono',
     noPrinter: 'No hay una impresora conectada. Conecta la MP210 primero.',
+    noPrintServer: 'Falta configurar la API de impresion (EXPO_PUBLIC_PRINTER_URL).',
+    printServerUnreachable: 'No se pudo contactar la impresora. Revisa que la laptop este prendida.',
+    printTimeout: 'La impresora tardo demasiado en responder.',
     galleryPermission: 'Se necesita acceso a la galeria para elegir fotos.',
   },
   statusSheet: {

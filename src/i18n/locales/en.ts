@@ -138,6 +138,9 @@ const en: typeof es = {
     timeout: 'The server took too long to respond. Check the connection.',
     photoMissing: 'The photo no longer exists on the phone',
     noPrinter: 'No printer connected. Connect the MP210 first.',
+    noPrintServer: 'The print API is not configured (EXPO_PUBLIC_PRINTER_URL).',
+    printServerUnreachable: 'Could not reach the printer. Check that the laptop is on.',
+    printTimeout: 'The printer took too long to respond.',
     galleryPermission: 'Gallery access is needed to choose photos.',
   },
   statusSheet: {
