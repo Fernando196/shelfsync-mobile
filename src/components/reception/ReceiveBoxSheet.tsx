@@ -1,4 +1,6 @@
 import { Boxes, Minus, Package, Plus } from 'lucide-react-native';
+import { parseMoney } from '../../lib/money';
+import { useTranslation } from 'react-i18next';
 import { View, Text, Pressable, Alert, Switch } from 'react-native';
 import { useEffect, useState, useRef } from 'react';
 import { Input } from '../ui/Input';
@@ -13,6 +15,7 @@ import { IProductLookup } from '../../interfaces/productLookup.interface';
 import PhotoPicker from '../form/PhotoPicker';
 import { useInventory } from '../../state/InventoryContext';
 import CategoryAutocomplete from '../form/CategoryAutocomplete';
+import { COLORS } from '../../const/theme.const';
 
 function emptyForm() {
   return {
@@ -25,10 +28,12 @@ function emptyForm() {
     description: '',
     needAssembly: false,
     categoryId: '',
+    cost: '',
   };
 }
 
 export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IReceiveBoxSheetProps) {
+  const { t } = useTranslation();
   const sheetRef = useRef<BottomSheetHandle>(null);
   const [form, setForm] = useState(() => ({
     ...emptyForm(),
@@ -43,8 +48,8 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         const perm = await Location.requestForegroundPermissionsAsync();
         if (!perm.granted) {
           Alert.alert(
-            'Permiso requerido',
-            'Se necesita acceso a la ubicacion para registrar donde esta el mueble.',
+            t('reception.locationPermissionTitle'),
+            t('reception.locationPermissionMessage'),
           );
           return;
         }
@@ -56,7 +61,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         }));
       } catch (e: any) {
         hapticError();
-        Alert.alert('No se pudo obtener la ubicacion', e?.message ?? String(e));
+        Alert.alert(t('reception.locationFailed'), e?.message ?? String(e));
       }
     })();
   }, []);
@@ -75,6 +80,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         qty: form.qty,
         location: form.location,
         notes: form.notes?.trim(),
+        cost: parseMoney(form.cost),
         longitude: form.longitude || undefined,
         latitude: form.latitude || undefined,
         categoryId: form.categoryId || undefined,
@@ -102,7 +108,7 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
       onSaved(newItem, print);
     } catch (e: any) {
       hapticError();
-      Alert.alert('No se pudo guardar', e?.message ?? String(e));
+      Alert.alert(t('reception.saveFailed'), e?.message ?? String(e));
     } finally {
       setSaving(false);
     }
@@ -111,40 +117,42 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
   return (
     <BottomSheet
       ref={sheetRef}
-      title={newProduct ? 'Producto nuevo' : 'Recibir caja'}
+      title={newProduct ? t('reception.newProduct') : t('reception.receiveBox')}
       onClose={onClose}
     >
-      <View className="bg-slate-50 rounded-2xl p-3">
+      <View className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-3">
         <View className="flex flex-row items-center">
-          <View className="w-12 h-12 rounded-xl bg-slate-200 items-center justify-center mr-3">
+          <View className="w-12 h-12 rounded-xl bg-slate-200 dark:bg-slate-600 items-center justify-center mr-3">
             <Package size={22} color="#64748b" />
           </View>
           <View className="flex-1">
-            <Text className="text-base font-semibold text-slate-800" numberOfLines={2}>
-              {product?.description || form.description.trim() || 'Sin descripción'}
+            <Text className="text-base font-semibold text-slate-800 dark:text-slate-100" numberOfLines={2}>
+              {product?.description || form.description.trim() || t('reception.noDescription')}
             </Text>
-            <Text className="text-slate-500 text-sm mt-0.5">
-              Barcode: {product?.barcode || newProduct?.barcode || 'Sin codigo de barras'}
+            <Text className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+              {t('reception.barcode', {
+                value: product?.barcode || newProduct?.barcode || t('reception.noBarcode'),
+              })}
             </Text>
-            <Text className="text-slate-500 text-sm mt-0.5">
-              SKU: {product?.sku || newProduct?.sku || 'Sin sku'}
+            <Text className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+              {t('reception.sku', { value: product?.sku || newProduct?.sku || t('reception.noSku') })}
             </Text>
           </View>
         </View>
         {newProduct && (
           <View className="mt-2">
             <Input
-              label="Descripción del manifiesto"
+              label={t('reception.manifestDescription')}
               value={form.description}
               onChangeText={(v) => set('description', v)}
               multiline
               textAlignVertical="top"
             />
             <View className="flex flex-row items-center gap-4 mt-3">
-              <Text>Requiere ensamble</Text>
+              <Text className="text-slate-800 dark:text-slate-100">{t('actions.requiresAssembly')}</Text>
               <Switch
-                trackColor={{ false: '#cbd5e1', true: '#a5b4fc' }}
-                thumbColor="#4f46e5"
+                trackColor={{ false: '#cbd5e1', true: '#6ee7b7' }}
+                thumbColor={COLORS.accent}
                 value={form.needAssembly}
                 onValueChange={(v) => set('needAssembly', v)}
               />
@@ -153,79 +161,89 @@ export function ReceiveBoxSheet({ product, newProduct, onClose, onSaved }: IRece
         )}
       </View>
 
-      <View className="flex flex-col bg-slate-50 rounded-2xl p-3 mt-3">
+      <View className="flex flex-col bg-slate-50 dark:bg-slate-800 rounded-2xl p-3 mt-3">
         <View className="flex flex-row gap-4">
-          <Boxes size={18} color="#4f46e5" />
-          <Text className="text-base font-bold">Inventario y stock</Text>
+          <Boxes size={18} color={COLORS.primary} />
+          <Text className="text-base font-bold text-slate-800 dark:text-slate-100">{t('reception.stockSection')}</Text>
         </View>
-        <View className="flex-row items-center self-start bg-slate-100 rounded-xl mb-4">
+        <View className="flex-row items-center self-start bg-slate-100 dark:bg-slate-700 rounded-xl mb-4">
           <Pressable
             onPress={() => set('qty', Math.max(1, form.qty - 1))}
             className="w-11 h-11 items-center justify-center active:scale-95"
           >
-            <Minus size={18} color="#334155" />
+            <Minus size={18} color={COLORS.primary} />
           </Pressable>
-          <Text className="w-10 text-center text-lg font-bold text-slate-800">{form.qty}</Text>
+          <Text className="w-10 text-center text-lg font-bold text-slate-800 dark:text-slate-100">{form.qty}</Text>
           <Pressable
             onPress={() => set('qty', form.qty + 1)}
             className="w-11 h-11 items-center justify-center active:scale-95"
           >
-            <Plus size={18} color="#334155" />
+            <Plus size={18} color={COLORS.primary} />
           </Pressable>
         </View>
 
+        {/* Opcional: a veces no se sabe al recibir; se puede llenar despues en Editar. */}
         <Input
-          label="Ubicacion en bodega"
-          value={form.location}
-          onChangeText={(v) => set('location', v)}
-          placeholder="Pasillo B - Estante 4 - Tarima 12"
+          label={t('pricing.costOptional')}
+          value={form.cost}
+          onChangeText={(v) => set('cost', v)}
+          keyboardType="decimal-pad"
+          placeholder="0.00"
+          className="mb-2"
         />
 
         <Input
-          label="Observaciones"
+          label={t('reception.warehouseLocation')}
+          value={form.location}
+          onChangeText={(v) => set('location', v)}
+          placeholder={t('reception.locationPlaceholder')}
+        />
+
+        <Input
+          label={t('reception.notes')}
           multiline
           textAlignVertical="top"
           value={form.notes}
           onChangeText={(v) => set('notes', v)}
-          placeholder="Caja abierta, le faltan piezas, etc."
+          placeholder={t('reception.notesPlaceholder')}
           placeholderTextColor="#94a3b8"
           className="mt-2"
         />
 
-        <Text className="text-sm font-semibold text-slate-500 my-2">Categoria (Opcional)</Text>
+        <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400 my-2">{t('reception.categoryOptional')}</Text>
         <CategoryAutocomplete
-          label="Buscar categoria"
+          label={t('reception.searchCategory')}
           onChange={(id) => set('categoryId', id)}
           selected={form.categoryId || ''}
         />
 
         <View className="mt-4">
-          <Text className="text-base font-bold mb-4">Fotos de caja o producto</Text>
+          <Text className="text-base font-bold mb-4 text-slate-800 dark:text-slate-100">{t('reception.photosSection')}</Text>
           <PhotoPicker photos={form.photos} onChange={(p) => set('photos', p)} />
         </View>
       </View>
 
       <Pressable
-        className={` bg-primary-600 rounded-xl py-3 items-center mt-3 ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
+        className={` bg-primary-600 dark:bg-slate-600 rounded-xl py-3 items-center mt-3 ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
         disabled={saving || (!!newProduct && !form.description.trim())}
         onPress={() => handleSave(true)}
       >
-        <Text className="text-sm font-semibold text-white">Guardar e imprimir</Text>
+        <Text className="text-sm font-semibold text-white">{t('reception.saveAndPrint')}</Text>
       </Pressable>
 
       <View className="flex-row mt-5">
         <Pressable
           onPress={() => sheetRef.current?.close()}
-          className="flex-1 bg-slate-100 rounded-xl py-3 mr-2 items-center"
+          className="flex-1 bg-slate-100 dark:bg-slate-700 rounded-xl py-3 mr-2 items-center"
         >
-          <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
+          <Text className="text-slate-700 dark:text-slate-200 font-semibold text-sm">{t('common.cancel')}</Text>
         </Pressable>
         <Pressable
-          className={`flex-1 bg-slate-100 rounded-xl py-3 items-center ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
+          className={`flex-1 bg-slate-100 dark:bg-slate-700 rounded-xl py-3 items-center ${saving || (!!newProduct && !form.description.trim()) ? 'opacity-50' : ''}`}
           disabled={saving || (!!newProduct && !form.description.trim())}
           onPress={() => handleSave(false)}
         >
-          <Text className="text-sm font-semibold text-slate-700">Solo guardar</Text>
+          <Text className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('reception.saveOnly')}</Text>
         </Pressable>
       </View>
     </BottomSheet>

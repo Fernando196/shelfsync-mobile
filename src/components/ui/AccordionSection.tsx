@@ -25,11 +25,11 @@ export default function AccordionSection({
   };
 
   return (
-    <View className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-4 overflow-hidden">
+    <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mb-4 overflow-hidden">
       <Pressable onPress={toggle} className="flex-row items-center justify-between px-4 py-4 active:bg-slate-50">
         <View className="flex-row items-center">
           {icon}
-          <Text className="text-base font-semibold text-slate-800 ml-2">{title}</Text>
+          <Text className="text-base font-semibold text-slate-800 dark:text-slate-100 ml-2">{title}</Text>
         </View>
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
           <ChevronDown size={18} color="#64748b" />

@@ -8,13 +8,13 @@ interface InputProps extends TextInputProps {
 export function Input({ label, error, multiline, className, ...rest }: InputProps) {
   return (
     <View className={className}>
-      {label ? <Text className="text-sm font-semibold text-slate-500">{label}</Text> : null}
+      {label ? <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400">{label}</Text> : null}
       <TextInput
         {...rest}
         multiline={multiline}
         className={
-          'mt-3 border rounded-xl px-4 py-3 text-base text-slate-800 ' +
-          (error ? 'border-red-500' : 'border-slate-300') +
+          'mt-3 border rounded-xl px-4 py-3 text-base text-slate-800 dark:text-slate-100 ' +
+          (error ? 'border-red-500' : 'border-slate-300 dark:border-slate-600') +
           ' ' +
           (multiline ? 'h-24' : '')
         }

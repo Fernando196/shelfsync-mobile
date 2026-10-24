@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import i18n from '../i18n';
 import { ItemAction } from '../const/itemStatus.const';
 import { IInventoryItem } from '../interfaces/item.interface';
-import { updateItemStatus } from '../services/items.service';
+import { updateItem, updateItemStatus } from '../services/items.service';
 import { hapticError } from '../lib/haptics';
 import { Alert } from 'react-native';
 
@@ -10,18 +11,21 @@ export function useItemStatusAction(itemId: string, onUpdated: (item: IInventory
   const [pendingAction, setPendingAction] = useState<ItemAction | null>(null);
 
   const handleAction = (action: ItemAction) => {
-    if (action.needsComment) setPendingAction(action);
+    // Daño pide motivo y vendido pide precio: primero se abre su hoja.
+    if (action.needsComment || action.needsPrice) setPendingAction(action);
     else runAction(action);
   };
 
-  const runAction = async (action: ItemAction, comment?: string) => {
+  // price null/undefined = no tocar el precio que ya tenia.
+  const runAction = async (action: ItemAction, comment?: string, price?: number | null) => {
     setChanging(true);
     try {
+      if (price != null) await updateItem(itemId, { price });
       onUpdated(await updateItemStatus(itemId, action.to, comment));
       setPendingAction(null);
     } catch (err: any) {
       hapticError();
-      Alert.alert('No se pudo cambiar', err.message);
+      Alert.alert(i18n.t('actions.changeFailed'), err.message);
     } finally {
       setChanging(false);
     }

@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Image, Pressable, ScrollView, Alert } from 'react-native';
 import { Camera, ImagePlus, X } from 'lucide-react-native';
 import { hapticTap, hapticSelect } from '../../lib/haptics';
 import { pickFromLibrary } from '../../lib/pickFromLibrary';
 import { CameraCaptureModal } from '../camera/CameraCaptureModal';
+import { COLORS } from '../../const/theme.const';
+
+const TILE =
+  'w-24 h-24 rounded-xl bg-primary-50 dark:bg-slate-800 border border-dashed border-primary-200 dark:border-slate-600 items-center justify-center mr-3 active:scale-95';
 
 interface PhotoPickerProps {
   photos: string[];
@@ -11,6 +16,7 @@ interface PhotoPickerProps {
 }
 
 export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
+  const { t } = useTranslation();
   const [cameraOpen, setCameraOpen] = useState(false);
 
   const addFromLibrary = async () => {
@@ -20,10 +26,10 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
 
   const openPicker = () => {
     hapticTap();
-    Alert.alert('Agregar foto', 'Elige una opcion', [
-      { text: 'Tomar foto', onPress: () => setCameraOpen(true) },
-      { text: 'Elegir de galeria', onPress: addFromLibrary },
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert(t('photoPicker.addTitle'), t('photoPicker.addMessage'), [
+      { text: t('photoPicker.takePhoto'), onPress: () => setCameraOpen(true) },
+      { text: t('photos.chooseFromGallery'), onPress: addFromLibrary },
+      { text: t('common.cancel'), style: 'cancel' },
     ]);
   };
 
@@ -35,13 +41,10 @@ export default function PhotoPicker({ photos, onChange }: PhotoPickerProps) {
   return (
     <>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <Pressable
-          onPress={openPicker}
-          className="w-24 h-24 rounded-xl bg-indigo-50 border border-dashed border-primary-200 items-center justify-center mr-3 active:scale-95"
-        >
+        <Pressable onPress={openPicker} className={TILE}>
           <View className="items-center">
-            <Camera size={22} color="#4f46e5" />
-            <ImagePlus size={14} color="#4f46e5" style={{ marginTop: 2 }} />
+            <Camera size={22} color={COLORS.primary} />
+            <ImagePlus size={14} color={COLORS.primary} style={{ marginTop: 2 }} />
           </View>
         </Pressable>
 

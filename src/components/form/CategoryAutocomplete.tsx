@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, Text, TextInput, View } from 'react-native';
 import { CirclePlus } from 'lucide-react-native';
 import { ICategory } from '../../interfaces/category.interface';
 import { getCategories, refreshCategories } from '../../lib/categoryCatalog';
 import { createCategory } from '../../services/categories.service';
+import { COLORS } from '../../const/theme.const';
 
 export default function CategoryAutocomplete({
   label,
@@ -14,6 +16,7 @@ export default function CategoryAutocomplete({
   selected: string;
   onChange: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [query, setQuery] = useState<string>('');
   const [isLoadingAddCat, setIsLoadingAddCat] = useState<boolean>(false);
@@ -47,7 +50,7 @@ export default function CategoryAutocomplete({
       const updated = await refreshCategories();
       setCategories(updated);
     } catch (e: any) {
-      Alert.alert('No se pudo crear la categoria', e.message);
+      Alert.alert(t('category.createFailed'), e.message);
     } finally {
       setIsLoadingAddCat(false);
     }
@@ -60,7 +63,7 @@ export default function CategoryAutocomplete({
           value={query}
           onChangeText={setQuery}
           placeholder={label}
-          className="border border-slate-200 rounded-xl px-4 py-3 mb-4 text-base flex-1"
+          className="border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 mb-4 text-base text-slate-800 dark:text-slate-100 flex-1"
           placeholderTextColor="#94a3b8"
         />
         {text !== '' && !exists && (
@@ -71,7 +74,7 @@ export default function CategoryAutocomplete({
             className="pt-3 ml-2"
             disabled={isLoadingAddCat}
           >
-            <CirclePlus color="#4f46e5" />
+            <CirclePlus color={COLORS.primary} />
           </Pressable>
         )}
       </View>
@@ -85,12 +88,12 @@ export default function CategoryAutocomplete({
               }}
               className={`px-4 py-2 rounded-full mr-2 mb-2 border active:scale-95 ${
                 categorie.id === selected
-                  ? 'bg-primary-600 border-primary-600'
-                  : 'bg-white border-slate-200'
+                  ? 'bg-primary-600 dark:bg-slate-600 border-primary-600 dark:border-slate-300'
+                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700'
               }`}
             >
               <Text
-                className={`text-sm font-medium ${categorie.id == selected ? 'text-white' : 'text-slate-600'}`}
+                className={`text-sm font-medium ${categorie.id == selected ? 'text-white' : 'text-slate-600 dark:text-slate-300'}`}
               >
                 {categorie.name}
               </Text>

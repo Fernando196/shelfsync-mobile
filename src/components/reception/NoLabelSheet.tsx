@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { IProductLookup } from '../../interfaces/productLookup.interface';
 import { useEffect, useState, useRef } from 'react';
@@ -7,6 +8,7 @@ import { searchProducts } from '../../services/productLookup.service';
 import { normalize } from '../../lib/normalize';
 
 export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps) {
+  const { t } = useTranslation();
   const sheetRef = useRef<BottomSheetHandle>(null);
   const [term, setTerm] = useState<string>('');
   const [results, setResults] = useState<IProductLookup[]>([]);
@@ -49,57 +51,62 @@ export function NoLabelSheet({ onClose, onCreate, onSelect }: NoLabelSheetProps)
     <Input
       value={term}
       onChangeText={(v) => setTerm(v)}
-      label="Descripción del producto"
+      label={t('reception.productDescription')}
       autoFocus
       className="mb-4"
     />
   );
 
   const actions = (
-    <View className="flex-row">
-      <Pressable
-        onPress={() => onCreate(term.trim())}
-        className={`flex-1 bg-primary-600  rounded-xl py-3 mr-2 items-center ${!canCreate ? 'opacity-50' : ''}`}
-        disabled={!canCreate}
-      >
-        <Text className="text-white font-semibold text-sm">Crear producto nuevo</Text>
-      </Pressable>
-      <Pressable
-        onPress={() => sheetRef.current?.close()}
-        className="flex-1 bg-slate-100 rounded-xl py-3 items-center"
-      >
-        <Text className="text-slate-700 font-semibold text-sm">Cancelar</Text>
-      </Pressable>
-    </View>
+    <Pressable
+      onPress={() => sheetRef.current?.close()}
+      className="bg-slate-100 dark:bg-slate-700 rounded-xl py-3 items-center"
+    >
+      <Text className="text-slate-700 dark:text-slate-200 font-semibold text-sm">{t('common.cancel')}</Text>
+    </Pressable>
   );
 
   return (
     <BottomSheet
       ref={sheetRef}
-      title="Caja sin etiqueta"
+      title={t('reception.noLabelTitle')}
       header={header}
       footer={actions}
       onClose={onClose}
     >
+      {/* Crear va arriba de los resultados: con descripciones, que haya parecidos no
+          significa que ya exista; solo se oculta si hay uno con la misma descripcion. */}
+      {canCreate && (
+        <Pressable
+          onPress={() => onCreate(term.trim())}
+          className="bg-primary-600 dark:bg-slate-600 rounded-xl py-3 px-4 mb-3 items-center active:opacity-80"
+        >
+          <Text className="text-white font-semibold text-sm" numberOfLines={1}>
+            {t('reception.createWithDescription', { description: term.trim() })}
+          </Text>
+        </Pressable>
+      )}
       {exactMatch && (
-        <Text className="text-xs text-slate-500 mb-2">
-          Ya existe «{exactMatch.description}», selecciónalo de la lista
+        <Text className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+          {t('reception.alreadyExists', { description: exactMatch.description })}
         </Text>
       )}
       {term.trim().length >= 2 && !loading && results.length === 0 ? (
-        <Text className="text-base text-slate-600">No encontre nada parecido</Text>
+        <Text className="text-base text-slate-600 dark:text-slate-300">{t('reception.noMatches')}</Text>
       ) : (
         results.map((product) => (
           <Pressable
             key={product.id}
-            className={`bg-white border shadow-sm rounded-xl p-3 mb-2 ${product.id === exactMatch?.id ? 'border-primary' : 'border-slate-200'}`}
+            className={`bg-white dark:bg-slate-900 border shadow-sm rounded-xl p-3 mb-2 ${product.id === exactMatch?.id ? 'border-primary' : 'border-slate-200 dark:border-slate-700'}`}
             onPress={() => onSelect(product)}
           >
-            <Text className="text-sm font-semibold text-slate-800">
-              {product.description || 'Sin descripción'}
+            <Text className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              {product.description || t('reception.noDescription')}
             </Text>
-            <Text className="text-xs font-semibold text-slate-500">
-              Requiere ensamble: {product.needAssembly ? 'Si' : 'No'}
+            <Text className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              {t('reception.needsAssembly', {
+                value: product.needAssembly ? t('common.yes') : t('common.no'),
+              })}
             </Text>
           </Pressable>
         ))

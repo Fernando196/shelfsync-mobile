@@ -1,139 +1,84 @@
 import { PillTone } from '../components/item/StatusPill';
 import { EnumItemStatus } from '../interfaces/enum/itemStatus.type';
 import { ButtonVariant } from './styles.const';
+import i18n from '../i18n';
+import es from '../i18n/locales/es';
+
+type ActionKey = keyof typeof es.actions;
+
+// `label` es un getter: se traduce al leerlo, asi todos los usos siguen el idioma actual.
+function status(key: EnumItemStatus, tone: PillTone) {
+  return {
+    get label() {
+      return i18n.t(`status.${key}`);
+    },
+    tone,
+  };
+}
+
+function action(
+  key: ActionKey,
+  to: EnumItemStatus,
+  variant: ButtonVariant,
+  needsComment?: boolean,
+  needsPrice?: boolean,
+): ItemAction {
+  return {
+    get label() {
+      return i18n.t(`actions.${key}`);
+    },
+    to,
+    variant,
+    needsComment,
+    needsPrice,
+  };
+}
 
 export const ITEM_STATUS: Record<EnumItemStatus, { label: string; tone: PillTone }> = {
-  received: {
-    label: 'Recibido',
-    tone: 'neutral',
-  },
-  pending_assembly: {
-    label: 'Por armar',
-    tone: 'warning',
-  },
-  assembling: {
-    label: 'Armando',
-    tone: 'info',
-  },
-  ready: {
-    label: 'Listo',
-    tone: 'success',
-  },
-  sold: {
-    label: 'Vendido',
-    tone: 'neutral',
-  },
-  damaged: {
-    label: 'Dañado',
-    tone: 'danger',
-  },
-  paused: {
-    label: 'En pausa',
-    tone: 'warning',
-  },
+  received: status(EnumItemStatus.RECEIVED, 'neutral'),
+  pending_assembly: status(EnumItemStatus.PENDING_ASSEMBLY, 'warning'),
+  assembling: status(EnumItemStatus.ASSEMBLING, 'info'),
+  ready: status(EnumItemStatus.READY, 'success'),
+  sold: status(EnumItemStatus.SOLD, 'neutral'),
+  damaged: status(EnumItemStatus.DAMAGED, 'danger'),
+  paused: status(EnumItemStatus.PAUSED, 'warning'),
 };
 
 export type ItemAction = {
-  label: string;
+  readonly label: string;
   to: EnumItemStatus;
   needsComment?: boolean;
+  // Vendido: pide en cuanto se vendio y lo guarda como precio de venta.
+  needsPrice?: boolean;
   variant: ButtonVariant;
 };
 
+const damaged = () => action('damaged', EnumItemStatus.DAMAGED, 'danger', true);
+const sold = () => action('sold', EnumItemStatus.SOLD, 'primary', false, true);
+
 export const ITEM_ACTIONS: Record<EnumItemStatus, ItemAction[]> = {
   [EnumItemStatus.RECEIVED]: [
-    {
-      label: 'Requiere ensamble',
-      to: EnumItemStatus.PENDING_ASSEMBLY,
-      variant: 'secondary',
-    },
-    {
-      label: 'Vendido',
-      to: EnumItemStatus.SOLD,
-      variant: 'primary',
-    },
-    {
-      label: 'Dañado',
-      to: EnumItemStatus.DAMAGED,
-      needsComment: true,
-      variant: 'danger',
-    },
+    action('requiresAssembly', EnumItemStatus.PENDING_ASSEMBLY, 'secondary'),
+    sold(),
+    damaged(),
   ],
   [EnumItemStatus.PENDING_ASSEMBLY]: [
-    {
-      label: 'Iniciar ensamble',
-      to: EnumItemStatus.ASSEMBLING,
-      variant: 'primary',
-    },
-    {
-      label: 'Dañado',
-      to: EnumItemStatus.DAMAGED,
-      needsComment: true,
-      variant: 'danger',
-    },
+    action('startAssembly', EnumItemStatus.ASSEMBLING, 'primary'),
+    damaged(),
   ],
   [EnumItemStatus.ASSEMBLING]: [
-    {
-      label: 'Terminado',
-      to: EnumItemStatus.READY,
-      variant: 'primary',
-    },
-    {
-      label: 'Pausar',
-      to: EnumItemStatus.PAUSED,
-      variant: 'secondary',
-    },
-    {
-      label: 'Cancelar ensamble',
-      to: EnumItemStatus.PENDING_ASSEMBLY,
-      variant: 'secondary',
-    },
-    {
-      label: 'Dañado',
-      to: EnumItemStatus.DAMAGED,
-      needsComment: true,
-      variant: 'danger',
-    },
+    action('finished', EnumItemStatus.READY, 'primary'),
+    action('pause', EnumItemStatus.PAUSED, 'secondary'),
+    action('cancelAssembly', EnumItemStatus.PENDING_ASSEMBLY, 'secondary'),
+    damaged(),
   ],
   [EnumItemStatus.PAUSED]: [
-    {
-      label: 'Reanudar',
-      to: EnumItemStatus.ASSEMBLING,
-      variant: 'primary',
-    },
-    {
-      label: 'Cancelar ensamble',
-      to: EnumItemStatus.PENDING_ASSEMBLY,
-      variant: 'secondary',
-    },
-    {
-      label: 'Dañado',
-      to: EnumItemStatus.DAMAGED,
-      needsComment: true,
-      variant: 'danger',
-    },
+    action('resume', EnumItemStatus.ASSEMBLING, 'primary'),
+    action('cancelAssembly', EnumItemStatus.PENDING_ASSEMBLY, 'secondary'),
+    damaged(),
   ],
-  [EnumItemStatus.READY]: [
-    {
-      label: 'Vendido',
-      to: EnumItemStatus.SOLD,
-      variant: 'primary',
-    },
-    {
-      label: 'Dañado',
-      to: EnumItemStatus.DAMAGED,
-      needsComment: true,
-      variant: 'danger',
-    },
-  ],
-  [EnumItemStatus.SOLD]: [
-    {
-      label: 'Dañado',
-      to: EnumItemStatus.DAMAGED,
-      needsComment: true,
-      variant: 'danger',
-    },
-  ],
+  [EnumItemStatus.READY]: [sold(), damaged()],
+  [EnumItemStatus.SOLD]: [damaged()],
   [EnumItemStatus.DAMAGED]: [],
 };
 

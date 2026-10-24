@@ -5,13 +5,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SessionProvider, useSession } from '../state/SessionContext';
 import { useAutoReconnectPrinter } from '../hooks/useAutoReconnectPrinter';
 import LoginScreen from '../screens/auth/LoginScreen';
-import CreatePinScreen from '../screens/auth/CreatePinScreen';
-import PinUnlockScreen from '../screens/auth/PinUnlockScreen';
 import MainTabs from './MainTabs';
 import ItemDetailScreen from '../screens/ItemDetailScreen';
 import EditProductScreen from '../screens/EditProductScreen';
 import { useRefreshCategories } from '../hooks/useRefreshCategories';
 import { InventoryProvider } from '../state/InventoryContext';
+import { COLORS } from '../const/theme.const';
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -23,35 +22,26 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function Splash() {
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <ActivityIndicator color="#4f46e5" />
+    <View className="flex-1 items-center justify-center bg-white dark:bg-slate-900">
+      <ActivityIndicator color={COLORS.primary} />
     </View>
   );
 }
 
 function Gate() {
-  const { loading, hasToken, hasPin, unlocked } = useSession();
-  useAutoReconnectPrinter(unlocked);
-  useRefreshCategories(unlocked);
+  const { loading, hasToken } = useSession();
+  useAutoReconnectPrinter(hasToken);
+  useRefreshCategories(hasToken);
 
   if (loading) return <Splash />;
   if (!hasToken) return <LoginScreen />;
-  if (!hasPin) return <CreatePinScreen />;
-  if (!unlocked) return <PinUnlockScreen />;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={MainTabs} />
-      <Stack.Screen
-        name="ItemDetail"
-        component={ItemDetailScreen}
-        options={{ headerShown: true, title: 'Detalle', headerTintColor: '#4f46e5' }}
-      />
-      <Stack.Screen
-        name="EditProduct"
-        component={EditProductScreen}
-        options={{ headerShown: true, title: 'Editar', headerTintColor: '#4f46e5' }}
-      />
+      {/* Sin header nativo: cada pantalla pinta su encabezado con BackButton */}
+      <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
+      <Stack.Screen name="EditProduct" component={EditProductScreen} />
     </Stack.Navigator>
   );
 }

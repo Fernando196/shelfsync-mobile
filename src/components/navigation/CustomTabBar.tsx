@@ -4,26 +4,41 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Boxes, Settings, ScanLine } from 'lucide-react-native';
 import { hapticTap } from '../../lib/haptics';
+import { COLORS } from '../../const/theme.const';
+import { useTranslation } from 'react-i18next';
 
 const ICONS: Record<string, any> = {
   Inventory: Boxes,
   Settings: Settings,
 };
 
-const LABELS: Record<string, string> = {
-  Inventory: 'Inventario',
-  Settings: 'Ajustes',
-};
+const LABEL_KEYS = {
+  Inventory: 'tabs.inventory',
+  Settings: 'tabs.settings',
+} as const;
 
 export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const pulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    // isInteraction: false — on web this runs in JS, and an endless "interaction" blocks
+    // InteractionManager, so FlatList never renders past its first 10 rows.
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 1.08, duration: 900, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 1, duration: 900, useNativeDriver: true }),
+        Animated.timing(pulse, {
+          toValue: 1.08,
+          duration: 900,
+          useNativeDriver: true,
+          isInteraction: false,
+        }),
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 900,
+          useNativeDriver: true,
+          isInteraction: false,
+        }),
       ]),
     );
     loop.start();
@@ -51,18 +66,20 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
         }}
         className="flex-1 items-center justify-center py-2 active:scale-95"
       >
-        <Icon size={22} color={focused ? '#4f46e5' : '#94a3b8'} />
+        <Icon size={22} color={focused ? COLORS.primary : '#94a3b8'} />
         <Text
-          className={`text-[10px] mt-1 font-medium ${focused ? 'text-primary-600' : 'text-slate-400'}`}
+          className={`text-[10px] mt-1 font-medium ${focused ? 'text-primary-600 dark:text-slate-200' : 'text-slate-400'}`}
         >
-          {LABELS[route.name] ?? route.name}
+          {route.name in LABEL_KEYS
+            ? t(LABEL_KEYS[route.name as keyof typeof LABEL_KEYS])
+            : route.name}
         </Text>
       </Pressable>
     );
   };
 
   return (
-    <View style={{ paddingBottom: insets.bottom }} className="bg-white border-t border-slate-200">
+    <View style={{ paddingBottom: insets.bottom }} className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
       <View className="flex-row items-center" style={{ height: 60 }}>
         {leftRoutes.map(renderTab)}
         <View style={{ width: 72 }} />
@@ -77,7 +94,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
               navigation.navigate('Scanner');
             }}
             className={`w-16 h-16 rounded-full items-center justify-center shadow-lg active:scale-95 ${
-              scannerFocused ? 'bg-primary-700' : 'bg-primary-600'
+              scannerFocused ? 'bg-accent-700' : 'bg-accent-600'
             }`}
             style={{ elevation: 6 }}
           >

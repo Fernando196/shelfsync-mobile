@@ -1,4 +1,6 @@
 import { useRef } from 'react';
+import { SoldPriceSheet } from './SoldPriceSheet';
+import { useTranslation } from 'react-i18next';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import ButtonPill from '../ui/ButtonPill';
 import { Text, View } from 'react-native';
@@ -22,18 +24,27 @@ export function ItemStatusSheet({
   onUpdate: (item: IInventoryItem) => void;
   onViewDetail: () => void;
 }) {
+  const { t } = useTranslation();
   const sheetRef = useRef<BottomSheetHandle>(null);
   const actions = ITEM_ACTIONS[item.status] ?? [];
+  // El cambio de estatus puede responder sin fotos/producto: se combina con el item escaneado.
   const { changing, handleAction, pendingAction, runAction, cancelComment } = useItemStatusAction(
     item.id,
-    onUpdate,
+    (next) => onUpdate({ ...item, ...next }),
   );
 
   const status = getItemStatus(item);
 
-  return pendingAction ? (
+  return pendingAction?.needsPrice ? (
+    <SoldPriceSheet
+      currentPrice={item.price}
+      onClose={cancelComment}
+      onConfirm={(price) => runAction(pendingAction, undefined, price)}
+      loading={changing}
+    />
+  ) : pendingAction ? (
     <CommentSheet
-      title="Motivo del daño"
+      title={t('statusSheet.damageReason')}
       onClose={cancelComment}
       onConfirm={(comment) => runAction(pendingAction, comment)}
       loading={changing}
@@ -41,25 +52,27 @@ export function ItemStatusSheet({
   ) : (
     <BottomSheet
       ref={sheetRef}
-      title={`Cambiar estatus de la caja ${formatItemCode(item.code)}`}
+      title={t('statusSheet.title', { code: formatItemCode(item.code) })}
       onClose={onClose}
     >
-      <View className="flex flex-row items-center bg-slate-200 p-3 rounded-md">
-        <View className="w-12 h-12 rounded-xl bg-slate-100 items-center justify-center mr-3">
+      <View className="flex flex-row items-center bg-slate-200 dark:bg-slate-600 p-3 rounded-md">
+        <View className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 items-center justify-center mr-3">
           <Package size={22} color="#64748b" />
         </View>
         <View className="flex-1">
           <View className="flex flex-row justify-between">
-            <Text className="text-base font-semibold text-slate-800 flex-1 mr-2" numberOfLines={2}>
-              {item.name || item.productLookup.description || 'Sin descripción'}
+            <Text className="text-base font-semibold text-slate-800 dark:text-slate-100 flex-1 mr-2" numberOfLines={2}>
+              {item.name || item.productLookup.description || t('reception.noDescription')}
             </Text>
             {status ? <StatusPill label={status.label} tone={status.tone} /> : null}
           </View>
-          <Text className="text-slate-500 text-sm mt-0.5">
-            Barcode: {item.productLookup.barcode || 'Sin codigo de barras'}
+          <Text className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+            {t('reception.barcode', {
+              value: item.productLookup.barcode || t('reception.noBarcode'),
+            })}
           </Text>
-          <Text className="text-slate-500 text-sm mt-0.5">
-            SKU: {item.productLookup.sku || 'Sin sku'}
+          <Text className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+            {t('reception.sku', { value: item.productLookup.sku || t('reception.noSku') })}
           </Text>
         </View>
       </View>
@@ -76,11 +89,11 @@ export function ItemStatusSheet({
         <ButtonPill
           disabled={changing}
           onPress={onViewDetail}
-          label={'Ver detalle'}
+          label={t('statusSheet.viewDetail')}
           variant={'secondary'}
         />
         <ButtonPill
-          label="Cancelar"
+          label={t('common.cancel')}
           variant="secondary"
           onPress={() => sheetRef.current?.close()}
         />

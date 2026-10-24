@@ -1,10 +1,11 @@
 import * as SecureStore from 'expo-secure-store';
 import { readJSON, writeJSON, removeKey, STORAGE_KEYS } from './storage';
 
-// El PIN y el token del backend se guardan en SecureStore (Keychain/Keystore,
-// cifrado a nivel de OS). El perfil local (nombre/rol, no sensible) se guarda
-// en AsyncStorage junto con la cola de sincronizacion.
-const PIN_SECURE_KEY = 'mp210_operator_pin';
+// El token del backend se guarda en SecureStore (Keychain/Keystore, cifrado a
+// nivel de OS). El perfil local (nombre/rol, no sensible) se guarda en
+// AsyncStorage. El PIN se quito: la llave solo se conserva para borrar el PIN
+// que quedo guardado en dispositivos de versiones anteriores.
+const LEGACY_PIN_SECURE_KEY = 'mp210_operator_pin';
 const TOKEN_SECURE_KEY = 'mp210_access_token';
 
 // El perfil ya no se captura a mano: viene del `user` que devuelve el login
@@ -31,8 +32,7 @@ export async function saveAccessToken(token: string): Promise<void> {
   await SecureStore.setItemAsync(TOKEN_SECURE_KEY, token);
 }
 
-// --- Perfil local + PIN: se piden una sola vez despues del login, y desde
-// entonces desbloquean la app sin volver a hablar con el backend. ---
+// --- Perfil local: se guarda una sola vez despues del login. ---
 
 export async function getProfile(): Promise<OperatorProfile | null> {
   return readJSON<OperatorProfile>(STORAGE_KEYS.profile);
@@ -59,24 +59,10 @@ export async function saveProfileFromUser(user: {
   return profile;
 }
 
-export async function hasPin(): Promise<boolean> {
-  return (await SecureStore.getItemAsync(PIN_SECURE_KEY)) !== null;
-}
-
-export async function setPin(pin: string): Promise<void> {
-  await SecureStore.setItemAsync(PIN_SECURE_KEY, pin);
-}
-
-export async function verifyPin(pin: string): Promise<boolean> {
-  const saved = await SecureStore.getItemAsync(PIN_SECURE_KEY);
-  return saved !== null && saved === pin;
-}
-
-/** Borra token, PIN y perfil local (cierre de sesion completo: login,
- * registro local y PIN se vuelven a pedir). No toca el inventario ya
- * sincronizado en el backend. */
+/** Borra token y perfil local (cierre de sesion completo: se vuelve a pedir
+ * el login). No toca el inventario en el backend. */
 export async function resetSession(): Promise<void> {
-  await SecureStore.deleteItemAsync(PIN_SECURE_KEY);
+  await SecureStore.deleteItemAsync(LEGACY_PIN_SECURE_KEY);
   await SecureStore.deleteItemAsync(TOKEN_SECURE_KEY);
   await removeKey(STORAGE_KEYS.profile);
 }

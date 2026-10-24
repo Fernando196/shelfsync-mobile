@@ -5,6 +5,7 @@ export const STORAGE_KEYS = {
   lastPrinter: 'shelfsync:last-printer',
   labelFormat: 'shelfsync:label-format',
   categories: 'shelfsync:categories',
+  language: 'shelfsync:language',
 } as const;
 
 export async function readJSON<T>(key: string): Promise<T | null> {
