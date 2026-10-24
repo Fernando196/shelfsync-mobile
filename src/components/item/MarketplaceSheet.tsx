@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, Share, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import * as Clipboard from 'expo-clipboard';
 import { Check, Copy, Download } from 'lucide-react-native';
 import { BottomSheet, BottomSheetHandle } from '../ui/BottomSheet';
 import { IInventoryItem } from '../../interfaces/item.interface';
@@ -40,9 +41,7 @@ export function MarketplaceSheet({ item, onClose }: MarketplaceSheetProps) {
 
   const copy = async (key: string, value: string) => {
     hapticTap();
-    // Sin modulo de portapapeles en este build: el menu de compartir de Android
-    // trae "Copiar" y tambien deja mandarlo directo a Facebook.
-    await Share.share({ message: value });
+    await Clipboard.setStringAsync(value);
     setCopied(key);
     setTimeout(() => setCopied((c) => (c === key ? null : c)), 1500);
   };

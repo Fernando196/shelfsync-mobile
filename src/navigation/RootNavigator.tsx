@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { View, ActivityIndicator, useColorScheme } from 'react-native';
+import { DarkTheme, DefaultTheme, NavigationContainer, Theme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SessionProvider, useSession } from '../state/SessionContext';
 import { useAutoReconnectPrinter } from '../hooks/useAutoReconnectPrinter';
@@ -19,6 +19,14 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
+// Fondo de las pantallas durante las transiciones: igual a bg-surface / dark:bg-slate-950,
+// si no en modo oscuro se ve un destello blanco al navegar.
+const lightTheme: Theme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: '#f8fafc' } };
+const darkTheme: Theme = {
+  ...DarkTheme,
+  colors: { ...DarkTheme.colors, background: '#020617', card: '#0f172a' },
+};
 
 function Splash() {
   return (
@@ -47,10 +55,11 @@ function Gate() {
 }
 
 export default function RootNavigator() {
+  const scheme = useColorScheme();
   return (
     <SessionProvider>
       <InventoryProvider>
-        <NavigationContainer>
+        <NavigationContainer theme={scheme === 'dark' ? darkTheme : lightTheme}>
           <Gate />
         </NavigationContainer>
       </InventoryProvider>

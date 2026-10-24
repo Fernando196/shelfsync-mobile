@@ -4,7 +4,7 @@
     "slug": "mp210-inventario",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": true,
@@ -18,7 +18,7 @@
       "package": "dev.fernandomorales.shelfsync",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#4f46e5"
+        "backgroundColor": "#334155"
       },
       "permissions": [
         "android.permission.CAMERA",
@@ -36,7 +36,9 @@
         "react-native-ble-plx",
         {
           "isBackgroundEnabled": false,
-          "modes": ["central"],
+          "modes": [
+            "central"
+          ],
           "bluetoothAlwaysPermission": "Se usa Bluetooth para conectarse a la impresora MP210 y generar etiquetas."
         }
       ],
@@ -58,6 +60,16 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "Se usa la ubicacion para registrar donde esta el mueble dentro de la bodega."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Se usan fotos para documentar articulos del inventario.",
+          "savePhotosPermission": "Se guardan las fotos de los muebles para publicarlos en Marketplace.",
+          "granularPermissions": [
+            "photo"
+          ]
         }
       ],
       "expo-image",
